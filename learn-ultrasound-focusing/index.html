@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Video Plotter</title>
+    </head>
+    <body>
+        <h1>Video Plotter</h1>
+        <form id="controls">
+            <fieldset>
+                <legend>Single Element Animation</legend>
+                <label>
+                    Delay Time (seconds):
+                    <input
+                        type="number"
+                        id="delayTime"
+                        value="0.0001"
+                        step="0.00001"
+                        min="0"
+                    />
+                </label>
+                <label>
+                    Current Time (seconds):
+                    <input
+                        type="number"
+                        id="currentTime"
+                        value="0"
+                        step="0.00001"
+                        min="0"
+                    />
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>Transducer Parameters (Future Use)</legend>
+                <label>
+                    Number of elements:
+                    <input
+                        type="number"
+                        id="numElements"
+                        value="32"
+                        min="1"
+                        step="1"
+                    />
+                </label>
+                <label>
+                    Pitch:
+                    <input type="number" id="pitch" value="0.5" step="0.1" />
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>Target (Future Use)</legend>
+                <label
+                    ><input
+                        type="radio"
+                        name="targetType"
+                        value="linear"
+                        checked
+                    />
+                    Linear</label
+                >
+                <label
+                    ><input type="radio" name="targetType" value="point" />
+                    Point</label
+                >
+                <div id="linearControls">
+                    <label>
+                        Angle:
+                        <input type="number" id="angle" value="0" step="0.1" />
+                    </label>
+                </div>
+                <div id="pointControls" style="display: none">
+                    <label>
+                        X:
+                        <input type="number" id="x" value="0" step="0.1" />
+                    </label>
+                    <label>
+                        Y:
+                        <input type="number" id="y" value="0" step="0.1" />
+                    </label>
+                </div>
+            </fieldset>
+            <button type="button" id="generate">Generate Frame</button>
+        </form>
+
+        <div id="movie">
+            <canvas
+                id="animationCanvas"
+                width="640"
+                height="480"
+                style="border: 1px solid #ccc"
+            ></canvas>
+            <div>
+                <button id="prevFrame">Prev Frame</button>
+                <button id="nextFrame">Next Frame</button>
+                <button id="downloadFrame">Download Frame</button>
+                <button id="downloadMovie">Download Movie</button>
+            </div>
+        </div>
+
+        <script type="module" src="/src/main.ts"></script>
+    </body>
+</html>
