@@ -24,10 +24,16 @@ const createMockCanvas = () => {
     fillText: jest.fn(),
     drawImage: jest.fn(),
     fillRect: jest.fn(),
+    save: jest.fn(),
+    restore: jest.fn(),
+    translate: jest.fn(),
+    rotate: jest.fn(),
+    setLineDash: jest.fn(),
     fillStyle: "",
     strokeStyle: "",
     lineWidth: 0,
     font: "",
+    textAlign: "start",
   } as unknown as CanvasRenderingContext2D;
 
   (canvas.getContext as jest.Mock).mockReturnValue(ctx);
@@ -78,7 +84,7 @@ describe("Multi-Element ArrayElement Functionality", () => {
     });
 
     it("should position elements at correct x coordinate", () => {
-      const elements = createElementArray(10, 5.0, 0.001, mockCanvas);
+      const elements = createElementArray(10, 50, 0.001, mockCanvas);
       const expectedX = mockCanvas.width * 0.4; // 40% from left
 
       elements.forEach((element) => {
@@ -86,30 +92,28 @@ describe("Multi-Element ArrayElement Functionality", () => {
       });
     });
 
-    it("should space elements correctly with pitch conversion", () => {
-      const pitchMm = 4.0;
-      const expectedPitchPx = pitchMm * 10; // 1mm = 10px conversion
-      const elements = createElementArray(5, pitchMm, 0.001, mockCanvas);
+    it("should space elements correctly with pitch in pixels", () => {
+      const pitch = 40;
+      const elements = createElementArray(5, pitch, 0.001, mockCanvas);
 
       // Check spacing between consecutive elements
       for (let i = 1; i < elements.length; i++) {
         const spacing = elements[i].y - elements[i - 1].y;
-        expect(spacing).toBeCloseTo(expectedPitchPx);
+        expect(spacing).toBeCloseTo(pitch);
       }
     });
 
     it("should center array vertically on canvas", () => {
       const numElements = 6;
-      const pitchMm = 5.0;
-      const pitchPx = pitchMm * 10;
+      const pitch = 50;
       const elements = createElementArray(
         numElements,
-        pitchMm,
+        pitch,
         0.001,
         mockCanvas,
       );
 
-      const totalHeight = (numElements - 1) * pitchPx;
+      const totalHeight = (numElements - 1) * pitch;
       const expectedStartY = (mockCanvas.height - totalHeight) / 2;
 
       expect(elements[0].y).toBeCloseTo(expectedStartY);
@@ -139,7 +143,7 @@ describe("Multi-Element ArrayElement Functionality", () => {
       const elements = createElementArray(4, 1.0, 0.001, mockCanvas); // 1mm pitch
       const spacing = elements[1].y - elements[0].y;
 
-      expect(spacing).toBe(10); // 1mm * 10px/mm
+      expect(spacing).toBe(1); // 1px pitch directly
     });
 
     it("should adapt to different canvas heights", () => {
@@ -378,7 +382,7 @@ describe("Multi-Element ArrayElement Functionality", () => {
       const elements = createElementArray(3, 100.0, 0.001, mockCanvas); // 100mm pitch
 
       expect(() => {
-        elements.forEach((el) => el.draw(ctx, 0.001));
+        elements.forEach((el) => el.draw(ctx, 0.001, 100));
       }).not.toThrow();
     });
 

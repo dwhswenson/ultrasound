@@ -1,6 +1,9 @@
-// Constants for visual animation timing (not physical)
-// These are designed for visual clarity over movie duration, not physical accuracy
-const VISUAL_SPEED_PX_PER_SEC = 200; // pixels per second for visual timing
+// Import shared constants for consistent values across the application
+import {
+  VISUAL_SPEED_PX_PER_SEC,
+  DEFAULT_ELEMENT_RADIUS,
+  DEFAULT_LINE_LENGTH,
+} from "./shared/constants";
 
 /**
  * Represents a single transducer element in a linear array.
@@ -16,8 +19,8 @@ export class ArrayElement {
     x: number,
     y: number,
     delay: number,
-    radius: number = 10,
-    lineLength: number = 200,
+    radius: number = DEFAULT_ELEMENT_RADIUS,
+    lineLength: number = DEFAULT_LINE_LENGTH,
   ) {
     this.x = x;
     this.y = y;
@@ -30,10 +33,14 @@ export class ArrayElement {
    * Draws the element on the given canvas context at global time t.
    * @param ctx Canvas rendering context
    * @param t   Global time in seconds
+   * @param visualSpeedPx Speed of sound in pixels per second
    */
-  draw(ctx: CanvasRenderingContext2D, t: number) {
-    // Use visual speed for screen-appropriate timing
-    const visualSpeedPx = VISUAL_SPEED_PX_PER_SEC;
+  draw(
+    ctx: CanvasRenderingContext2D,
+    t: number,
+    visualSpeedPx: number = VISUAL_SPEED_PX_PER_SEC,
+  ) {
+    // Use visual speed parameter for timing calculations
 
     // 1. Draw main element circle
     ctx.beginPath();

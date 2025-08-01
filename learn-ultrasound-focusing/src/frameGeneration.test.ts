@@ -19,10 +19,16 @@ const createMockCanvas = () => {
     fillText: jest.fn(),
     drawImage: jest.fn(),
     fillRect: jest.fn(),
+    save: jest.fn(),
+    restore: jest.fn(),
+    translate: jest.fn(),
+    rotate: jest.fn(),
+    setLineDash: jest.fn(),
     fillStyle: "",
     strokeStyle: "",
     lineWidth: 0,
     font: "",
+    textAlign: "start",
   } as unknown as CanvasRenderingContext2D;
 
   (canvas.getContext as jest.Mock).mockReturnValue(ctx);
@@ -41,7 +47,7 @@ function drawElementsAtTime(
   time: number,
 ) {
   elements.forEach((element) => {
-    element.draw(ctx, time);
+    element.draw(ctx, time, 100); // Use default speed for tests
   });
 }
 
@@ -105,8 +111,8 @@ describe("Frame Generation Functions", () => {
       const testTime = 0.0015;
       drawElementsAtTime(ctx, elements, testTime);
 
-      expect(drawSpy1).toHaveBeenCalledWith(ctx, testTime);
-      expect(drawSpy2).toHaveBeenCalledWith(ctx, testTime);
+      expect(drawSpy1).toHaveBeenCalledWith(ctx, testTime, 100);
+      expect(drawSpy2).toHaveBeenCalledWith(ctx, testTime, 100);
     });
 
     it("should handle empty array gracefully", () => {
@@ -119,7 +125,7 @@ describe("Frame Generation Functions", () => {
 
       drawElementsAtTime(ctx, [element], 0.0005);
 
-      expect(drawSpy).toHaveBeenCalledWith(ctx, 0.0005);
+      expect(drawSpy).toHaveBeenCalledWith(ctx, 0.0005, 100);
     });
   });
 
@@ -358,7 +364,7 @@ describe("Frame Generation Functions", () => {
       drawElementsAtTime(ctx, elements, 0.0015);
 
       drawSpies.forEach((spy) => {
-        expect(spy).toHaveBeenCalledWith(ctx, 0.0015);
+        expect(spy).toHaveBeenCalledWith(ctx, 0.0015, 100);
       });
     });
 

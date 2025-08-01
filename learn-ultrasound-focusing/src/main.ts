@@ -1,7 +1,14 @@
 import { ArrayElement } from "./arrayElement";
+import {
+  APP_FRAME_RATE,
+  DEFAULT_ELEMENT_RADIUS,
+  DEFAULT_LINE_LENGTH,
+  DEFAULT_ELEMENT_X_POSITION,
+} from "./shared/constants";
 
 // Global variables for DOM elements (initialized in initializeUI)
-let delayTimeInput: HTMLInputElement;
+
+let speedOfSoundInput: HTMLInputElement;
 let currentTimeInput: HTMLInputElement;
 let movieDurationInput: HTMLInputElement;
 let numElementsInput: HTMLInputElement;
@@ -26,6 +33,18 @@ let isPlaying = false;
 let playInterval: number | null = null;
 
 /**
+ * Gets the current speed of sound from the UI input field
+ * Falls back to default value if DOM element is not available (for testing)
+ */
+function getSpeedOfSound(): number {
+  if (speedOfSoundInput && speedOfSoundInput.value) {
+    return parseFloat(speedOfSoundInput.value);
+  }
+  // Fallback for tests or when DOM is not initialized
+  return 100;
+}
+
+/**
  * Creates a frame showing multiple ArrayElements at the specified time.
  */
 async function createMultiElementFrame(
@@ -48,8 +67,6 @@ async function createMultiElementFrame(
     elements,
     delayTime,
     currentTime,
-    numElements,
-    pitch,
     "linear",
     canvasElement,
     context,
@@ -63,22 +80,20 @@ async function createMultiElementFrame(
  */
 async function createMultiElementFrameWithElements(
   elements: ArrayElement[],
-  maxDelayTime: number,
+  _maxDelayTime: number,
   currentTime: number,
-  numElements: number,
-  pitch: number,
   targetType: string,
-  canvasElement: HTMLCanvasElement = canvas,
-  context: CanvasRenderingContext2D = ctx,
+  canvasElement: HTMLCanvasElement,
+  context: CanvasRenderingContext2D,
   targetX?: number,
   targetY?: number,
 ): Promise<ImageBitmap> {
-  // Clear canvas and set white background
+  // Clear the canvas
   context.clearRect(0, 0, canvasElement.width, canvasElement.height);
   context.fillStyle = "white";
   context.fillRect(0, 0, canvasElement.width, canvasElement.height);
 
-  // Draw all elements
+  // Draw elements
   drawElementsAtTime(context, elements, currentTime);
 
   // Draw target point if point targeting
@@ -243,12 +258,7 @@ async function createMultiElementFrameWithElements(
       );
       context.fillStyle = "black"; // Reset color
     } else {
-      const amplitude = calculateWaveAmplitudeAtTarget(
-        elements,
-        targetX,
-        targetY,
-        currentTime,
-      );
+      calculateWaveAmplitudeAtTarget(elements, targetX, targetY, currentTime);
       /*context.fillText(
         `Wave Amplitude at Target: ${(amplitude * 100).toFixed(1)}%`,
         10,
@@ -277,7 +287,7 @@ function calculateWaveAmplitudeAtTarget(
   targetY: number,
   currentTime: number,
 ): number {
-  const visualSpeed = 200; // px/sec, same as in ArrayElement
+  const visualSpeed = getSpeedOfSound(); // px/sec, from user input
   let totalAmplitude = 0;
   let waveCount = 0;
 
@@ -368,7 +378,7 @@ function calculatePointTargetDelays(
   targetX: number,
   targetY: number,
 ): number[] {
-  const visualSpeed = 200; // px/sec, same as in ArrayElement
+  const visualSpeed = getSpeedOfSound(); // px/sec, from user input
 
   // Calculate distances from each element to target
   const distances = elementPositions.map((pos) =>
@@ -388,24 +398,21 @@ function calculatePointTargetDelays(
  */
 function createElementArray(
   numElements: number,
-  pitchMm: number,
-  delays: number[] | number,
-  canvasElement: HTMLCanvasElement = canvas,
+  pitch: number,
+  delays: number | number[],
+  canvasElement: HTMLCanvasElement,
 ): ArrayElement[] {
   const elements: ArrayElement[] = [];
 
-  // Convert pitch from mm to pixels (assume 1mm = 10 pixels for good screen visibility)
-  const pitchPx = pitchMm * 10;
-
   // Calculate total height needed and center the array vertically
-  const totalHeight = (numElements - 1) * pitchPx;
+  const totalHeight = (numElements - 1) * pitch;
   const startY = (canvasElement.height - totalHeight) / 2;
 
   // Position elements horizontally to leave room for trigger lines and waves
-  const elementX = canvasElement.width * 0.4; // 40% from left edge
+  const elementX = canvasElement.width * 0.4;
 
   for (let i = 0; i < numElements; i++) {
-    const elementY = startY + i * pitchPx;
+    const elementY = startY + i * pitch;
     const elementDelay = Array.isArray(delays) ? delays[i] : delays;
     elements.push(new ArrayElement(elementX, elementY, elementDelay));
   }
@@ -428,7 +435,7 @@ async function generateMovie(
 
   // Use visual timeline instead of physical timing
   // The movie duration controls the total visual time
-  const frameRate = 30; // fps - match video encoding rate
+  const frameRate = APP_FRAME_RATE; // Use consistent application frame rate
   const totalFrames = Math.ceil(movieDuration * frameRate);
 
   // Calculate visual delay time as a fraction of total movie duration
@@ -444,19 +451,18 @@ async function generateMovie(
     targetY !== undefined
   ) {
     // Point targeting: calculate individual delays
-    const pitchPx = pitch * 10;
-    const totalHeight = (numElements - 1) * pitchPx;
+    const totalHeight = (numElements - 1) * pitch;
     const startY = (canvas.height - totalHeight) / 2;
-    const elementX = canvas.width * 0.4;
+    const elementX = canvas.width * DEFAULT_ELEMENT_X_POSITION;
 
     const positions = [];
     for (let i = 0; i < numElements; i++) {
-      positions.push({ x: elementX, y: startY + i * pitchPx });
+      positions.push({ x: elementX, y: startY + i * pitch });
     }
 
-    // Calculate delays directly using visual speed (200 px/sec)
+    // Calculate delays directly using visual speed (100 px/sec)
     // This ensures proper convergence in the visual timeline
-    const visualSpeed = 200; // Must match VISUAL_SPEED_PX_PER_SEC in ArrayElement
+    const visualSpeed = getSpeedOfSound(); // Speed from user input
 
     // Calculate distances from each element to target
     const distances = positions.map((pos) =>
@@ -475,9 +481,9 @@ async function generateMovie(
     maxDelayTime = Math.max(...visualDelays);
   } else {
     // Linear targeting: calculate delay so red pulse starts at far left of wire
-    const visualSpeed = 200; // Must match VISUAL_SPEED_PX_PER_SEC in ArrayElement
-    const lineLength = 200; // Default line length from ArrayElement
-    const radius = 10; // Default radius from ArrayElement
+    const visualSpeed = getSpeedOfSound(); // Speed from user input
+    const lineLength = DEFAULT_LINE_LENGTH;
+    const radius = DEFAULT_ELEMENT_RADIUS;
     const linearDelay = (lineLength - radius) / visualSpeed;
     elements = createElementArray(numElements, pitch, linearDelay, canvas);
     maxDelayTime = linearDelay;
@@ -490,8 +496,6 @@ async function generateMovie(
       elements,
       maxDelayTime,
       visualCurrentTime,
-      numElements,
-      pitch,
       targetType,
       canvas,
       ctx,
@@ -517,6 +521,8 @@ function playMovie(): void {
   currentFrame = 0;
   renderFrame(currentFrame);
 
+  // Use consistent frame rate for playback
+  const frameRate = APP_FRAME_RATE;
   playInterval = window.setInterval(() => {
     currentFrame++;
     if (currentFrame >= frames.length) {
@@ -524,7 +530,7 @@ function playMovie(): void {
       return;
     }
     renderFrame(currentFrame);
-  }, 1000 / 30); // 30 fps for smoother playback
+  }, 1000 / frameRate);
 }
 
 /**
@@ -549,8 +555,9 @@ function drawElementsAtTime(
   elements: ArrayElement[],
   time: number,
 ) {
+  const speed = getSpeedOfSound();
   elements.forEach((element) => {
-    element.draw(ctx, time);
+    element.draw(ctx, time, speed);
   });
 }
 
@@ -567,7 +574,9 @@ function renderFrame(idx: number) {
  */
 function initializeUI(): void {
   // Get DOM element references
-  delayTimeInput = document.getElementById("delayTime") as HTMLInputElement;
+  speedOfSoundInput = document.getElementById(
+    "speedOfSound",
+  ) as HTMLInputElement;
   currentTimeInput = document.getElementById("currentTime") as HTMLInputElement;
   movieDurationInput = document.getElementById(
     "movieDuration",
@@ -620,14 +629,13 @@ function initializeUI(): void {
       const targetY = parseFloat(targetYInput.value);
 
       // Create element positions first
-      const pitchPx = pitch * 10;
-      const totalHeight = (numElements - 1) * pitchPx;
+      const totalHeight = (numElements - 1) * pitch;
       const startY = (canvas.height - totalHeight) / 2;
-      const elementX = canvas.width * 0.4;
+      const elementX = canvas.width * DEFAULT_ELEMENT_X_POSITION;
 
       const positions = [];
       for (let i = 0; i < numElements; i++) {
-        positions.push({ x: elementX, y: startY + i * pitchPx });
+        positions.push({ x: elementX, y: startY + i * pitch });
       }
 
       // Calculate point target delays
@@ -639,9 +647,9 @@ function initializeUI(): void {
     } else {
       // Linear target: calculate delay so red pulse starts at far left of wire
       // travelTime = (lineLength - radius) / visualSpeed
-      const visualSpeed = 200; // Must match VISUAL_SPEED_PX_PER_SEC in ArrayElement
-      const lineLength = 200; // Default line length from ArrayElement
-      const radius = 10; // Default radius from ArrayElement
+      const visualSpeed = getSpeedOfSound(); // Speed from user input
+      const lineLength = DEFAULT_LINE_LENGTH;
+      const radius = DEFAULT_ELEMENT_RADIUS;
       const singleDelay = (lineLength - radius) / visualSpeed;
       elements = createElementArray(numElements, pitch, singleDelay, canvas);
       effectiveDelayTime = singleDelay;
@@ -676,8 +684,6 @@ function initializeUI(): void {
       elements,
       effectiveDelayTime,
       currentTime,
-      numElements,
-      pitch,
       targetType,
       canvas,
       ctx,
@@ -707,7 +713,7 @@ function initializeUI(): void {
       targetY = parseFloat(targetYInput.value);
 
       // Validate target point before generating movie
-      const elementX = canvas.width * 0.4;
+      const elementX = canvas.width * DEFAULT_ELEMENT_X_POSITION;
       const validation = validateTargetPoint(
         targetX,
         targetY,
@@ -831,7 +837,10 @@ function initializeUI(): void {
   // Add auto-preview to all parameter inputs
   numElementsInput.addEventListener("input", autoPreview);
   pitchInput.addEventListener("input", autoPreview);
-  delayTimeInput.addEventListener("input", autoPreview);
+  speedOfSoundInput.addEventListener("input", () => {
+    autoPreview();
+    updateSpeedDisplay();
+  });
   targetXInput.addEventListener("input", autoPreview);
   targetYInput.addEventListener("input", autoPreview);
   angleInput.addEventListener("input", autoPreview);
@@ -852,6 +861,7 @@ if (typeof document !== "undefined" && typeof jest === "undefined") {
     document.addEventListener("DOMContentLoaded", initializeUI);
   } else {
     initializeUI();
+    updateSpeedDisplay(); // Initialize speed display
   }
 }
 
@@ -867,6 +877,7 @@ export {
   validateTargetPoint,
   showTargetSetFeedback,
   updateCoordinateDisplay,
+  updateSpeedDisplay,
   downloadMovie,
 };
 
@@ -955,14 +966,14 @@ async function downloadMovieWithMediaRecorder(): Promise<void> {
   if (frames.length === 0) {
     console.log("No frames found, generating movie first...");
     downloadMovieBtn.textContent = "Generating frames...";
-    downloadMovieBtn.disabled = true;
+    (downloadMovieBtn as HTMLButtonElement).disabled = true;
     const numElements = parseInt(numElementsInput.value, 10);
     const pitch = parseFloat(pitchInput.value);
     const movieDuration = parseFloat(movieDurationInput.value);
 
     const targetType =
       (
-        targetRadios.querySelector(
+        document.querySelector(
           'input[name="target"]:checked',
         ) as HTMLInputElement
       )?.value || "linear";
@@ -982,11 +993,12 @@ async function downloadMovieWithMediaRecorder(): Promise<void> {
       targetX,
       targetY,
     );
+    const frameRateForLog = APP_FRAME_RATE;
     console.log(
-      `Generated ${frames.length} frames for ${movieDuration}s duration at ${frameRate}fps`,
+      `Generated ${frames.length} frames for ${movieDuration}s duration at ${frameRateForLog}fps`,
     );
     console.log(
-      `Expected frames: ${Math.ceil(movieDuration * frameRate)}, Actual frames: ${frames.length}`,
+      `Expected frames: ${Math.ceil(movieDuration * frameRateForLog)}, Actual frames: ${frames.length}`,
     );
     downloadMovieBtn.textContent = "Starting video encoding...";
   }
@@ -998,7 +1010,7 @@ async function downloadMovieWithMediaRecorder(): Promise<void> {
   const offscreenCtx = offscreenCanvas.getContext("2d")!;
 
   // Set up canvas stream with consistent frame rate
-  const frameRate = 30;
+  const frameRate = APP_FRAME_RATE;
   const stream = offscreenCanvas.captureStream(frameRate);
   console.log(
     "Created canvas stream with",
@@ -1087,12 +1099,12 @@ async function downloadMovieWithMediaRecorder(): Promise<void> {
 
         // Reset button state
         downloadMovieBtn.textContent = "Download Movie";
-        downloadMovieBtn.disabled = false;
+        (downloadMovieBtn as HTMLButtonElement).disabled = false;
         resolve();
       } catch (error) {
         // Reset button state on error
         downloadMovieBtn.textContent = "Download Movie";
-        downloadMovieBtn.disabled = false;
+        (downloadMovieBtn as HTMLButtonElement).disabled = false;
         reject(error);
       }
     };
@@ -1100,7 +1112,7 @@ async function downloadMovieWithMediaRecorder(): Promise<void> {
     mediaRecorder.onerror = (event) => {
       // Reset button state on error
       downloadMovieBtn.textContent = "Download Movie";
-      downloadMovieBtn.disabled = false;
+      (downloadMovieBtn as HTMLButtonElement).disabled = false;
       reject(new Error(`MediaRecorder error: ${event}`));
     };
 
@@ -1115,7 +1127,7 @@ async function downloadMovieWithMediaRecorder(): Promise<void> {
 
         // Render frames at exact frame rate to match canvas stream
         let frameIndex = 0;
-        const frameDuration = 1000 / frameRate; // Match canvas stream rate exactly
+        const frameDuration = 1000 / frameRate; // Match consistent application frame rate
         const startTime = performance.now();
 
         const renderNextFrame = () => {
@@ -1297,5 +1309,13 @@ function updateCoordinateDisplay(x: number, y: number): void {
   const mouseCoords = document.getElementById("mouseCoords");
   if (mouseCoords) {
     mouseCoords.textContent = `(${Math.round(x)}, ${Math.round(y)})`;
+  }
+}
+
+function updateSpeedDisplay(): void {
+  // Update the speed display span in the HTML
+  const currentSpeed = document.getElementById("currentSpeed");
+  if (currentSpeed) {
+    currentSpeed.textContent = speedOfSoundInput.value;
   }
 }

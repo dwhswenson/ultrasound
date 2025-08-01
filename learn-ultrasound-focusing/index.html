@@ -142,16 +142,17 @@
                 <legend>Animation Timing</legend>
                 <div class="control-group">
                     <label>
-                        Delay Time (seconds):
+                        Speed of Sound (px/s):
                         <input
                             type="number"
-                            id="delayTime"
-                            value="0.0001"
-                            step="0.00001"
-                            min="0"
+                            id="speedOfSound"
+                            value="100"
+                            step="10"
+                            min="20"
+                            max="500"
                         />
                         <small style="display: block; color: #666; margin-top: 2px;">
-                            Note: Not used for linear targeting (auto-calculated)
+                            Controls animation speed - lower is slower, higher is faster
                         </small>
                     </label>
                     <label>
@@ -191,13 +192,13 @@
                         />
                     </label>
                     <label>
-                        Pitch (mm):
+                        Pitch (px):
                         <input
                             type="number"
                             id="pitch"
-                            value="5.0"
-                            step="0.5"
-                            min="1.0"
+                            value="50"
+                            step="5"
+                            min="10"
                         />
                     </label>
                 </div>
@@ -281,7 +282,7 @@
                 • Canvas size: 640×480 pixels<br>
                 • Element position: ~40% from left edge (≈256px)<br>
                 • Current mouse position: <span id="mouseCoords">(hover over canvas)</span><br>
-                • Wave visualization speed: 200 px/sec<br>
+                • Wave visualization speed: <span id="currentSpeed">100</span> px/sec<br>
                 • Green circle = wave convergence at target
             </div>
 

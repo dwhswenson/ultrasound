@@ -27,10 +27,15 @@ const createMockCanvas = () => {
     fillText: jest.fn(),
     fillRect: jest.fn(),
     setLineDash: jest.fn(),
+    save: jest.fn(),
+    restore: jest.fn(),
+    translate: jest.fn(),
+    rotate: jest.fn(),
     fillStyle: "",
     strokeStyle: "",
     lineWidth: 0,
     font: "",
+    textAlign: "start",
   } as unknown as CanvasRenderingContext2D;
 
   (canvas.getContext as jest.Mock).mockReturnValue(ctx);
@@ -202,8 +207,6 @@ describe("Point Targeting Functionality", () => {
         elements,
         0.002,
         0.0015,
-        3,
-        5.0,
         "point",
         canvas,
         ctx,
@@ -226,10 +229,8 @@ describe("Point Targeting Functionality", () => {
 
       await createMultiElementFrameWithElements(
         elements,
-        0.001,
-        0.0005,
-        1,
-        5.0,
+        0.002,
+        0.0015,
         "point",
         canvas,
         ctx,
@@ -245,10 +246,8 @@ describe("Point Targeting Functionality", () => {
 
       await createMultiElementFrameWithElements(
         elements,
-        0.001,
-        0.0005,
-        1,
-        5.0,
+        0.002,
+        0.0015,
         "linear",
         canvas,
         ctx,
@@ -412,10 +411,8 @@ describe("Point Targeting Functionality", () => {
 
       await createMultiElementFrameWithElements(
         elements,
-        0.001,
+        0.002,
         2.0, // Long time to ensure waves reach target
-        1,
-        5.0,
         "point",
         canvas,
         ctx,
@@ -445,10 +442,8 @@ describe("Point Targeting Functionality", () => {
 
       await createMultiElementFrameWithElements(
         elements,
-        0.001,
-        0.5,
-        1,
-        5.0,
+        0.002,
+        0.0015,
         "point",
         canvas,
         ctx,
@@ -475,10 +470,8 @@ describe("Point Targeting Functionality", () => {
 
       await createMultiElementFrameWithElements(
         elements,
-        0.001,
-        0.0005,
-        1,
-        5.0,
+        0.002,
+        0.0015,
         "linear",
         canvas,
         ctx,

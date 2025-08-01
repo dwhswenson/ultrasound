@@ -1,4 +1,5 @@
 import { createMultiElementFrame } from "./main";
+import { VISUAL_SPEED_PX_PER_SEC } from "./shared/constants";
 
 // Mock canvas context and elements for testing
 const createMockCanvas = () => {
@@ -19,10 +20,16 @@ const createMockCanvas = () => {
     fillText: jest.fn(),
     drawImage: jest.fn(),
     fillRect: jest.fn(),
+    save: jest.fn(),
+    restore: jest.fn(),
+    translate: jest.fn(),
+    rotate: jest.fn(),
+    setLineDash: jest.fn(),
     fillStyle: "",
     strokeStyle: "",
     lineWidth: 0,
     font: "",
+    textAlign: "start",
   } as unknown as CanvasRenderingContext2D;
 
   (canvas.getContext as jest.Mock).mockReturnValue(ctx);
@@ -644,12 +651,12 @@ describe("Movie Generation Functionality", () => {
   describe("Visual Speed vs Physical Speed", () => {
     it("should use visual speed for screen-appropriate timing", () => {
       // Visual speed should be much slower than physical speed for visibility
-      const visualSpeedPxPerSec = 200; // From ArrayElement
+      const visualSpeedPxPerSec = VISUAL_SPEED_PX_PER_SEC; // From shared constants
       const physicalSpeedPxPerSec = 1540 * 1000; // Old physical calculation
 
       expect(visualSpeedPxPerSec).toBeLessThan(physicalSpeedPxPerSec);
       expect(visualSpeedPxPerSec).toBeGreaterThan(50); // Fast enough to be interesting
-      expect(visualSpeedPxPerSec).toBeLessThan(500); // Slow enough to observe
+      expect(visualSpeedPxPerSec).toBeLessThan(200); // Slow enough to observe
     });
 
     it("should allow waves to traverse screen in reasonable time", async () => {
