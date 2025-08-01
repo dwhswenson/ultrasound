@@ -155,7 +155,7 @@ describe("ArrayElement", () => {
       element.draw(ctx, justAfterDelay);
 
       const timeSinceEmission = justAfterDelay - 0.001; // 0.0001s
-      const expectedRadius = 1540 * 1000 * timeSinceEmission; // SPEED_OF_SOUND * SCALE * time
+      const expectedRadius = 200 * timeSinceEmission; // VISUAL_SPEED_PX_PER_SEC * time
 
       // Should draw half-circle for wave
       expect(ctx.arc).toHaveBeenCalledWith(
@@ -174,7 +174,7 @@ describe("ArrayElement", () => {
       element.draw(ctx, laterTime);
 
       const timeSinceEmission = laterTime - 0.001; // 0.001s
-      const expectedRadius = 1540 * 1000 * timeSinceEmission; // larger radius
+      const expectedRadius = 200 * timeSinceEmission; // larger radius
 
       expect(ctx.arc).toHaveBeenCalledWith(
         100,
@@ -201,7 +201,7 @@ describe("ArrayElement", () => {
       element.draw(ctx, 0.001); // any positive time
 
       // Should immediately show wave propagation
-      const expectedRadius = 1540 * 1000 * 0.001;
+      const expectedRadius = 200 * 0.001;
       expect(ctx.arc).toHaveBeenCalledWith(
         100,
         200,
@@ -238,15 +238,15 @@ describe("ArrayElement", () => {
     });
   });
 
-  describe("Physics Constants", () => {
-    it("should use correct speed of sound and scale in calculations", () => {
+  describe("Visual Speed Constants", () => {
+    it("should use correct visual speed in calculations", () => {
       element = new ArrayElement(100, 200, 0.001, 10, 200);
 
       const testTime = 0.002; // 0.001s after delay
       element.draw(ctx, testTime);
 
       const timeSinceEmission = 0.001;
-      const expectedRadius = 1540 * 1000 * timeSinceEmission; // 1,540,000 pixels
+      const expectedRadius = 200 * timeSinceEmission; // 200 pixels per second
 
       expect(ctx.arc).toHaveBeenCalledWith(
         100,

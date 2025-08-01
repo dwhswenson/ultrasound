@@ -1,6 +1,6 @@
-// Constants for physical-to-pixel mapping
-const SPEED_OF_SOUND = 1540; // m/s
-const SCALE = 1000; // px per meter (adjust as needed)
+// Constants for visual animation timing (not physical)
+// These are designed for visual clarity over movie duration, not physical accuracy
+const VISUAL_SPEED_PX_PER_SEC = 200; // pixels per second for visual timing
 
 /**
  * Represents a single transducer element in a linear array.
@@ -32,7 +32,8 @@ export class ArrayElement {
    * @param t   Global time in seconds
    */
   draw(ctx: CanvasRenderingContext2D, t: number) {
-    const speedPx = SPEED_OF_SOUND * SCALE; // pixels per second
+    // Use visual speed for screen-appropriate timing
+    const visualSpeedPx = VISUAL_SPEED_PX_PER_SEC;
 
     // 1. Draw main element circle
     ctx.beginPath();
@@ -65,7 +66,7 @@ export class ArrayElement {
     } else {
       // PHASE 2: Half-circle wave propagating to the right
       const timeSinceEmission = t - this.delay;
-      const waveRadius = speedPx * timeSinceEmission;
+      const waveRadius = visualSpeedPx * timeSinceEmission;
 
       if (waveRadius > 0) {
         ctx.beginPath();
