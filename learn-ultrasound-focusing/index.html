@@ -3,98 +3,261 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Video Plotter</title>
+        <title>Ultrasound Array Focusing Visualization</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f5f5f5;
+            }
+
+            h1 {
+                color: #333;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            #controls {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
+            }
+
+            fieldset {
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                margin-bottom: 15px;
+                padding: 15px;
+            }
+
+            legend {
+                font-weight: bold;
+                color: #333;
+                padding: 0 10px;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 10px;
+                color: #555;
+            }
+
+            input[type="number"] {
+                width: 100px;
+                padding: 5px;
+                border: 1px solid #ddd;
+                border-radius: 3px;
+                margin-left: 10px;
+            }
+
+            input[type="radio"] {
+                margin-right: 5px;
+            }
+
+            button {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-right: 10px;
+                margin-bottom: 10px;
+            }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+            button:disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
+            }
+
+            #movie {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                text-align: center;
+            }
+
+            #animationCanvas {
+                border: 2px solid #333;
+                border-radius: 4px;
+                cursor: crosshair;
+                background: #fff;
+            }
+
+            #coordinateInfo {
+                margin-top: 10px;
+                padding: 10px;
+                background-color: #e9ecef;
+                border-radius: 4px;
+                font-family: monospace;
+                font-size: 12px;
+                text-align: left;
+                max-width: 640px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .control-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+                align-items: center;
+            }
+
+            .control-group label {
+                margin-bottom: 0;
+            }
+
+            small {
+                color: #666;
+                font-style: italic;
+            }
+
+            .status-indicator {
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                margin-right: 5px;
+            }
+
+            .status-valid { background-color: #28a745; }
+            .status-invalid { background-color: #dc3545; }
+            .status-neutral { background-color: #6c757d; }
+        </style>
     </head>
     <body>
-        <h1>Video Plotter</h1>
+        <h1>🔊 Ultrasound Array Focusing Visualization</h1>
         <form id="controls">
             <fieldset>
-                <legend>Single Element Animation</legend>
-                <label>
-                    Delay Time (seconds):
-                    <input
-                        type="number"
-                        id="delayTime"
-                        value="0.0001"
-                        step="0.00001"
-                        min="0"
-                    />
-                </label>
-                <label>
-                    Current Time (seconds):
-                    <input
-                        type="number"
-                        id="currentTime"
-                        value="0"
-                        step="0.00001"
-                        min="0"
-                    />
-                </label>
-                <label>
-                    Movie Duration (seconds):
-                    <input
-                        type="number"
-                        id="movieDuration"
-                        value="3.0"
-                        step="0.5"
-                        min="1.0"
-                    />
-                </label>
+                <legend>Animation Timing</legend>
+                <div class="control-group">
+                    <label>
+                        Delay Time (seconds):
+                        <input
+                            type="number"
+                            id="delayTime"
+                            value="0.0001"
+                            step="0.00001"
+                            min="0"
+                        />
+                    </label>
+                    <label>
+                        Current Time (seconds):
+                        <input
+                            type="number"
+                            id="currentTime"
+                            value="0"
+                            step="0.00001"
+                            min="0"
+                        />
+                    </label>
+                    <label>
+                        Movie Duration (seconds):
+                        <input
+                            type="number"
+                            id="movieDuration"
+                            value="3.0"
+                            step="0.5"
+                            min="1.0"
+                        />
+                    </label>
+                </div>
             </fieldset>
             <fieldset>
                 <legend>Transducer Parameters</legend>
-                <label>
-                    Number of elements:
-                    <input
-                        type="number"
-                        id="numElements"
-                        value="16"
-                        min="4"
-                        max="64"
-                        step="1"
-                    />
-                </label>
-                <label>
-                    Pitch (mm):
-                    <input
-                        type="number"
-                        id="pitch"
-                        value="5.0"
-                        step="0.5"
-                        min="1.0"
-                    />
-                </label>
-            </fieldset>
-            <fieldset>
-                <legend>Target (Future Use)</legend>
-                <label
-                    ><input
-                        type="radio"
-                        name="targetType"
-                        value="linear"
-                        checked
-                    />
-                    Linear</label
-                >
-                <label
-                    ><input type="radio" name="targetType" value="point" />
-                    Point</label
-                >
-                <div id="linearControls">
+                <div class="control-group">
                     <label>
-                        Angle:
-                        <input type="number" id="angle" value="0" step="0.1" />
+                        Number of elements:
+                        <input
+                            type="number"
+                            id="numElements"
+                            value="16"
+                            min="4"
+                            max="64"
+                            step="1"
+                        />
+                    </label>
+                    <label>
+                        Pitch (mm):
+                        <input
+                            type="number"
+                            id="pitch"
+                            value="5.0"
+                            step="0.5"
+                            min="1.0"
+                        />
                     </label>
                 </div>
+                <small>Pitch: distance between element centers</small>
+            </fieldset>
+            <fieldset>
+                <legend>🎯 Focusing Target</legend>
+                <div class="control-group">
+                    <label
+                        ><input
+                            type="radio"
+                            name="targetType"
+                            value="linear"
+                            checked
+                        />
+                        Linear (parallel beams)</label
+                    >
+                    <label
+                        ><input type="radio" name="targetType" value="point" />
+                        Point focus</label
+                    >
+                </div>
+
+                <div id="linearControls">
+                    <div class="control-group">
+                        <label>
+                            Beam angle (°):
+                            <input type="number" id="angle" value="0" step="0.1" />
+                        </label>
+                    </div>
+                    <small>All elements fire with same delay for parallel beams</small>
+                </div>
+
                 <div id="pointControls" style="display: none">
-                    <label>
-                        X:
-                        <input type="number" id="x" value="0" step="0.1" />
-                    </label>
-                    <label>
-                        Y:
-                        <input type="number" id="y" value="0" step="0.1" />
-                    </label>
+                    <div class="control-group">
+                        <label>
+                            Target X (px):
+                            <input
+                                type="number"
+                                id="targetX"
+                                value="400"
+                                step="1"
+                                min="0"
+                                max="640"
+                            />
+                        </label>
+                        <label>
+                            Target Y (px):
+                            <input
+                                type="number"
+                                id="targetY"
+                                value="240"
+                                step="1"
+                                min="0"
+                                max="480"
+                            />
+                        </label>
+                    </div>
+                    <small>💡 Click on canvas to set target point | Coordinate system: (0,0) at top-left</small>
+                    <div id="targetStatus" style="margin-top: 10px;">
+                        <span class="status-indicator status-neutral"></span>
+                        <span id="targetStatusText">Set target coordinates</span>
+                    </div>
                 </div>
             </fieldset>
             <button type="button" id="generate">Generate Frame</button>
@@ -102,19 +265,32 @@
         </form>
 
         <div id="movie">
+            <h3>🎬 Animation Canvas</h3>
             <canvas
                 id="animationCanvas"
                 width="640"
                 height="480"
-                style="border: 1px solid #ccc"
+                title="Click to set target point when Point focus is selected"
             ></canvas>
-            <div>
-                <button id="prevFrame">Prev Frame</button>
-                <button id="nextFrame">Next Frame</button>
-                <button id="downloadFrame">Download Frame</button>
-                <button id="downloadMovie">Download Movie</button>
+
+            <div id="coordinateInfo">
+                <strong>Canvas Information:</strong><br>
+                • Canvas size: 640×480 pixels<br>
+                • Element position: ~40% from left edge (≈256px)<br>
+                • Current mouse position: <span id="mouseCoords">(hover over canvas)</span><br>
+                • Wave visualization speed: 200 px/sec<br>
+                • Green circle = wave convergence at target
+            </div>
+
+            <div style="margin-top: 15px;">
+                <button id="prevFrame">⏮ Prev Frame</button>
+                <button id="nextFrame">Next Frame ⏭</button>
+                <button id="downloadFrame">💾 Download Frame</button>
+                <button id="downloadMovie">🎥 Download Movie</button>
             </div>
         </div>
+</text>
+
 
         <script type="module" src="/src/main.ts"></script>
     </body>

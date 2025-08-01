@@ -215,7 +215,7 @@ describe("Multi-Element ArrayElement Functionality", () => {
         20,
       );
       expect(ctx.fillText).toHaveBeenCalledWith(
-        `Delay Time: ${delayTime.toFixed(6)}s`,
+        `Max Delay: ${delayTime.toFixed(6)}s`,
         10,
         40,
       );
