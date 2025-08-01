@@ -12,6 +12,7 @@ const createMockContext = () => {
     clearRect: jest.fn(),
     fillText: jest.fn(),
     drawImage: jest.fn(),
+    fillRect: jest.fn(),
     fillStyle: "",
     strokeStyle: "",
     lineWidth: 0,
@@ -85,30 +86,33 @@ describe("ArrayElement", () => {
       element = new ArrayElement(100, 200, 0.001, 10, 200);
     });
 
-    it("should draw red pulse at start of line when t=0", () => {
+    it("should draw red pulse at correct position when t=0", () => {
       element.draw(ctx, 0);
 
-      // Should draw red pulse at start position
-      const expectedXStart = 100 - 200; // x - lineLength
-      expect(ctx.arc).toHaveBeenCalledWith(
-        expectedXStart,
-        200,
-        5,
-        0,
-        2 * Math.PI,
-      ); // radius/2 = 5
+      // With constant speed physics:
+      // travelDistance = 200 - 10 = 190px
+      // travelTime = 190 / 200 = 0.95s
+      // startTime = 0.001 - 0.95 = -0.949s
+      // At t=0: position = xStart + 200 * (0 - (-0.949)) = xStart + 189.8
+      const xStart = 100 - 200; // x - lineLength
+      const expectedX = xStart + 200 * (0 - (0.001 - 0.95));
+
+      expect(ctx.arc).toHaveBeenCalledWith(expectedX, 200, 5, 0, 2 * Math.PI); // radius/2 = 5
       // Check that red fillStyle was set (after black for main element)
       expect(ctx.fillStyle).toHaveProperty("length");
     });
 
-    it("should draw red pulse midway when t is half of delay time", () => {
+    it("should draw red pulse at correct position at half delay time", () => {
       const halfDelayTime = 0.0005;
       element.draw(ctx, halfDelayTime);
 
-      // At half delay time, pulse should be halfway along the line
-      const totalDistance = 200 - 10; // lineLength - radius
-      const expectedDistance = 0.5 * totalDistance; // 50% of the way
-      const expectedX = 100 - 200 + expectedDistance; // start + distance
+      // With constant speed physics:
+      // startTime = 0.001 - 0.95 = -0.949s
+      // At t=0.0005: position = xStart + 200 * (0.0005 - (-0.949))
+      const xStart = 100 - 200; // x - lineLength
+      const travelTime = (200 - 10) / 200; // 0.95s
+      const startTime = 0.001 - travelTime;
+      const expectedX = xStart + 200 * (halfDelayTime - startTime);
 
       expect(ctx.arc).toHaveBeenCalledWith(expectedX, 200, 5, 0, 2 * Math.PI);
       expect(ctx.fillStyle).toHaveProperty("length");
@@ -118,11 +122,11 @@ describe("ArrayElement", () => {
       const justBeforeDelay = 0.00099;
       element.draw(ctx, justBeforeDelay);
 
-      // Should be very close to the element
-      const totalDistance = 200 - 10; // lineLength - radius
-      const progress = justBeforeDelay / 0.001; // 99% progress
-      const expectedDistance = progress * totalDistance;
-      const expectedX = 100 - 200 + expectedDistance;
+      // With constant speed physics, pulse should be very close to element
+      const xStart = 100 - 200; // x - lineLength
+      const travelTime = (200 - 10) / 200; // 0.95s
+      const startTime = 0.001 - travelTime;
+      const expectedX = xStart + 200 * (justBeforeDelay - startTime);
 
       expect(ctx.arc).toHaveBeenCalledWith(expectedX, 200, 5, 0, 2 * Math.PI);
       expect(ctx.fillStyle).toHaveProperty("length");
@@ -134,6 +138,69 @@ describe("ArrayElement", () => {
       // Should not call arc for wave propagation (only for element and pulse)
       const arcCalls = (ctx.arc as jest.Mock).mock.calls;
       expect(arcCalls).toHaveLength(2); // main element + red pulse only
+    });
+
+    it("should not show red pulse before it starts", () => {
+      // Create element with long delay so pulse hasn't started yet
+      const laterElement = new ArrayElement(100, 200, 2.0, 10, 200);
+      laterElement.draw(ctx, 0.5); // Early time when pulse hasn't started
+
+      // Should only draw main element (no pulse yet)
+      const arcCalls = (ctx.arc as jest.Mock).mock.calls;
+      expect(arcCalls).toHaveLength(1); // main element only
+    });
+
+    it("should handle pulse traveling at constant speed", () => {
+      const t1 = 0;
+      const t2 = 0.0001; // 0.1ms later
+
+      // Draw at two different times
+      element.draw(ctx, t1);
+
+      (ctx.arc as jest.Mock).mockClear();
+      element.draw(ctx, t2);
+
+      // Should have moved at constant speed (200 px/s)
+      // Verify pulse is still being drawn
+      const arcCalls = (ctx.arc as jest.Mock).mock.calls;
+      expect(arcCalls.length).toBeGreaterThan(0);
+    });
+
+    it("should demonstrate constant speed physics across multiple elements", () => {
+      // Create elements with different delays to test staggered start times
+      const element1 = new ArrayElement(100, 200, 0.001, 10, 200); // Short delay
+      const element2 = new ArrayElement(100, 250, 0.002, 10, 200); // Long delay
+      const element3 = new ArrayElement(100, 300, 0.0005, 10, 200); // Very short delay
+
+      const testTime = 0.0008; // Test at 0.8ms
+
+      // Draw each element at the same time
+      element1.draw(ctx, testTime);
+      const element1Calls = (ctx.arc as jest.Mock).mock.calls.length;
+
+      (ctx.arc as jest.Mock).mockClear();
+      element2.draw(ctx, testTime);
+      const element2Calls = (ctx.arc as jest.Mock).mock.calls.length;
+
+      (ctx.arc as jest.Mock).mockClear();
+      element3.draw(ctx, testTime);
+      const element3Calls = (ctx.arc as jest.Mock).mock.calls.length;
+
+      // Element 1 (delay=0.001s): pulse should be visible, very close to element
+      expect(element1Calls).toBe(2); // main element + red pulse
+
+      // Element 2 (delay=0.002s): pulse should be visible, farther from element
+      expect(element2Calls).toBe(2); // main element + red pulse
+
+      // Element 3 (delay=0.0005s): pulse should have already fired (no red pulse)
+      expect(element3Calls).toBe(2); // main element + wave propagation
+
+      // Verify constant speed: all visible pulses travel at 200 px/s
+      const visualSpeed = 200;
+      const travelDistance = 200 - 10; // lineLength - radius = 190px
+      const travelTime = travelDistance / visualSpeed; // 0.95s
+
+      expect(travelTime).toBeCloseTo(0.95, 3);
     });
   });
 

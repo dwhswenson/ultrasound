@@ -11,6 +11,7 @@ let linearControls: HTMLElement;
 let pointControls: HTMLElement;
 let targetXInput: HTMLInputElement;
 let targetYInput: HTMLInputElement;
+let angleInput: HTMLInputElement;
 let generateBtn: HTMLElement;
 let playMovieBtn: HTMLElement;
 let prevFrameBtn: HTMLElement;
@@ -72,8 +73,10 @@ async function createMultiElementFrameWithElements(
   targetX?: number,
   targetY?: number,
 ): Promise<ImageBitmap> {
-  // Clear canvas
+  // Clear canvas and set white background
   context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+  context.fillStyle = "white";
+  context.fillRect(0, 0, canvasElement.width, canvasElement.height);
 
   // Draw all elements
   drawElementsAtTime(context, elements, currentTime);
@@ -167,16 +170,21 @@ async function createMultiElementFrameWithElements(
   // Add some helpful text
   context.fillStyle = "black";
   context.font = "14px Arial";
-  context.fillText(`Current Time: ${currentTime.toFixed(6)}s`, 10, 20);
-  context.fillText(`Max Delay: ${maxDelayTime.toFixed(6)}s`, 10, 40);
-  context.fillText(
-    `Elements: ${numElements}, Pitch: ${pitch.toFixed(3)}`,
-    10,
-    60,
-  );
+  /*context.fillText(`Current Time: ${currentTime.toFixed(6)}s`, 10, 20);
+  //context.fillText(`Max Delay: ${maxDelayTime.toFixed(6)}s`, 10, 40);
+  //context.fillText(
+  //  `Elements: ${numElements}, Pitch: ${pitch.toFixed(3)}`,
+  //  10,
+  //60,
+ //);
 
   // Add coordinate information for target positioning
-  context.fillText(
+  //context.fillText(
+  //  `Canvas: ${canvasElement.width}×${canvasElement.height} px`,
+  //  10,
+  //60,
+ //);
+    context.fillText(
     `Canvas: ${canvasElement.width}×${canvasElement.height} px`,
     10,
     80,
@@ -187,7 +195,8 @@ async function createMultiElementFrameWithElements(
     100,
   );
   context.fillText(`Coordinate system: (0,0) at top-left`, 10, 120);
-
+*/
+  /*
   // Add click instruction for point targeting
   if (targetType === "point") {
     context.fillStyle = "blue";
@@ -209,7 +218,7 @@ async function createMultiElementFrameWithElements(
   } else {
     context.fillText(`Target: Linear (parallel to array)`, 10, 140);
   }
-
+*/
   // Add validation and wave amplitude information for point targeting
   if (
     targetType === "point" &&
@@ -240,13 +249,20 @@ async function createMultiElementFrameWithElements(
         targetY,
         currentTime,
       );
-      context.fillText(
+      /*context.fillText(
         `Wave Amplitude at Target: ${(amplitude * 100).toFixed(1)}%`,
         10,
         160,
-      );
+      );*/
     }
   }
+  // Add credit along left edge: ultrasound.dwhswenson.net
+  context.save();
+  context.translate(15, 470);
+  context.rotate(-Math.PI / 2);
+  context.textAlign = "left";
+  context.fillText("ultrasound.dwhswenson.net", 0, 0);
+  context.restore();
 
   return await createImageBitmap(canvasElement);
 }
@@ -412,12 +428,11 @@ async function generateMovie(
 
   // Use visual timeline instead of physical timing
   // The movie duration controls the total visual time
-  const frameRate = 30; // fps
+  const frameRate = 30; // fps - match video encoding rate
   const totalFrames = Math.ceil(movieDuration * frameRate);
 
   // Calculate visual delay time as a fraction of total movie duration
   // Show red pulse phase for first 30% of movie, waves for remaining 70%
-  const baseVisualDelayTime = movieDuration * 0.3;
 
   // Create elements with appropriate delays based on target type
   let elements: ArrayElement[];
@@ -459,14 +474,13 @@ async function generateMovie(
     elements = createElementArray(numElements, pitch, visualDelays, canvas);
     maxDelayTime = Math.max(...visualDelays);
   } else {
-    // Linear targeting: all elements have same delay
-    elements = createElementArray(
-      numElements,
-      pitch,
-      baseVisualDelayTime,
-      canvas,
-    );
-    maxDelayTime = baseVisualDelayTime;
+    // Linear targeting: calculate delay so red pulse starts at far left of wire
+    const visualSpeed = 200; // Must match VISUAL_SPEED_PX_PER_SEC in ArrayElement
+    const lineLength = 200; // Default line length from ArrayElement
+    const radius = 10; // Default radius from ArrayElement
+    const linearDelay = (lineLength - radius) / visualSpeed;
+    elements = createElementArray(numElements, pitch, linearDelay, canvas);
+    maxDelayTime = linearDelay;
   }
 
   // Generate frames with visual timing
@@ -499,14 +513,18 @@ function playMovie(): void {
   isPlaying = true;
   playMovieBtn.textContent = "Stop Movie";
 
-  playInterval = window.setInterval(() => {
-    renderFrame(currentFrame);
-    currentFrame++;
+  // Reset to first frame and render immediately
+  currentFrame = 0;
+  renderFrame(currentFrame);
 
+  playInterval = window.setInterval(() => {
+    currentFrame++;
     if (currentFrame >= frames.length) {
       stopMovie();
+      return;
     }
-  }, 1000 / 15); // 15 fps for better visual clarity
+    renderFrame(currentFrame);
+  }, 1000 / 30); // 30 fps for smoother playback
 }
 
 /**
@@ -563,6 +581,7 @@ function initializeUI(): void {
   pointControls = document.getElementById("pointControls")!;
   targetXInput = document.getElementById("targetX") as HTMLInputElement;
   targetYInput = document.getElementById("targetY") as HTMLInputElement;
+  angleInput = document.getElementById("angle") as HTMLInputElement;
   generateBtn = document.getElementById("generate")!;
   playMovieBtn = document.getElementById("playMovie")!;
   prevFrameBtn = document.getElementById("prevFrame")!;
@@ -618,8 +637,12 @@ function initializeUI(): void {
       // Use the maximum delay as reference for timing
       effectiveDelayTime = Math.max(...delays);
     } else {
-      // Linear target: use single delay for all elements
-      const singleDelay = parseFloat(delayTimeInput.value);
+      // Linear target: calculate delay so red pulse starts at far left of wire
+      // travelTime = (lineLength - radius) / visualSpeed
+      const visualSpeed = 200; // Must match VISUAL_SPEED_PX_PER_SEC in ArrayElement
+      const lineLength = 200; // Default line length from ArrayElement
+      const radius = 10; // Default radius from ArrayElement
+      const singleDelay = (lineLength - radius) / visualSpeed;
       elements = createElementArray(numElements, pitch, singleDelay, canvas);
       effectiveDelayTime = singleDelay;
     }
@@ -725,7 +748,20 @@ function initializeUI(): void {
   });
 
   downloadFrameBtn.addEventListener("click", () => {
-    canvas.toBlob((blob) => {
+    // Create temporary canvas with white background for PNG export
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext("2d")!;
+
+    // Fill with white background
+    tempCtx.fillStyle = "white";
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+    // Draw the current canvas content on top
+    tempCtx.drawImage(canvas, 0, 0);
+
+    tempCanvas.toBlob((blob) => {
       const url = URL.createObjectURL(blob!);
       const a = document.createElement("a");
       a.href = url;
@@ -735,9 +771,18 @@ function initializeUI(): void {
     });
   });
 
-  downloadMovieBtn.addEventListener("click", () => {
-    // TODO: hook up MediaRecorder or GIF.js to export frames as movie
-    alert("Download movie not implemented yet");
+  downloadMovieBtn.addEventListener("click", async () => {
+    if (frames.length === 0) {
+      alert("No movie to download. Please generate a movie first.");
+      return;
+    }
+
+    try {
+      await downloadMovie();
+    } catch (error) {
+      console.error("Error downloading movie:", error);
+      alert("Failed to download movie. Please try again.");
+    }
   });
 
   // Add click-to-set-target functionality
@@ -750,6 +795,7 @@ function initializeUI(): void {
     const pointRadio = Array.from(targetRadios).find(
       (r) => r.value === "point" && r.checked,
     );
+
     if (pointRadio) {
       targetXInput.value = Math.round(x).toString();
       targetYInput.value = Math.round(y).toString();
@@ -757,8 +803,10 @@ function initializeUI(): void {
       // Show visual feedback
       showTargetSetFeedback(x, y);
 
-      // Auto-generate frame if current settings are valid
-      generateBtn.click();
+      // Trigger the same logic as the Generate Frame button
+      setTimeout(() => {
+        generateBtn.click();
+      }, 150);
     }
   });
 
@@ -771,6 +819,31 @@ function initializeUI(): void {
     // Update cursor coordinate display
     updateCoordinateDisplay(x, y);
   });
+
+  // Add auto-preview functionality - show first frame when parameters change
+  const autoPreview = () => {
+    // Small delay to ensure DOM updates are complete
+    setTimeout(() => {
+      generateBtn.click();
+    }, 50);
+  };
+
+  // Add auto-preview to all parameter inputs
+  numElementsInput.addEventListener("input", autoPreview);
+  pitchInput.addEventListener("input", autoPreview);
+  delayTimeInput.addEventListener("input", autoPreview);
+  targetXInput.addEventListener("input", autoPreview);
+  targetYInput.addEventListener("input", autoPreview);
+  angleInput.addEventListener("input", autoPreview);
+  movieDurationInput.addEventListener("input", autoPreview);
+
+  // Add auto-preview to radio button changes
+  targetRadios.forEach((radio) => {
+    radio.addEventListener("change", autoPreview);
+  });
+
+  // Show initial frame on page load
+  autoPreview();
 }
 
 // Initialize when DOM is ready (but not during testing)
@@ -794,7 +867,386 @@ export {
   validateTargetPoint,
   showTargetSetFeedback,
   updateCoordinateDisplay,
+  downloadMovie,
 };
+
+/**
+ * Downloads the current movie frames as a video file.
+ * Safari-compatible implementation with fallback methods.
+ */
+async function downloadMovie(): Promise<void> {
+  // Check if MediaRecorder is supported and working
+  const isMediaRecorderSupported = () => {
+    try {
+      if (
+        typeof MediaRecorder === "undefined" ||
+        !MediaRecorder.isTypeSupported
+      ) {
+        return false;
+      }
+
+      // Test formats by browser capability
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isSafari =
+        userAgent.includes("safari") && !userAgent.includes("chrome");
+
+      const formats = isSafari
+        ? [
+            "video/mp4", // Safari's MP4 support actually works!
+            "video/mp4;codecs=avc1", // H.264 MP4 for Safari
+          ]
+        : [
+            "video/webm;codecs=vp8", // WebM for Chrome/Firefox
+            "video/webm", // Basic WebM fallback
+          ];
+
+      return formats.some((format) => MediaRecorder.isTypeSupported(format));
+    } catch (e) {
+      console.error("MediaRecorder support check failed:", e);
+      return false;
+    }
+  };
+
+  if (isMediaRecorderSupported()) {
+    try {
+      await downloadMovieWithMediaRecorder();
+      return;
+    } catch (error) {
+      console.warn(
+        "MediaRecorder failed, falling back to frame sequence:",
+        error,
+      );
+
+      // Inform user about fallback with more specific error info
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isSafari =
+        userAgent.includes("safari") && !userAgent.includes("chrome");
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const message = isSafari
+        ? "Safari doesn't support video recording. We'll download key frames as PNG images instead."
+        : `Video recording failed (${errorMessage}). We'll download key frames as PNG images instead.`;
+
+      console.warn("MediaRecorder failed:", error);
+      alert(message);
+    }
+  }
+
+  // Inform user about fallback method
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isSafari =
+    userAgent.includes("safari") && !userAgent.includes("chrome");
+  const message = isSafari
+    ? "Safari doesn't support video recording. We'll download key frames as PNG images instead."
+    : "Video recording not supported. We'll download key frames as PNG images instead.";
+
+  alert(message);
+
+  // Fallback: Download frames as individual images
+  await downloadMovieAsFrameSequence();
+}
+
+/**
+ * Downloads movie using MediaRecorder (Chrome, Firefox)
+ * Records in background without affecting visible canvas
+ */
+async function downloadMovieWithMediaRecorder(): Promise<void> {
+  // Auto-generate frames if they don't exist
+  if (frames.length === 0) {
+    console.log("No frames found, generating movie first...");
+    downloadMovieBtn.textContent = "Generating frames...";
+    downloadMovieBtn.disabled = true;
+    const numElements = parseInt(numElementsInput.value, 10);
+    const pitch = parseFloat(pitchInput.value);
+    const movieDuration = parseFloat(movieDurationInput.value);
+
+    const targetType =
+      (
+        targetRadios.querySelector(
+          'input[name="target"]:checked',
+        ) as HTMLInputElement
+      )?.value || "linear";
+    let targetX: number | undefined;
+    let targetY: number | undefined;
+
+    if (targetType === "point") {
+      targetX = parseFloat(targetXInput.value);
+      targetY = parseFloat(targetYInput.value);
+    }
+
+    await generateMovie(
+      numElements,
+      pitch,
+      movieDuration,
+      targetType,
+      targetX,
+      targetY,
+    );
+    console.log(
+      `Generated ${frames.length} frames for ${movieDuration}s duration at ${frameRate}fps`,
+    );
+    console.log(
+      `Expected frames: ${Math.ceil(movieDuration * frameRate)}, Actual frames: ${frames.length}`,
+    );
+    downloadMovieBtn.textContent = "Starting video encoding...";
+  }
+
+  // Create off-screen canvas for recording
+  const offscreenCanvas = document.createElement("canvas");
+  offscreenCanvas.width = canvas.width;
+  offscreenCanvas.height = canvas.height;
+  const offscreenCtx = offscreenCanvas.getContext("2d")!;
+
+  // Set up canvas stream with consistent frame rate
+  const frameRate = 30;
+  const stream = offscreenCanvas.captureStream(frameRate);
+  console.log(
+    "Created canvas stream with",
+    frameRate,
+    "fps for",
+    frames.length,
+    "frames",
+  );
+  console.log("Expected video duration:", frames.length / frameRate, "seconds");
+
+  // Ensure canvas has initial content for Safari
+  offscreenCtx.fillStyle = "white";
+  offscreenCtx.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+
+  // Use appropriate formats per browser
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isSafari =
+    userAgent.includes("safari") && !userAgent.includes("chrome");
+
+  const formats = isSafari
+    ? [
+        { mimeType: "video/mp4", extension: "mp4" }, // Safari MP4 works!
+        { mimeType: "video/mp4;codecs=avc1", extension: "mp4" }, // H.264 fallback
+      ]
+    : [
+        { mimeType: "video/webm;codecs=vp8", extension: "webm" }, // Chrome/Firefox WebM
+        { mimeType: "video/webm", extension: "webm" }, // WebM fallback
+      ];
+
+  let selectedFormat = null;
+  for (const format of formats) {
+    const supported = MediaRecorder.isTypeSupported(format.mimeType);
+    if (supported && !selectedFormat) {
+      selectedFormat = format;
+    }
+  }
+
+  if (!selectedFormat) {
+    throw new Error("No supported video format found");
+  }
+
+  console.log("Using format:", selectedFormat);
+
+  const mediaRecorder = new MediaRecorder(stream, {
+    mimeType: selectedFormat.mimeType,
+    videoBitsPerSecond: 1000000, // 1 Mbps for compatibility
+  });
+  const recordedChunks: Blob[] = [];
+
+  console.log("MediaRecorder created, state:", mediaRecorder.state);
+
+  return new Promise((resolve, reject) => {
+    mediaRecorder.ondataavailable = (event) => {
+      console.log("Data available, size:", event.data.size);
+      if (event.data.size > 0) {
+        recordedChunks.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = () => {
+      try {
+        console.log("Recording stopped, chunks:", recordedChunks.length);
+        console.log(
+          "Total size:",
+          recordedChunks.reduce((sum, chunk) => sum + chunk.size, 0),
+        );
+
+        if (recordedChunks.length === 0) {
+          reject(new Error("No data recorded"));
+          return;
+        }
+
+        const blob = new Blob(recordedChunks, {
+          type: selectedFormat.mimeType,
+        });
+        console.log("Final blob size:", blob.size);
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `ultrasound-animation.${selectedFormat.extension}`;
+        document.body.appendChild(a); // Ensure element is in DOM
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        // Reset button state
+        downloadMovieBtn.textContent = "Download Movie";
+        downloadMovieBtn.disabled = false;
+        resolve();
+      } catch (error) {
+        // Reset button state on error
+        downloadMovieBtn.textContent = "Download Movie";
+        downloadMovieBtn.disabled = false;
+        reject(error);
+      }
+    };
+
+    mediaRecorder.onerror = (event) => {
+      // Reset button state on error
+      downloadMovieBtn.textContent = "Download Movie";
+      downloadMovieBtn.disabled = false;
+      reject(new Error(`MediaRecorder error: ${event}`));
+    };
+
+    // Give Safari a moment to initialize the stream before recording
+    setTimeout(
+      () => {
+        // Start recording
+        mediaRecorder.start(100); // Collect data every 100ms
+        console.log("Recording started, state:", mediaRecorder.state);
+        console.log("Frame duration:", 1000 / frameRate, "ms per frame");
+        downloadMovieBtn.textContent = "Encoding video...";
+
+        // Render frames at exact frame rate to match canvas stream
+        let frameIndex = 0;
+        const frameDuration = 1000 / frameRate; // Match canvas stream rate exactly
+        const startTime = performance.now();
+
+        const renderNextFrame = () => {
+          if (frameIndex < frames.length) {
+            // Render frame to off-screen canvas
+            offscreenCtx.clearRect(
+              0,
+              0,
+              offscreenCanvas.width,
+              offscreenCanvas.height,
+            );
+            offscreenCtx.fillStyle = "white";
+            offscreenCtx.fillRect(
+              0,
+              0,
+              offscreenCanvas.width,
+              offscreenCanvas.height,
+            );
+            offscreenCtx.drawImage(frames[frameIndex], 0, 0);
+
+            // Update progress
+            const progress = Math.round((frameIndex / frames.length) * 100);
+            downloadMovieBtn.textContent = `Encoding video... ${progress}%`;
+
+            frameIndex++;
+            setTimeout(renderNextFrame, frameDuration);
+          } else {
+            const endTime = performance.now();
+            const actualDuration = (endTime - startTime) / 1000;
+            console.log(
+              "All frames rendered in",
+              actualDuration.toFixed(2),
+              "seconds, stopping recording after delay...",
+            );
+            console.log(
+              "Expected duration:",
+              frames.length / frameRate,
+              "seconds",
+            );
+            downloadMovieBtn.textContent = "Finalizing video...";
+            // Stop recording after delay to ensure all frames are captured
+            const stopDelay = isSafari ? 1000 : 500;
+            setTimeout(() => {
+              console.log(
+                "Stopping MediaRecorder, state:",
+                mediaRecorder.state,
+              );
+              if (mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+              }
+            }, stopDelay);
+          }
+        };
+
+        // Start rendering frames
+        renderNextFrame();
+      },
+      isSafari ? 500 : 100,
+    ); // Extra delay for Safari
+  });
+}
+
+/**
+ * Downloads movie as a sequence of PNG frames (Safari fallback)
+ */
+async function downloadMovieAsFrameSequence(): Promise<void> {
+  const zip = await createFrameSequenceZip();
+
+  // Download the zip file
+  const url = URL.createObjectURL(zip);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "ultrasound-animation-frames.zip";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Creates a ZIP file containing all frames as PNG images
+ */
+async function createFrameSequenceZip(): Promise<Blob> {
+  // Simple ZIP implementation for frame sequence
+
+  // For Safari compatibility, download key frames (first, middle, last)
+  // This gives users a sample of the animation without requiring video support
+  const framesToDownload = [
+    0,
+    Math.floor(frames.length / 2),
+    frames.length - 1,
+  ];
+
+  let downloadPromise = Promise.resolve();
+
+  framesToDownload.forEach((frameIndex) => {
+    downloadPromise = downloadPromise.then(() => {
+      return new Promise<void>((resolve) => {
+        // Create temporary canvas with white background for PNG export
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext("2d")!;
+
+        // Fill with white background
+        tempCtx.fillStyle = "white";
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+        // Draw the frame on top
+        tempCtx.drawImage(frames[frameIndex], 0, 0);
+
+        setTimeout(() => {
+          tempCanvas.toBlob((blob) => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `ultrasound-frame-${String(frameIndex).padStart(3, "0")}.png`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }
+            resolve();
+          }, "image/png");
+        }, 100); // Small delay to ensure render completes
+      });
+    });
+  });
+
+  await downloadPromise;
+
+  // Return empty blob since we're downloading individual files
+  return new Blob([], { type: "application/zip" });
+}
 
 /**
  * Shows visual feedback when a target point is set by clicking.

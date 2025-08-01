@@ -23,6 +23,7 @@ const createMockCanvas = () => {
     clearRect: jest.fn(),
     fillText: jest.fn(),
     drawImage: jest.fn(),
+    fillRect: jest.fn(),
     fillStyle: "",
     strokeStyle: "",
     lineWidth: 0,

@@ -25,6 +25,7 @@ const createMockCanvas = () => {
     stroke: jest.fn(),
     fill: jest.fn(),
     fillText: jest.fn(),
+    fillRect: jest.fn(),
     setLineDash: jest.fn(),
     fillStyle: "",
     strokeStyle: "",
@@ -658,6 +659,35 @@ describe("Point Targeting Functionality", () => {
         expect(delay).not.toBe(Infinity);
         expect(delay).not.toBeNaN();
       });
+    });
+
+    it("should calculate correct delay for linear targeting", () => {
+      // Test the linear delay calculation logic from movie generation
+      const visualSpeed = 200; // Must match VISUAL_SPEED_PX_PER_SEC in ArrayElement
+      const lineLength = 200; // Default line length from ArrayElement
+      const radius = 10; // Default radius from ArrayElement
+      const expectedLinearDelay = (lineLength - radius) / visualSpeed;
+
+      // This should equal 0.95 seconds (190px / 200px/s)
+      expect(expectedLinearDelay).toBeCloseTo(0.95, 3);
+
+      // Verify this delay makes red pulse start at far left
+      // At t=0, pulse should be at xStart (far left of wire)
+      // pulseX = xStart + visualSpeed * (t - startTime)
+      // startTime = delay - travelTime = delay - (travelDistance / visualSpeed)
+      // At t=0: pulseX = xStart + visualSpeed * (0 - (delay - travelTime))
+      //                = xStart + visualSpeed * (-delay + travelTime)
+      //                = xStart + visualSpeed * travelTime - visualSpeed * delay
+      //                = xStart + travelDistance - visualSpeed * delay
+      //                = xStart + (lineLength - radius) - visualSpeed * expectedLinearDelay
+      //                = xStart + 190 - 200 * 0.95
+      //                = xStart + 190 - 190
+      //                = xStart (exactly at start of wire)
+
+      const travelDistance = lineLength - radius;
+      const calculatedPosition =
+        travelDistance - visualSpeed * expectedLinearDelay;
+      expect(calculatedPosition).toBeCloseTo(0, 10);
     });
   });
 

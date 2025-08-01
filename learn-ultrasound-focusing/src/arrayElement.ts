@@ -52,17 +52,25 @@ export class ArrayElement {
 
     // 3. Animation phases
     if (t < this.delay) {
-      // PHASE 1: Red pulse moving towards element
-      // Calculate how far the pulse should travel to hit the element exactly at delay time
-      const totalDistance = this.lineLength - this.radius;
-      const timeToTravel = this.delay;
-      const currentDistance = (t / timeToTravel) * totalDistance;
+      // PHASE 1: Red pulse moving towards element at constant speed
+      // All pulses travel at the same speed but start at different times
+      const travelDistance = this.lineLength - this.radius;
+      const travelTime = travelDistance / visualSpeedPx;
+      const startTime = this.delay - travelTime;
 
-      const cx = xStart + currentDistance;
-      ctx.beginPath();
-      ctx.arc(cx, this.y, this.radius / 2, 0, 2 * Math.PI);
-      ctx.fillStyle = "red";
-      ctx.fill();
+      // Only show pulse if it has started and is on the visible wire
+      if (t >= startTime) {
+        const timeSinceStart = t - startTime;
+        const pulseX = xStart + visualSpeedPx * timeSinceStart;
+
+        // Only draw pulse if it's on the visible wire segment
+        if (pulseX >= xStart && pulseX <= this.x - this.radius) {
+          ctx.beginPath();
+          ctx.arc(pulseX, this.y, this.radius / 2, 0, 2 * Math.PI);
+          ctx.fillStyle = "red";
+          ctx.fill();
+        }
+      }
     } else {
       // PHASE 2: Half-circle wave propagating to the right
       const timeSinceEmission = t - this.delay;
