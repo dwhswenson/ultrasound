@@ -207,11 +207,13 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
 
-      // Should show "Red pulses approaching" text
+      // Should show coordinate information
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
+      expect(ctx.fillText).toHaveBeenCalledWith("Element X: 256 px", 10, 100);
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Red pulses approaching",
+        "Coordinate system: (0,0) at top-left",
         10,
-        80,
+        120,
       );
     });
 
@@ -230,11 +232,13 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
 
-      // Should show "Waves propagating" text
+      // Should show coordinate information
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
+      expect(ctx.fillText).toHaveBeenCalledWith("Element X: 256 px", 10, 100);
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Waves propagating",
+        "Coordinate system: (0,0) at top-left",
         10,
-        80,
+        120,
       );
     });
 
@@ -253,11 +257,7 @@ describe("Movie Generation Functionality", () => {
         canvas,
         ctx,
       );
-      expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Red pulses approaching",
-        10,
-        80,
-      );
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
 
       // Frame just after delay
       jest.clearAllMocks();
@@ -269,11 +269,7 @@ describe("Movie Generation Functionality", () => {
         canvas,
         ctx,
       );
-      expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Waves propagating",
-        10,
-        80,
-      );
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
     });
   });
 
@@ -459,11 +455,7 @@ describe("Movie Generation Functionality", () => {
       );
 
       expect(bitmap).toBeDefined();
-      expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Waves propagating",
-        10,
-        80,
-      );
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
     });
 
     it("should handle very small time steps", async () => {
@@ -506,11 +498,7 @@ describe("Movie Generation Functionality", () => {
       );
 
       expect(bitmap).toBeDefined();
-      expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Waves propagating",
-        10,
-        80,
-      );
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
     });
   });
 
@@ -562,11 +550,7 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
 
-      expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Red pulses approaching",
-        10,
-        80,
-      );
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
     });
 
     it("should show wave phase for last 70% of movie", async () => {
@@ -586,11 +570,7 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
 
-      expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Waves propagating",
-        10,
-        80,
-      );
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
     });
 
     it("should handle different movie durations", async () => {
@@ -628,6 +608,35 @@ describe("Movie Generation Functionality", () => {
 
       expect(visualDelayTime).toBeGreaterThanOrEqual(0.6); // At least 0.6s for red pulse
       expect(waveTime).toBeGreaterThanOrEqual(1.4); // At least 1.4s for wave propagation
+    });
+
+    it("should display comprehensive coordinate information", async () => {
+      const delayTime = 0.001;
+      const currentTime = 0.0005;
+      const numElements = 16;
+      const pitch = 5.0;
+
+      await createMultiElementFrame(
+        delayTime,
+        currentTime,
+        numElements,
+        pitch,
+        canvas,
+        ctx,
+      );
+
+      // Check all coordinate information is displayed
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
+      expect(ctx.fillText).toHaveBeenCalledWith("Element X: 256 px", 10, 100);
+      expect(ctx.fillText).toHaveBeenCalledWith(
+        "Coordinate system: (0,0) at top-left",
+        10,
+        120,
+      );
+
+      // Verify element X calculation (40% of canvas width)
+      const expectedElementX = Math.round(640 * 0.4);
+      expect(expectedElementX).toBe(256);
     });
   });
 

@@ -58,11 +58,18 @@ async function createMultiElementFrame(
     60,
   );
 
-  if (currentTime < delayTime) {
-    context.fillText("Phase: Red pulses approaching", 10, 80);
-  } else {
-    context.fillText("Phase: Waves propagating", 10, 80);
-  }
+  // Add coordinate information for target positioning
+  context.fillText(
+    `Canvas: ${canvasElement.width}×${canvasElement.height} px`,
+    10,
+    80,
+  );
+  context.fillText(
+    `Element X: ${Math.round(canvasElement.width * 0.4)} px`,
+    10,
+    100,
+  );
+  context.fillText(`Coordinate system: (0,0) at top-left`, 10, 120);
 
   return await createImageBitmap(canvasElement);
 }

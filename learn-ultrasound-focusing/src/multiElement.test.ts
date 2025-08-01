@@ -226,23 +226,27 @@ describe("Multi-Element ArrayElement Functionality", () => {
       );
     });
 
-    it("should show correct phase text for pre-delay", async () => {
-      await createMultiElementFrame(0.002, 0.001, 8, 5.0, mockCanvas, ctx); // currentTime < delayTime
+    it("should show coordinate information", async () => {
+      await createMultiElementFrame(0.002, 0.001, 8, 5.0, mockCanvas, ctx);
 
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
+      expect(ctx.fillText).toHaveBeenCalledWith("Element X: 256 px", 10, 100);
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Red pulses approaching",
+        "Coordinate system: (0,0) at top-left",
         10,
-        80,
+        120,
       );
     });
 
-    it("should show correct phase text for post-delay", async () => {
-      await createMultiElementFrame(0.001, 0.002, 8, 5.0, mockCanvas, ctx); // currentTime > delayTime
+    it("should show consistent coordinate information regardless of time", async () => {
+      await createMultiElementFrame(0.001, 0.002, 8, 5.0, mockCanvas, ctx);
 
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
+      expect(ctx.fillText).toHaveBeenCalledWith("Element X: 256 px", 10, 100);
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Waves propagating",
+        "Coordinate system: (0,0) at top-left",
         10,
-        80,
+        120,
       );
     });
 

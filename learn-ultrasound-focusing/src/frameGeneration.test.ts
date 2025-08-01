@@ -75,11 +75,10 @@ function createSingleElementFrameLogic(
   ctx.fillText(`Current Time: ${currentTime.toFixed(6)}s`, 10, 20);
   ctx.fillText(`Delay Time: ${delayTime.toFixed(6)}s`, 10, 40);
 
-  if (currentTime < delayTime) {
-    ctx.fillText("Phase: Red pulse approaching", 10, 60);
-  } else {
-    ctx.fillText("Phase: Wave propagating", 10, 60);
-  }
+  // Add coordinate information for target positioning
+  ctx.fillText(`Canvas: ${canvasWidth}×${canvasHeight} px`, 10, 60);
+  ctx.fillText(`Element X: ${Math.round(canvasWidth * 0.4)} px`, 10, 80);
+  ctx.fillText("Coordinate system: (0,0) at top-left", 10, 100);
 
   return elements;
 }
@@ -181,10 +180,12 @@ describe("Frame Generation Functions", () => {
         10,
         40,
       );
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 60);
+      expect(ctx.fillText).toHaveBeenCalledWith("Element X: 256 px", 10, 80);
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Red pulse approaching",
+        "Coordinate system: (0,0) at top-left",
         10,
-        60,
+        100,
       );
     });
 
@@ -210,10 +211,12 @@ describe("Frame Generation Functions", () => {
         10,
         40,
       );
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 60);
+      expect(ctx.fillText).toHaveBeenCalledWith("Element X: 256 px", 10, 80);
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Wave propagating",
+        "Coordinate system: (0,0) at top-left",
         10,
-        60,
+        100,
       );
     });
 
@@ -262,11 +265,7 @@ describe("Frame Generation Functions", () => {
       );
 
       expect(elements[0].delay).toBe(0);
-      expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Wave propagating",
-        10,
-        60,
-      );
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 60);
     });
 
     it("should handle current time equal to delay time", () => {
@@ -279,11 +278,7 @@ describe("Frame Generation Functions", () => {
         delayTime,
       );
 
-      expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Wave propagating",
-        10,
-        60,
-      );
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 60);
     });
 
     it("should format time display correctly", () => {
@@ -331,28 +326,20 @@ describe("Frame Generation Functions", () => {
       expect(elements[0].delay).toBe(delayTime);
 
       // Verify text was added
-      expect(ctx.fillText).toHaveBeenCalledTimes(3);
+      expect(ctx.fillText).toHaveBeenCalledTimes(5);
     });
 
     it("should handle animation phases correctly in frame generation", () => {
       // Test pre-delay phase
       createSingleElementFrameLogic(ctx, 640, 480, 0.002, 0.001);
-      expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Red pulse approaching",
-        10,
-        60,
-      );
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 60);
 
       // Reset mocks
       jest.clearAllMocks();
 
       // Test post-delay phase
       createSingleElementFrameLogic(ctx, 640, 480, 0.001, 0.002);
-      expect(ctx.fillText).toHaveBeenCalledWith(
-        "Phase: Wave propagating",
-        10,
-        60,
-      );
+      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 60);
     });
   });
 
