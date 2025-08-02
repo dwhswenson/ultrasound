@@ -855,15 +855,7 @@ function initializeUI(): void {
   autoPreview();
 }
 
-// Initialize when DOM is ready (but not during testing)
-if (typeof document !== "undefined" && typeof jest === "undefined") {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeUI);
-  } else {
-    initializeUI();
-    updateSpeedDisplay(); // Initialize speed display
-  }
-}
+// Note: Initialization is now handled by client.ts for Astro compatibility
 
 // Export functions for testing
 export {
@@ -879,6 +871,7 @@ export {
   updateCoordinateDisplay,
   updateSpeedDisplay,
   downloadMovie,
+  initializeUI,
 };
 
 /**
