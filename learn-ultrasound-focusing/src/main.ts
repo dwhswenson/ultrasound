@@ -9,17 +9,12 @@ import {
 // Global variables for DOM elements (initialized in initializeUI)
 
 let speedOfSoundInput: HTMLInputElement;
-let currentTimeInput: HTMLInputElement;
 let movieDurationInput: HTMLInputElement;
 let numElementsInput: HTMLInputElement;
 let pitchInput: HTMLInputElement;
-let targetRadios: NodeListOf<HTMLInputElement>;
-let linearControls: HTMLElement;
-let pointControls: HTMLElement;
 let targetXInput: HTMLInputElement;
 let targetYInput: HTMLInputElement;
-let angleInput: HTMLInputElement;
-let generateBtn: HTMLElement;
+let unsetTargetBtn: HTMLElement;
 let playMovieBtn: HTMLElement;
 let prevFrameBtn: HTMLElement;
 let nextFrameBtn: HTMLElement;
@@ -41,7 +36,7 @@ function getSpeedOfSound(): number {
     return parseFloat(speedOfSoundInput.value);
   }
   // Fallback for tests or when DOM is not initialized
-  return 100;
+  return 150;
 }
 
 /**
@@ -577,21 +572,14 @@ function initializeUI(): void {
   speedOfSoundInput = document.getElementById(
     "speedOfSound",
   ) as HTMLInputElement;
-  currentTimeInput = document.getElementById("currentTime") as HTMLInputElement;
   movieDurationInput = document.getElementById(
     "movieDuration",
   ) as HTMLInputElement;
   numElementsInput = document.getElementById("numElements") as HTMLInputElement;
   pitchInput = document.getElementById("pitch") as HTMLInputElement;
-  targetRadios = document.getElementsByName(
-    "targetType",
-  ) as NodeListOf<HTMLInputElement>;
-  linearControls = document.getElementById("linearControls")!;
-  pointControls = document.getElementById("pointControls")!;
   targetXInput = document.getElementById("targetX") as HTMLInputElement;
   targetYInput = document.getElementById("targetY") as HTMLInputElement;
-  angleInput = document.getElementById("angle") as HTMLInputElement;
-  generateBtn = document.getElementById("generate")!;
+  unsetTargetBtn = document.getElementById("unsetTarget")!;
   playMovieBtn = document.getElementById("playMovie")!;
   prevFrameBtn = document.getElementById("prevFrame")!;
   nextFrameBtn = document.getElementById("nextFrame")!;
@@ -600,100 +588,25 @@ function initializeUI(): void {
   canvas = document.getElementById("animationCanvas") as HTMLCanvasElement;
   ctx = canvas.getContext("2d")!;
 
-  // Toggle target-specific controls (for future use)
-  targetRadios.forEach((radio) => {
-    radio.addEventListener("change", () => {
-      if (radio.value === "linear" && radio.checked) {
-        linearControls.style.display = "";
-        pointControls.style.display = "none";
-      } else if (radio.value === "point" && radio.checked) {
-        linearControls.style.display = "none";
-        pointControls.style.display = "";
-      }
-    });
+  // Enable unset button when target values are set
+  const updateUnsetButton = () => {
+    const hasTarget = targetXInput.value && targetYInput.value;
+    unsetTargetBtn.disabled = !hasTarget;
+  };
+
+  // Unset target button functionality
+  unsetTargetBtn.addEventListener("click", () => {
+    targetXInput.value = "";
+    targetYInput.value = "";
+    unsetTargetBtn.disabled = true;
+    showTargetSetFeedback(false, "Target unset - using linear mode");
   });
 
-  // Generate frame based on current form values
-  generateBtn.addEventListener("click", async () => {
-    const currentTime = parseFloat(currentTimeInput.value);
-    const numElements = parseInt(numElementsInput.value, 10);
-    const pitch = parseFloat(pitchInput.value);
-    const targetType = Array.from(targetRadios).find((r) => r.checked)!.value;
+  targetXInput.addEventListener("input", updateUnsetButton);
+  targetYInput.addEventListener("input", updateUnsetButton);
 
-    // Calculate appropriate delays based on target type
-    let effectiveDelayTime: number;
-    let elements: ArrayElement[];
-
-    if (targetType === "point") {
-      const targetX = parseFloat(targetXInput.value);
-      const targetY = parseFloat(targetYInput.value);
-
-      // Create element positions first
-      const totalHeight = (numElements - 1) * pitch;
-      const startY = (canvas.height - totalHeight) / 2;
-      const elementX = canvas.width * DEFAULT_ELEMENT_X_POSITION;
-
-      const positions = [];
-      for (let i = 0; i < numElements; i++) {
-        positions.push({ x: elementX, y: startY + i * pitch });
-      }
-
-      // Calculate point target delays
-      const delays = calculatePointTargetDelays(positions, targetX, targetY);
-      elements = createElementArray(numElements, pitch, delays, canvas);
-
-      // Use the maximum delay as reference for timing
-      effectiveDelayTime = Math.max(...delays);
-    } else {
-      // Linear target: calculate delay so red pulse starts at far left of wire
-      // travelTime = (lineLength - radius) / visualSpeed
-      const visualSpeed = getSpeedOfSound(); // Speed from user input
-      const lineLength = DEFAULT_LINE_LENGTH;
-      const radius = DEFAULT_ELEMENT_RADIUS;
-      const singleDelay = (lineLength - radius) / visualSpeed;
-      elements = createElementArray(numElements, pitch, singleDelay, canvas);
-      effectiveDelayTime = singleDelay;
-    }
-
-    // Clear previous frames and generate a single frame
-    frames = [];
-
-    // Get target coordinates if point targeting
-    let targetX, targetY;
-    if (targetType === "point") {
-      targetX = parseFloat(targetXInput.value);
-      targetY = parseFloat(targetYInput.value);
-
-      // Validate target point
-      const elementX = canvas.width * 0.4;
-      const validation = validateTargetPoint(
-        targetX,
-        targetY,
-        canvas.width,
-        canvas.height,
-        elementX,
-      );
-
-      if (!validation.isValid) {
-        alert(`Invalid target position: ${validation.errorMessage}`);
-        return;
-      }
-    }
-
-    const bitmap = await createMultiElementFrameWithElements(
-      elements,
-      effectiveDelayTime,
-      currentTime,
-      targetType,
-      canvas,
-      ctx,
-      targetX,
-      targetY,
-    );
-    frames.push(bitmap);
-    currentFrame = 0;
-    renderFrame(0);
-  });
+  // Initialize the unset button state
+  updateUnsetButton();
 
   // Play movie functionality
   playMovieBtn.addEventListener("click", async () => {
@@ -705,10 +618,13 @@ function initializeUI(): void {
     const numElements = parseInt(numElementsInput.value, 10);
     const pitch = parseFloat(pitchInput.value);
     const movieDuration = parseFloat(movieDurationInput.value);
-    const targetType = Array.from(targetRadios).find((r) => r.checked)!.value;
+
+    // Check if target is set
+    const hasTarget = targetXInput.value && targetYInput.value;
+    const targetType = hasTarget ? "point" : "linear";
 
     let targetX, targetY;
-    if (targetType === "point") {
+    if (hasTarget) {
       targetX = parseFloat(targetXInput.value);
       targetY = parseFloat(targetYInput.value);
 
@@ -797,23 +713,15 @@ function initializeUI(): void {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
-    // Only set target if point targeting is selected
-    const pointRadio = Array.from(targetRadios).find(
-      (r) => r.value === "point" && r.checked,
-    );
+    // Set target coordinates
+    targetXInput.value = Math.round(x).toString();
+    targetYInput.value = Math.round(y).toString();
 
-    if (pointRadio) {
-      targetXInput.value = Math.round(x).toString();
-      targetYInput.value = Math.round(y).toString();
+    // Update unset button state
+    updateUnsetButton();
 
-      // Show visual feedback
-      showTargetSetFeedback(x, y);
-
-      // Trigger the same logic as the Generate Frame button
-      setTimeout(() => {
-        generateBtn.click();
-      }, 150);
-    }
+    // Show visual feedback
+    showTargetSetFeedback(x, y);
   });
 
   // Add mouse move tracking for coordinate display
@@ -826,33 +734,10 @@ function initializeUI(): void {
     updateCoordinateDisplay(x, y);
   });
 
-  // Add auto-preview functionality - show first frame when parameters change
-  const autoPreview = () => {
-    // Small delay to ensure DOM updates are complete
-    setTimeout(() => {
-      generateBtn.click();
-    }, 50);
-  };
-
-  // Add auto-preview to all parameter inputs
-  numElementsInput.addEventListener("input", autoPreview);
-  pitchInput.addEventListener("input", autoPreview);
+  // Add speed display update
   speedOfSoundInput.addEventListener("input", () => {
-    autoPreview();
     updateSpeedDisplay();
   });
-  targetXInput.addEventListener("input", autoPreview);
-  targetYInput.addEventListener("input", autoPreview);
-  angleInput.addEventListener("input", autoPreview);
-  movieDurationInput.addEventListener("input", autoPreview);
-
-  // Add auto-preview to radio button changes
-  targetRadios.forEach((radio) => {
-    radio.addEventListener("change", autoPreview);
-  });
-
-  // Show initial frame on page load
-  autoPreview();
 }
 
 // Note: Initialization is now handled by client.ts for Astro compatibility

@@ -1,0 +1,172 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout
+    title="Pulse Harmonics - Equation 18 Spectrum Explorer"
+    description="Interactive visualization of radiation force spectrum from pulsed ultrasound harmonics"
+>
+    <div class="pulse-harmonics-container">
+        <div class="page-header">
+            <h1>🔊 Equation 18 Spectrum Explorer</h1>
+            <p>
+                Adjust the base frequency and pulse duration below. Pan/zoom
+                with the mouse wheel or drag to explore the radiation force
+                spectrum.
+            </p>
+        </div>
+
+        <div class="visualization-content">
+            <div id="spectrum" class="spectrum-container"></div>
+        </div>
+    </div>
+</Layout>
+
+<script>
+    import { mountRadiationSpectrum } from "./RadiationSpectrum.ts";
+
+    // Initialize when DOM is ready
+    async function initSpectrum() {
+        try {
+            await mountRadiationSpectrum("#spectrum");
+        } catch (error) {
+            console.error("Failed to initialize spectrum:", error);
+        }
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initSpectrum);
+    } else {
+        initSpectrum();
+    }
+</script>
+
+<style>
+    .pulse-harmonics-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 12px;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        margin: 0 0 1rem 0;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        font-size: 1.125rem;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.7;
+    }
+
+    .visualization-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .spectrum-container {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Style the controls that will be injected by the RadiationSpectrum component */
+    :global(.controls) {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    :global(.controls label) {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    :global(.controls input[type="number"]) {
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        width: 120px;
+        transition: border-color 0.3s ease;
+    }
+
+    :global(.controls input[type="number"]:focus) {
+        outline: none;
+        border-color: #06b6d4;
+        box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+    }
+
+    :global(.controls button) {
+        background: #06b6d4;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    :global(.controls button:hover) {
+        background: #0891b2;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+        }
+
+        .page-header p {
+            font-size: 1rem;
+        }
+
+        .visualization-content {
+            padding: 1rem;
+        }
+
+        :global(.controls) {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        :global(.controls label) {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        :global(.controls input[type="number"]) {
+            width: 100px;
+        }
+    }
+</style>

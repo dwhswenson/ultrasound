@@ -9,7 +9,9 @@ import Layout from '../layouts/Layout.astro';
       <p>Explore how ultrasound transducer arrays focus acoustic energy through precise timing control. Adjust parameters in real-time to see how they affect the focused beam pattern.</p>
     </div>
 
-    <form id="controls" class="controls-panel">
+    <div class="main-content">
+      <div class="controls-section">
+        <form id="controls" class="controls-panel">
       <fieldset>
         <legend>Animation Timing</legend>
         <div class="control-group">
@@ -18,31 +20,20 @@ import Layout from '../layouts/Layout.astro';
             <input
               type="number"
               id="speedOfSound"
-              value="100"
+              value="150"
               step="10"
               min="20"
               max="500"
-            />
-            <small style="display: block; color: #666; margin-top: 2px;">
-              Controls animation speed - lower is slower, higher is faster
-            </small>
-          </label>
-          <label>
-            Current Time (seconds):
-            <input
-              type="number"
-              id="currentTime"
-              value="0"
-              step="0.00001"
-              min="0"
+              title="Controls animation speed - lower is slower, higher is faster"
             />
           </label>
+
           <label>
             Movie Duration (seconds):
             <input
               type="number"
               id="movieDuration"
-              value="3.0"
+              value="7.0"
               step="0.5"
               min="1.0"
             />
@@ -72,80 +63,51 @@ import Layout from '../layouts/Layout.astro';
               value="50"
               step="5"
               min="10"
+            title="Distance between element centers"
             />
           </label>
         </div>
-        <small>Pitch: distance between element centers</small>
       </fieldset>
 
       <fieldset>
         <legend>🎯 Focusing Target</legend>
         <div class="control-group">
           <label>
+            Target X (px):
             <input
-              type="radio"
-              name="targetType"
-              value="linear"
-              checked
+              type="number"
+              id="targetX"
+              value="400"
+              step="1"
+              min="0"
+              max="640"
             />
-            Linear (parallel beams)
           </label>
           <label>
-            <input type="radio" name="targetType" value="point" />
-            Point focus
+            Target Y (px):
+            <input
+              type="number"
+              id="targetY"
+              value="240"
+              step="1"
+              min="0"
+              max="480"
+            />
           </label>
+          <button type="button" id="unsetTarget" disabled>Unset Target</button>
         </div>
-
-        <div id="linearControls">
-          <div class="control-group">
-            <label>
-              Beam angle (°):
-              <input type="number" id="angle" value="0" step="0.1" />
-            </label>
-          </div>
-          <small>All elements fire with same delay for parallel beams</small>
-        </div>
-
-        <div id="pointControls" style="display: none">
-          <div class="control-group">
-            <label>
-              Target X (px):
-              <input
-                type="number"
-                id="targetX"
-                value="400"
-                step="1"
-                min="0"
-                max="640"
-              />
-            </label>
-            <label>
-              Target Y (px):
-              <input
-                type="number"
-                id="targetY"
-                value="240"
-                step="1"
-                min="0"
-                max="480"
-              />
-            </label>
-          </div>
-          <small>💡 Click on canvas to set target point | Coordinate system: (0,0) at top-left</small>
-          <div id="targetStatus" style="margin-top: 10px;">
-            <span class="status-indicator status-neutral"></span>
-            <span id="targetStatusText">Set target coordinates</span>
-          </div>
+        <div id="targetStatus" style="margin-top: 10px;">
+          <span class="status-indicator status-neutral"></span>
+          <span id="targetStatusText">Set target coordinates</span>
         </div>
       </fieldset>
 
-      <div class="button-group">
-        <button type="button" id="generate">Generate Frame</button>
-        <button type="button" id="playMovie">Play Movie</button>
-      </div>
-    </form>
 
-    <div id="movie" class="visualization-panel">
+        </form>
+      </div>
+
+      <div class="visualization-section">
+        <div id="movie" class="visualization-panel">
       <h3>🎬 Animation Canvas</h3>
       <canvas
         id="animationCanvas"
@@ -159,11 +121,12 @@ import Layout from '../layouts/Layout.astro';
         • Canvas size: 640×480 pixels<br>
         • Element position: ~40% from left edge (≈256px)<br>
         • Current mouse position: <span id="mouseCoords">(hover over canvas)</span><br>
-        • Wave visualization speed: <span id="currentSpeed">100</span> px/sec<br>
+        • Wave visualization speed: <span id="currentSpeed">150</span> px/sec<br>
         • Green circle = wave convergence at target
       </div>
 
       <div class="movie-controls">
+        <button type="button" id="playMovie">▶️ Play Movie</button>
         <button id="prevFrame">⏮ Prev Frame</button>
         <button id="nextFrame">Next Frame ⏭</button>
         <button id="downloadFrame">💾 Download Frame</button>
@@ -172,6 +135,8 @@ import Layout from '../layouts/Layout.astro';
 
       <div class="download-info">
         <strong>Download Movie:</strong> Chrome/Firefox download WebM videos. Safari downloads MP4 videos. Both playable in VLC/QuickTime.
+      </div>
+        </div>
       </div>
     </div>
   </div>
@@ -196,6 +161,22 @@ import Layout from '../layouts/Layout.astro';
   .visualization-container {
     max-width: none;
     padding: 0;
+  }
+
+  .main-content {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+
+  .controls-section {
+    flex: 0 0 400px;
+    min-width: 400px;
+  }
+
+  .visualization-section {
+    flex: 1;
+    min-width: 0;
   }
 
   .page-header {
@@ -397,6 +378,17 @@ import Layout from '../layouts/Layout.astro';
     background: #f9fafb;
     border-radius: 6px;
     border: 1px solid #e5e7eb;
+  }
+
+  @media (max-width: 1200px) {
+    .main-content {
+      flex-direction: column;
+    }
+
+    .controls-section {
+      flex: none;
+      min-width: auto;
+    }
   }
 
   @media (max-width: 768px) {

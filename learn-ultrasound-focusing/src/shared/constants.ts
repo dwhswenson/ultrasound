@@ -4,7 +4,7 @@
  */
 
 /** Visual speed of sound waves in pixels per second. */
-export const VISUAL_SPEED_PX_PER_SEC = 100;
+export const VISUAL_SPEED_PX_PER_SEC = 150;
 
 /** Application frame rate in frames per second. */
 export const APP_FRAME_RATE = 30;

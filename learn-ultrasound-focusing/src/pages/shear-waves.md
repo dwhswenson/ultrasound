@@ -6,11 +6,16 @@ description: "Understanding shear wave generation and propagation in ultrasound 
 
 # 🌊 Ultrasonic Observation of Shear Waves
 
-Shear waves play a crucial role in ultrasound elastography and tissue characterization. Unlike compressional waves, shear waves propagate much slower and are highly sensitive to tissue mechanical properties.
+Shear waves play a crucial role in ultrasound elastography and tissue
+characterization. Unlike compressional waves, shear waves propagate much slower
+and are highly sensitive to tissue mechanical properties. 
 
 ## Introduction
 
-Shear waves are transverse mechanical waves that propagate perpendicular to the direction of particle motion. In biological tissues, shear wave velocity is directly related to tissue stiffness, making them invaluable for medical diagnostics.
+Shear waves are transverse mechanical waves that propagate perpendicular to the
+direction of particle motion. In biological tissues, shear wave velocity is
+directly related to tissue stiffness, making them invaluable for medical
+diagnostics.
 
 ### Key Properties
 
@@ -22,95 +27,35 @@ Shear waves are transverse mechanical waves that propagate perpendicular to the 
 
 ### Mechanical Vibration
 
-Traditional methods use external mechanical vibrators that apply oscillatory motion to the tissue surface:
+![Mechanical Vibration Shear Waves](./mech_shaker_schematic.svg)
 
-- **Surface transducers**: Apply sinusoidal vibrations directly to skin
-- **Frequency range**: Typically 50-500 Hz
-- **Advantages**: Simple, well-controlled
-- **Disadvantages**: Limited penetration, surface coupling required
+One way to generate shear waves is through mechanical vibration: you can
+literally shake the tissue to make the shear waves. This is actually done as
+part of the proof-of-concept in a number of papers on shear wave elastography.
+However, it clearly isn't practical for clinical use: you're not going to cut
+open a patient and shake their liver to measure its stiffness!
+
 
 ### Acoustic Radiation Force
 
-Modern ultrasound systems can generate shear waves using focused acoustic radiation force:
+![Acoustic Radiation Force](./arf_schematic.svg)
 
-#### Acoustic Radiation Force Impulse (ARFI)
-- High-intensity focused ultrasound (HIFU) creates localized tissue displacement
-- Short duration pulses (typically 50-400 μs)
-- Creates shear waves that propagate outward from focus
+A more practical method for clinical use is to use the acoustic radiation force
+to cause shear waves. The basic idea is to use a focused ultrasound beam to
+cause local vibrations at a point in the tissue. This creates shear waves that
+propagate away from the focal point, and can be observed.
 
-#### Shear Wave Elastography (SWE)
-- Multiple ARFI pulses create plane shear waves
-- Enables quantitative elasticity measurements
-- Real-time imaging capabilities
+In general, ultrasound shear wave elastography uses time-of-flight methods,
+which assume a constant shear wave speed, to measure the shear wave velocity.
+The shear wave speed is then related to tissue stiffness or viscoelastic
+properties.
 
-## Detection and Imaging
+This site has a couple additional pages about aspects of how ultrasound can
+create shear waves:
 
-### Ultrasonic Tracking
-- High frame rate ultrasound imaging (>1000 fps)
-- Motion detection using correlation algorithms
-- Particle velocity measurements
-
-### Time-of-Flight Analysis
-1. Measure shear wave arrival times at different locations
-2. Calculate velocity from distance/time relationships
-3. Convert velocity to elasticity using wave equations
-
-## Applications
-
-### Medical Diagnostics
-- **Liver fibrosis assessment**: Detect liver scarring and cirrhosis
-- **Breast lesion characterization**: Differentiate benign from malignant masses
-- **Cardiac elastography**: Assess myocardial stiffness
-- **Muscle assessment**: Evaluate muscle tone and pathology
-
-### Research Applications
-- Tissue mechanical property mapping
-- Treatment monitoring (thermal therapy, radiation)
-- Biomechanics studies
-
-## Wave Equations
-
-The relationship between shear wave velocity (vs) and shear modulus (μ) is:
-
-```
-vs = √(μ/ρ)
-```
-
-Where:
-- vs = shear wave velocity
-- μ = shear modulus
-- ρ = tissue density
-
-For elastic tissues, Young's modulus (E) relates to shear modulus:
-
-```
-E ≈ 3μ (for incompressible materials)
-```
-
-## Challenges and Limitations
-
-### Technical Challenges
-- **Attenuation**: Shear waves attenuate rapidly with depth
-- **Anisotropy**: Tissue fiber orientation affects propagation
-- **Boundary conditions**: Reflections from interfaces complicate analysis
-- **Viscosity**: Tissue viscosity causes dispersion
-
-### Clinical Considerations
-- **Motion artifacts**: Patient movement affects measurements
-- **Breathing**: Respiratory motion in abdominal imaging
-- **Operator dependence**: Requires skilled technique
-- **Standardization**: Need for consistent protocols
-
-## Future Directions
-
-### Advanced Techniques
-- **3D shear wave imaging**: Volumetric elasticity mapping
-- **Multifrequency analysis**: Characterize frequency-dependent properties
-- **Guided waves**: Use anatomical structures to guide wave propagation
-
-### Emerging Applications
-- **Neurological applications**: Brain elastography
-- **Ophthalmology**: Corneal and lens elasticity
-- **Interventional guidance**: Real-time stiffness monitoring during procedures
-
-
+* [Ultrasound Focusing](): This page contains an interactive tool to show how 
+  ultrasound can be focused to a specific point in the tissue.
+* [Harmonic Generation](): This page explains how the square-wave pulse
+  sequence used in, for example, shear wave dispersion ultrasound vibrometry
+  (SDUV) can create harmonics of a fundamental frequency, allowing a single ARF
+  excitation to be used to sample shear wave speed at multiple frequencies.

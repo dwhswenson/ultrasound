@@ -298,7 +298,7 @@ describe("Multi-Element ArrayElement Functionality", () => {
       drawElementsAtTime(ctx, elements, testTime);
 
       drawSpies.forEach((spy) => {
-        expect(spy).toHaveBeenCalledWith(ctx, testTime);
+        expect(spy).toHaveBeenCalledWith(ctx, testTime, 150);
       });
     });
 

@@ -84,7 +84,7 @@ describe("Point Targeting Functionality", () => {
       const dist2 = Math.sqrt((400 - 256) ** 2 + (240 - 280) ** 2); // ~149.5
 
       const maxDist = Math.max(dist0, dist1, dist2);
-      const visualSpeed = 200;
+      const visualSpeed = 150;
 
       expect(delays[0]).toBeCloseTo((maxDist - dist0) / visualSpeed);
       expect(delays[1]).toBeCloseTo((maxDist - dist1) / visualSpeed);

@@ -1,281 +1,315 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Learn Ultrasound Focusing - Interactive Visualizations">
-  <div class="hero">
-    <h1>🔊 Learn Ultrasound Focusing</h1>
-    <p class="hero-subtitle">
-      Interactive visualizations to understand ultrasound array focusing techniques
-    </p>
-    <div class="hero-actions">
-      <a href="/visualization" class="cta-button primary">
-        Start Visualization
-      </a>
-      <a href="/theory" class="cta-button secondary">
-        Learn Theory
-      </a>
-    </div>
-  </div>
-
-  <section class="features">
-    <h2>What You'll Learn</h2>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <div class="feature-icon">🎯</div>
-        <h3>Array Focusing</h3>
-        <p>Understand how ultrasound transducer arrays focus acoustic energy at specific points through precise timing control.</p>
-        <a href="/visualization" class="feature-link">Try Interactive Demo →</a>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">🌊</div>
-        <h3>Wave Propagation</h3>
-        <p>Visualize how ultrasound waves propagate through media and interfere constructively to create focused beams.</p>
-        <a href="/shear-waves" class="feature-link">Explore Shear Waves →</a>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">📐</div>
-        <h3>Mathematical Theory</h3>
-        <p>Learn the underlying physics and mathematics that govern ultrasound focusing, beamforming, and wave interference.</p>
-        <a href="/theory" class="feature-link">Study Theory →</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="getting-started">
-    <h2>Getting Started</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h3>Start with Visualization</h3>
-          <p>Jump right into our interactive ultrasound focusing simulator to see the concepts in action.</p>
+    <div class="hero">
+        <h1>🔊 Ultrasound</h1>
+        <p class="hero-subtitle">
+            Some teaching materials and visualization related to ultrasound, in
+            particular shear-wave ultrasound vibrometry.
+        </p>
+        <div class="hero-actions">
+            <a href="/visualization" class="cta-button primary">
+                Start Visualization
+            </a>
+            <a href="/theory" class="cta-button secondary"> Learn Theory </a>
         </div>
-      </div>
-
-      <div class="step">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h3>Experiment with Parameters</h3>
-          <p>Adjust array parameters, target positions, and timing to understand how they affect the focused beam.</p>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h3>Learn the Theory</h3>
-          <p>Dive deeper into the physics and mathematics behind ultrasound focusing techniques.</p>
-        </div>
-      </div>
     </div>
-  </section>
+
+    <section class="features">
+        <h2>What You'll Learn</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Array Focusing</h3>
+                <p>
+                    Understand how ultrasound transducer arrays focus acoustic
+                    energy at specific points through precise timing control.
+                </p>
+                <a href="/visualization" class="feature-link"
+                    >Try Interactive Demo →</a
+                >
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🌊</div>
+                <h3>Wave Propagation</h3>
+                <p>
+                    Visualize how ultrasound waves propagate through media and
+                    interfere constructively to create focused beams.
+                </p>
+                <a href="/shear-waves" class="feature-link"
+                    >Explore Shear Waves →</a
+                >
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Pulse Harmonics</h3>
+                <p>
+                    Explore radiation force spectra from pulsed ultrasound using
+                    Equation 18. Adjust frequency and pulse duration parameters
+                    interactively.
+                </p>
+                <a href="/pulse_harmonics" class="feature-link"
+                    >Analyze Spectrum →</a
+                >
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📐</div>
+                <h3>Mathematical Theory</h3>
+                <p>
+                    Learn the underlying physics and mathematics that govern
+                    ultrasound focusing, beamforming, and wave interference.
+                </p>
+                <a href="/theory" class="feature-link">Study Theory →</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="getting-started">
+        <h2>Getting Started</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Start with Visualization</h3>
+                    <p>
+                        Jump right into our interactive ultrasound focusing
+                        simulator to see the concepts in action.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Experiment with Parameters</h3>
+                    <p>
+                        Adjust array parameters, target positions, and timing to
+                        understand how they affect the focused beam.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Learn the Theory</h3>
+                    <p>
+                        Dive deeper into the physics and mathematics behind
+                        ultrasound focusing techniques.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
 </Layout>
 
 <style>
-  .hero {
-    text-align: center;
-    padding: 4rem 0;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    border-radius: 12px;
-    margin-bottom: 4rem;
-  }
+    .hero {
+        text-align: center;
+        padding: 4rem 0;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 12px;
+        margin-bottom: 4rem;
+    }
 
-  .hero h1 {
-    font-size: 3rem;
-    margin: 0 0 1rem 0;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 70%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .hero-subtitle {
-    font-size: 1.25rem;
-    color: #64748b;
-    margin: 0 0 2rem 0;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .hero-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .cta-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.875rem 2rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-
-  .cta-button.primary {
-    background: #0f172a;
-    color: white;
-  }
-
-  .cta-button.primary:hover {
-    background: #1e293b;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
-
-  .cta-button.secondary {
-    background: white;
-    color: #0f172a;
-    border: 2px solid #e2e8f0;
-  }
-
-  .cta-button.secondary:hover {
-    border-color: #0f172a;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
-
-  .features {
-    margin-bottom: 4rem;
-  }
-
-  .features h2 {
-    text-align: center;
-    font-size: 2.25rem;
-    margin-bottom: 3rem;
-    color: #1e293b;
-  }
-
-  .feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-  }
-
-  .feature-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    border: 1px solid #e2e8f0;
-    transition: all 0.3s ease;
-  }
-
-  .feature-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-  }
-
-  .feature-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-  }
-
-  .feature-card h3 {
-    font-size: 1.5rem;
-    margin: 0 0 1rem 0;
-    color: #1e293b;
-  }
-
-  .feature-card p {
-    color: #64748b;
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-  }
-
-  .feature-link {
-    color: #06b6d4;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
-  }
-
-  .feature-link:hover {
-    color: #0891b2;
-  }
-
-  .getting-started h2 {
-    text-align: center;
-    font-size: 2.25rem;
-    margin-bottom: 3rem;
-    color: #1e293b;
-  }
-
-  .steps {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .step {
-    display: flex;
-    align-items: flex-start;
-    gap: 1.5rem;
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    border: 1px solid #e2e8f0;
-  }
-
-  .step-number {
-    flex-shrink: 0;
-    width: 3rem;
-    height: 3rem;
-    background: #06b6d4;
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 1.25rem;
-  }
-
-  .step-content h3 {
-    margin: 0 0 0.5rem 0;
-    color: #1e293b;
-    font-size: 1.25rem;
-  }
-
-  .step-content p {
-    margin: 0;
-    color: #64748b;
-    line-height: 1.7;
-  }
-
-  @media (max-width: 768px) {
     .hero h1 {
-      font-size: 2rem;
+        font-size: 3rem;
+        margin: 0 0 1rem 0;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 70%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .hero-subtitle {
-      font-size: 1.125rem;
+        font-size: 1.25rem;
+        color: #64748b;
+        margin: 0 0 2rem 0;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .hero-actions {
-      flex-direction: column;
-      align-items: center;
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
     }
 
     .cta-button {
-      width: 100%;
-      max-width: 300px;
-      justify-content: center;
+        display: inline-flex;
+        align-items: center;
+        padding: 0.875rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    .features h2,
-    .getting-started h2 {
-      font-size: 1.875rem;
+    .cta-button.primary {
+        background: #0f172a;
+        color: white;
     }
-  }
+
+    .cta-button.primary:hover {
+        background: #1e293b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .cta-button.secondary {
+        background: white;
+        color: #0f172a;
+        border: 2px solid #e2e8f0;
+    }
+
+    .cta-button.secondary:hover {
+        border-color: #0f172a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .features {
+        margin-bottom: 4rem;
+    }
+
+    .features h2 {
+        text-align: center;
+        font-size: 2.25rem;
+        margin-bottom: 3rem;
+        color: #1e293b;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .feature-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+        font-size: 1.5rem;
+        margin: 0 0 1rem 0;
+        color: #1e293b;
+    }
+
+    .feature-card p {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+    }
+
+    .feature-link {
+        color: #06b6d4;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .feature-link:hover {
+        color: #0891b2;
+    }
+
+    .getting-started h2 {
+        text-align: center;
+        font-size: 2.25rem;
+        margin-bottom: 3rem;
+        color: #1e293b;
+    }
+
+    .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .step {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.5rem;
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .step-number {
+        flex-shrink: 0;
+        width: 3rem;
+        height: 3rem;
+        background: #06b6d4;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    .step-content h3 {
+        margin: 0 0 0.5rem 0;
+        color: #1e293b;
+        font-size: 1.25rem;
+    }
+
+    .step-content p {
+        margin: 0;
+        color: #64748b;
+        line-height: 1.7;
+    }
+
+    @media (max-width: 768px) {
+        .hero h1 {
+            font-size: 2rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.125rem;
+        }
+
+        .hero-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .cta-button {
+            width: 100%;
+            max-width: 300px;
+            justify-content: center;
+        }
+
+        .features h2,
+        .getting-started h2 {
+            font-size: 1.875rem;
+        }
+    }
 </style>
