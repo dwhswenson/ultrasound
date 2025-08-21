@@ -142,7 +142,7 @@ properties.
 This site has a couple additional pages about aspects of how ultrasound can
 create shear waves:
 
-* [Ultrasound Focusing](): This page contains an interactive tool to show how 
+* [Ultrasound Focusing](/ultrasound-focusing/): This page contains an interactive tool to show how 
   ultrasound can be focused to a specific point in the tissue.
 * [Harmonic Generation](): This page explains how the square-wave pulse
   sequence used in, for example, shear wave dispersion ultrasound vibrometry
