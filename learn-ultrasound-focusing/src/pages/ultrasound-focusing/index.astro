@@ -76,7 +76,7 @@ import Layout from "../../layouts/Layout.astro";
                         </div>
                     </fieldset>
 
-                    <fieldset>
+                    <fieldset style="display: none;">
                         <legend>🎯 Focusing Target</legend>
                         <div class="control-group">
                             <label>
@@ -101,9 +101,6 @@ import Layout from "../../layouts/Layout.astro";
                                     max="480"
                                 />
                             </label>
-                            <button type="button" id="unsetTarget" disabled
-                                >Unset Target</button
-                            >
                         </div>
                         <div id="targetStatus" style="margin-top: 10px;">
                             <span class="status-indicator status-neutral"
@@ -140,7 +137,6 @@ import Layout from "../../layouts/Layout.astro";
                     </div>
                     -->
 
-
                     <div class="movie-controls">
                         <button type="button" id="playMovie"
                             >▶️ Play Movie</button
@@ -149,8 +145,10 @@ import Layout from "../../layouts/Layout.astro";
                         <button id="nextFrame">Next Frame ⏭</button>
                         <button id="downloadFrame">💾 Download Frame</button>
                         <button id="downloadMovie">🎥 Download Movie</button>
+                        <button type="button" id="unsetTarget" disabled
+                            >Unset Target</button
+                        >
                     </div>
-
                 </div>
             </div>
         </div>
