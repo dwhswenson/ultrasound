@@ -23,7 +23,7 @@ export default {
   collectCoverageFrom: [
     "src/**/*.ts",
     "!src/**/*.d.ts",
-    "!src/main.ts", // Exclude main.ts as it's DOM-heavy
+    "!src/components/ultrasound-focusing/main.ts", // Exclude main.ts as it's DOM-heavy
   ],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "html"],

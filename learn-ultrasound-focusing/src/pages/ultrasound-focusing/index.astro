@@ -1,0 +1,473 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout
+    title="Ultrasound Focusing Visualization"
+    description="Interactive ultrasound array focusing visualization with real-time parameter control"
+>
+    <div class="visualization-container">
+        <div class="page-header">
+            <h1>🔊 Ultrasound Array Focusing Visualization</h1>
+            <p>
+                Explore how ultrasound transducer arrays focus acoustic energy
+                through precise timing control. Adjust parameters in real-time
+                to see how they affect the focused beam pattern.
+            </p>
+        </div>
+
+        <div class="main-content">
+            <div class="controls-section">
+                <form id="controls" class="controls-panel">
+                    <fieldset>
+                        <legend>Animation Timing</legend>
+                        <div class="control-group">
+                            <label>
+                                Speed of Sound (px/s):
+                                <input
+                                    type="number"
+                                    id="speedOfSound"
+                                    value="150"
+                                    step="10"
+                                    min="20"
+                                    max="500"
+                                    title="Controls animation speed - lower is slower, higher is faster"
+                                />
+                            </label>
+
+                            <label>
+                                Movie Duration (seconds):
+                                <input
+                                    type="number"
+                                    id="movieDuration"
+                                    value="7.0"
+                                    step="0.5"
+                                    min="1.0"
+                                />
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Transducer Parameters</legend>
+                        <div class="control-group">
+                            <label>
+                                Number of elements:
+                                <input
+                                    type="number"
+                                    id="numElements"
+                                    value="16"
+                                    min="4"
+                                    max="64"
+                                    step="1"
+                                />
+                            </label>
+                            <label>
+                                Pitch (px):
+                                <input
+                                    type="number"
+                                    id="pitch"
+                                    value="50"
+                                    step="5"
+                                    min="10"
+                                    title="Distance between element centers"
+                                />
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>🎯 Focusing Target</legend>
+                        <div class="control-group">
+                            <label>
+                                Target X (px):
+                                <input
+                                    type="number"
+                                    id="targetX"
+                                    value="400"
+                                    step="1"
+                                    min="0"
+                                    max="640"
+                                />
+                            </label>
+                            <label>
+                                Target Y (px):
+                                <input
+                                    type="number"
+                                    id="targetY"
+                                    value="240"
+                                    step="1"
+                                    min="0"
+                                    max="480"
+                                />
+                            </label>
+                            <button type="button" id="unsetTarget" disabled
+                                >Unset Target</button
+                            >
+                        </div>
+                        <div id="targetStatus" style="margin-top: 10px;">
+                            <span class="status-indicator status-neutral"
+                            ></span>
+                            <span id="targetStatusText"
+                                >Set target coordinates</span
+                            >
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+
+            <div class="visualization-section">
+                <div id="movie" class="visualization-panel">
+                    <h3>🎬 Animation Canvas</h3>
+                    <canvas
+                        id="animationCanvas"
+                        width="640"
+                        height="480"
+                        title="Click to set target point when Point focus is selected"
+                    ></canvas>
+
+                    <div id="coordinateInfo">
+                        <strong>Canvas Information:</strong><br />
+                        • Canvas size: 640×480 pixels<br />
+                        • Element position: ~40% from left edge (≈256px)<br />
+                        • Current mouse position: <span id="mouseCoords"
+                            >(hover over canvas)</span
+                        ><br />
+                        • Wave visualization speed: <span id="currentSpeed"
+                            >150</span
+                        > px/sec<br />
+                        • Green circle = wave convergence at target
+                    </div>
+
+                    <div class="movie-controls">
+                        <button type="button" id="playMovie"
+                            >▶️ Play Movie</button
+                        >
+                        <button id="prevFrame">⏮ Prev Frame</button>
+                        <button id="nextFrame">Next Frame ⏭</button>
+                        <button id="downloadFrame">💾 Download Frame</button>
+                        <button id="downloadMovie">🎥 Download Movie</button>
+                    </div>
+
+                    <div class="download-info">
+                        <strong>Download Movie:</strong> Chrome/Firefox download
+                        WebM videos. Safari downloads MP4 videos. Both playable in
+                        VLC/QuickTime.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        import {
+            initializeUI,
+            updateSpeedDisplay,
+        } from "../../components/ultrasound-focusing/main.ts";
+
+        // Initialize when DOM is ready
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", () => {
+                initializeUI();
+                updateSpeedDisplay();
+            });
+        } else {
+            initializeUI();
+            updateSpeedDisplay();
+        }
+    </script>
+</Layout>
+
+<style>
+    .visualization-container {
+        max-width: none;
+        padding: 0;
+    }
+
+    .main-content {
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
+    }
+
+    .controls-section {
+        flex: 0 0 400px;
+        min-width: 400px;
+    }
+
+    .visualization-section {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 12px;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        margin: 0 0 1rem 0;
+        color: #1e293b;
+    }
+
+    .page-header p {
+        font-size: 1.125rem;
+        color: #64748b;
+        margin: 0;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.7;
+    }
+
+    .controls-panel {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 2rem;
+    }
+
+    fieldset {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        background: #f8fafc;
+    }
+
+    legend {
+        font-weight: 600;
+        color: #1e293b;
+        padding: 0 1rem;
+        background: white;
+        border-radius: 4px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .control-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .control-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .control-group label {
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    input[type="number"] {
+        width: 120px;
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        transition: border-color 0.3s ease;
+    }
+
+    input[type="number"]:focus {
+        outline: none;
+        border-color: #06b6d4;
+        box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+    }
+
+    input[type="radio"] {
+        margin-right: 0.5rem;
+        accent-color: #06b6d4;
+    }
+
+    small {
+        color: #6b7280;
+        font-style: italic;
+        font-size: 0.875rem;
+    }
+
+    .status-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+    }
+
+    .status-valid {
+        background-color: #10b981;
+    }
+    .status-invalid {
+        background-color: #ef4444;
+    }
+    .status-neutral {
+        background-color: #6b7280;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+
+    button {
+        background: #06b6d4;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+        background: #0891b2;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    button:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .visualization-panel {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+        text-align: center;
+    }
+
+    .visualization-panel h3 {
+        margin: 0 0 1.5rem 0;
+        color: #1e293b;
+        font-size: 1.5rem;
+    }
+
+    #animationCanvas {
+        border: 2px solid #1e293b;
+        border-radius: 8px;
+        cursor: crosshair;
+        background-color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #coordinateInfo {
+        margin: 1.5rem auto;
+        padding: 1rem;
+        background-color: #f1f5f9;
+        border-radius: 8px;
+        font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+        font-size: 0.75rem;
+        text-align: left;
+        max-width: 640px;
+        color: #374151;
+        border: 1px solid #e2e8f0;
+    }
+
+    .movie-controls {
+        margin: 1.5rem 0;
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .movie-controls button {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .download-info {
+        margin-top: 1rem;
+        font-size: 0.75rem;
+        color: #6b7280;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+    }
+
+    @media (max-width: 1200px) {
+        .main-content {
+            flex-direction: column;
+        }
+
+        .controls-section {
+            flex: none;
+            min-width: auto;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+        }
+
+        .page-header p {
+            font-size: 1rem;
+        }
+
+        .controls-panel,
+        .visualization-panel {
+            padding: 1.5rem;
+        }
+
+        .control-group {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .control-group label {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .button-group,
+        .movie-controls {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .button-group button,
+        .movie-controls button {
+            width: 100%;
+            max-width: 200px;
+        }
+
+        #animationCanvas {
+            max-width: 100%;
+            height: auto;
+        }
+    }
+</style>
