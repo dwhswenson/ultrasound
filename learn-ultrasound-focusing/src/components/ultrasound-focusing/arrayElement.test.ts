@@ -114,11 +114,15 @@ describe("ArrayElement", () => {
 
       // With constant speed physics:
       // travelDistance = DEFAULT_LINE_LENGTH - DEFAULT_ELEMENT_RADIUS = 190px
-      // travelTime = 190 / VISUAL_SPEED_PX_PER_SEC = 1.9s
-      // startTime = 0.001 - 1.9 = -1.899s
-      // At t=0: position = xStart + VISUAL_SPEED_PX_PER_SEC * (0 - (-1.899)) = xStart + 189.9
+      // travelTime = 190 / VISUAL_SPEED_PX_PER_SEC = 190/150 = 1.2667s
+      // startTime = 0.001 - 1.2667 = -1.2657s
+      // At t=0: position = xStart + VISUAL_SPEED_PX_PER_SEC * (0 - (-1.2657)) = xStart + 189.855
       const xStart = 100 - DEFAULT_LINE_LENGTH; // x - lineLength
-      const expectedX = xStart + VISUAL_SPEED_PX_PER_SEC * (0 - (0.001 - 1.9));
+      const travelTime =
+        (DEFAULT_LINE_LENGTH - DEFAULT_ELEMENT_RADIUS) /
+        VISUAL_SPEED_PX_PER_SEC;
+      const startTime = 0.001 - travelTime;
+      const expectedX = xStart + VISUAL_SPEED_PX_PER_SEC * (0 - startTime);
 
       expect(ctx.arc).toHaveBeenCalledWith(
         expectedX,
@@ -136,12 +140,13 @@ describe("ArrayElement", () => {
       element.draw(ctx, halfDelayTime, VISUAL_SPEED_PX_PER_SEC);
 
       // With constant speed physics:
-      // startTime = 0.001 - 1.9 = -1.899s
-      // At t=0.0005: position = xStart + 100 * (0.0005 - (-1.899))
+      // travelTime = 190/150 = 1.2667s
+      // startTime = 0.001 - 1.2667 = -1.2657s
+      // At t=0.0005: position = xStart + 150 * (0.0005 - (-1.2657))
       const xStart = 100 - DEFAULT_LINE_LENGTH; // x - lineLength
       const travelTime =
         (DEFAULT_LINE_LENGTH - DEFAULT_ELEMENT_RADIUS) /
-        VISUAL_SPEED_PX_PER_SEC; // 1.9s
+        VISUAL_SPEED_PX_PER_SEC; // 1.2667s
       const startTime = 0.001 - travelTime;
       const expectedX =
         xStart + VISUAL_SPEED_PX_PER_SEC * (halfDelayTime - startTime);
@@ -158,7 +163,7 @@ describe("ArrayElement", () => {
       const xStart = 100 - DEFAULT_LINE_LENGTH; // x - lineLength
       const travelTime =
         (DEFAULT_LINE_LENGTH - DEFAULT_ELEMENT_RADIUS) /
-        VISUAL_SPEED_PX_PER_SEC; // 1.9s
+        VISUAL_SPEED_PX_PER_SEC; // 1.2667s
       const startTime = 0.001 - travelTime;
       const expectedX =
         xStart + VISUAL_SPEED_PX_PER_SEC * (justBeforeDelay - startTime);
@@ -180,7 +185,7 @@ describe("ArrayElement", () => {
       const laterElement = new ArrayElement(100, 200, 2.0, 10, 200);
       laterElement.draw(ctx, 0.05, VISUAL_SPEED_PX_PER_SEC); // Very early time when pulse hasn't started
 
-      // With delay=2.0s, travel time = 1.9s, start time = 0.1s
+      // With delay=2.0s, travel time = 1.2667s, start time = 0.7333s
       // At t=0.05s (before start time), should only draw main element
       const arcCalls = (ctx.arc as jest.Mock).mock.calls;
       expect(arcCalls).toHaveLength(1); // main element only
@@ -252,9 +257,9 @@ describe("ArrayElement", () => {
       // Verify constant speed: all visible pulses travel at VISUAL_SPEED_PX_PER_SEC px/s
       const visualSpeed = VISUAL_SPEED_PX_PER_SEC;
       const travelDistance = DEFAULT_LINE_LENGTH - DEFAULT_ELEMENT_RADIUS; // lineLength - radius = 190px
-      const travelTime = travelDistance / visualSpeed; // 1.9s
+      const travelTime = travelDistance / visualSpeed; // 190/150 = 1.2667s
 
-      expect(travelTime).toBeCloseTo(1.9, 3);
+      expect(travelTime).toBeCloseTo(1.2667, 3);
     });
   });
 

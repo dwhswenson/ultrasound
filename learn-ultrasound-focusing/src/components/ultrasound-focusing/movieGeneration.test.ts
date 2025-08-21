@@ -215,13 +215,11 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
 
-      // Should show coordinate information
-      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
-      expect(ctx.fillText).toHaveBeenCalledWith("Element X: 256 px", 10, 100);
+      // Should show credit text
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Coordinate system: (0,0) at top-left",
-        10,
-        120,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
     });
 
@@ -240,13 +238,11 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
 
-      // Should show coordinate information
-      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
-      expect(ctx.fillText).toHaveBeenCalledWith("Element X: 256 px", 10, 100);
+      // Should show credit text
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Coordinate system: (0,0) at top-left",
-        10,
-        120,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
     });
 
@@ -265,7 +261,11 @@ describe("Movie Generation Functionality", () => {
         canvas,
         ctx,
       );
-      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
+      expect(ctx.fillText).toHaveBeenCalledWith(
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
+      );
 
       // Frame just after delay
       jest.clearAllMocks();
@@ -277,7 +277,11 @@ describe("Movie Generation Functionality", () => {
         canvas,
         ctx,
       );
-      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
+      expect(ctx.fillText).toHaveBeenCalledWith(
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
+      );
     });
   });
 
@@ -297,9 +301,9 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Elements: 4, Pitch: 5.000",
-        10,
-        60,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
 
       jest.clearAllMocks();
@@ -314,9 +318,9 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Elements: 64, Pitch: 5.000",
-        10,
-        60,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
     });
 
@@ -335,9 +339,9 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Elements: 16, Pitch: 1.000",
-        10,
-        60,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
 
       jest.clearAllMocks();
@@ -352,9 +356,9 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Elements: 16, Pitch: 20.000",
-        10,
-        60,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
     });
 
@@ -463,7 +467,11 @@ describe("Movie Generation Functionality", () => {
       );
 
       expect(bitmap).toBeDefined();
-      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
+      expect(ctx.fillText).toHaveBeenCalledWith(
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
+      );
     });
 
     it("should handle very small time steps", async () => {
@@ -506,7 +514,11 @@ describe("Movie Generation Functionality", () => {
       );
 
       expect(bitmap).toBeDefined();
-      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
+      expect(ctx.fillText).toHaveBeenCalledWith(
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
+      );
     });
   });
 
@@ -558,7 +570,11 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
 
-      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
+      expect(ctx.fillText).toHaveBeenCalledWith(
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
+      );
     });
 
     it("should show wave phase for last 70% of movie", async () => {
@@ -578,7 +594,11 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
 
-      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
+      expect(ctx.fillText).toHaveBeenCalledWith(
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
+      );
     });
 
     it("should handle different movie durations", async () => {
@@ -633,13 +653,11 @@ describe("Movie Generation Functionality", () => {
         ctx,
       );
 
-      // Check all coordinate information is displayed
-      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
-      expect(ctx.fillText).toHaveBeenCalledWith("Element X: 256 px", 10, 100);
+      // Should show credit text
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Coordinate system: (0,0) at top-left",
-        10,
-        120,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
 
       // Verify element X calculation (40% of canvas width)

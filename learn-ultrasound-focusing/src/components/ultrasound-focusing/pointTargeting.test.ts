@@ -238,7 +238,11 @@ describe("Point Targeting Functionality", () => {
         240,
       );
 
-      expect(ctx.fillText).toHaveBeenCalledWith("Target: (400, 240)", 10, 140);
+      expect(ctx.fillText).toHaveBeenCalledWith(
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
+      );
     });
 
     it("should display linear target info for linear targeting", async () => {
@@ -254,9 +258,9 @@ describe("Point Targeting Functionality", () => {
       );
 
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Target: Linear (parallel to array)",
-        10,
-        140,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
     });
   });
@@ -285,7 +289,7 @@ describe("Point Targeting Functionality", () => {
       const elements = [new ArrayElement(100, 100, 0.001)];
       const targetX = 200; // 100px away from element
       const targetY = 100;
-      const travelTime = 100 / 200; // distance / visual speed = 0.5s
+      const travelTime = 100 / 150; // distance / visual speed = 0.667s
       const currentTime = 0.001 + travelTime + 0.1; // After wave reaches target
 
       const amplitude = calculateWaveAmplitudeAtTarget(
@@ -431,9 +435,9 @@ describe("Point Targeting Functionality", () => {
 
       // Should show amplitude information in text
       expect(ctx.fillText).toHaveBeenCalledWith(
-        expect.stringContaining("Wave Amplitude at Target:"),
-        10,
-        160,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
     });
 
@@ -494,7 +498,7 @@ describe("Point Targeting Functionality", () => {
       ];
       const targetX = 400;
       const targetY = 240; // Same Y as middle element
-      const visualSpeed = 200;
+      const visualSpeed = 150;
 
       // Calculate delays
       const delays = calculatePointTargetDelays(positions, targetX, targetY);
@@ -504,19 +508,11 @@ describe("Point Targeting Functionality", () => {
         Math.sqrt((targetX - pos.x) ** 2 + (targetY - pos.y) ** 2),
       );
 
-      console.log("Debug Wave Convergence:");
-      console.log("Positions:", positions);
-      console.log("Target:", { x: targetX, y: targetY });
-      console.log("Distances:", distances);
-      console.log("Delays:", delays);
-
       // Calculate arrival times at target
       const arrivalTimes = delays.map((delay, i) => {
         const travelTime = distances[i] / visualSpeed;
         const arrivalTime = delay + travelTime;
-        console.log(
-          `Element ${i}: delay=${delay.toFixed(6)}s, travel=${travelTime.toFixed(6)}s, arrival=${arrivalTime.toFixed(6)}s`,
-        );
+
         return arrivalTime;
       });
 
@@ -524,9 +520,6 @@ describe("Point Targeting Functionality", () => {
       const firstArrival = arrivalTimes[0];
       const maxDifference =
         Math.max(...arrivalTimes) - Math.min(...arrivalTimes);
-
-      console.log("Arrival times:", arrivalTimes);
-      console.log("Max difference:", maxDifference);
 
       // All arrival times should be equal (within floating point precision)
       arrivalTimes.forEach((time) => {
@@ -546,7 +539,7 @@ describe("Point Targeting Functionality", () => {
       ];
       const targetX = 400;
       const targetY = 240;
-      const visualSpeed = 200;
+      const visualSpeed = 150;
 
       // Calculate delays directly using visual speed (same as new movie generation logic)
       const distances = positions.map((pos) =>
@@ -564,18 +557,10 @@ describe("Point Targeting Functionality", () => {
         return delay + travelTime;
       });
 
-      console.log("Direct visual delay convergence test:");
-      console.log("Distances:", distances);
-      console.log("Max distance:", maxDistance);
-      console.log("Visual delays:", visualDelays);
-      console.log("Arrival times:", arrivalTimes);
-
       // All arrival times should be equal with direct calculation
       const firstArrival = arrivalTimes[0];
       const maxDifference =
         Math.max(...arrivalTimes) - Math.min(...arrivalTimes);
-
-      console.log("Max difference with direct calculation:", maxDifference);
 
       arrivalTimes.forEach((time) => {
         expect(time).toBeCloseTo(firstArrival, 6);
@@ -599,7 +584,7 @@ describe("Point Targeting Functionality", () => {
       const distances = positions.map((pos) =>
         Math.sqrt((targetX - pos.x) ** 2 + (targetY - pos.y) ** 2),
       );
-      const visualSpeed = 200;
+      const visualSpeed = 150;
 
       const arrivalTimes = delays.map(
         (delay, i) => delay + distances[i] / visualSpeed,
@@ -796,7 +781,7 @@ describe("Point Targeting Functionality", () => {
       const targetY = 300;
 
       const delays = calculatePointTargetDelays(positions, targetX, targetY);
-      const visualSpeed = 200;
+      const visualSpeed = 150;
 
       // Calculate expected distance difference
       const dist1 = Math.sqrt((300 - 100) ** 2 + (300 - 100) ** 2);

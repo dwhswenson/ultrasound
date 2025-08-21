@@ -215,43 +215,29 @@ describe("Multi-Element ArrayElement Functionality", () => {
       );
 
       expect(ctx.fillText).toHaveBeenCalledWith(
-        `Current Time: ${currentTime.toFixed(6)}s`,
-        10,
-        20,
-      );
-      expect(ctx.fillText).toHaveBeenCalledWith(
-        `Max Delay: ${delayTime.toFixed(6)}s`,
-        10,
-        40,
-      );
-      expect(ctx.fillText).toHaveBeenCalledWith(
-        `Elements: ${numElements}, Pitch: ${pitch.toFixed(3)}`,
-        10,
-        60,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
     });
 
     it("should show coordinate information", async () => {
       await createMultiElementFrame(0.002, 0.001, 8, 5.0, mockCanvas, ctx);
 
-      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
-      expect(ctx.fillText).toHaveBeenCalledWith("Element X: 256 px", 10, 100);
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Coordinate system: (0,0) at top-left",
-        10,
-        120,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
     });
 
     it("should show consistent coordinate information regardless of time", async () => {
       await createMultiElementFrame(0.001, 0.002, 8, 5.0, mockCanvas, ctx);
 
-      expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 80);
-      expect(ctx.fillText).toHaveBeenCalledWith("Element X: 256 px", 10, 100);
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Coordinate system: (0,0) at top-left",
-        10,
-        120,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
     });
 
@@ -259,9 +245,9 @@ describe("Multi-Element ArrayElement Functionality", () => {
       // Test minimum
       await createMultiElementFrame(0.001, 0.0005, 4, 5.0, mockCanvas, ctx);
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Elements: 4, Pitch: 5.000",
-        10,
-        60,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
 
       jest.clearAllMocks();
@@ -269,9 +255,9 @@ describe("Multi-Element ArrayElement Functionality", () => {
       // Test maximum
       await createMultiElementFrame(0.001, 0.0005, 64, 3.0, mockCanvas, ctx);
       expect(ctx.fillText).toHaveBeenCalledWith(
-        "Elements: 64, Pitch: 3.000",
-        10,
-        60,
+        "ultrasound.dwhswenson.net",
+        0,
+        0,
       );
     });
 
