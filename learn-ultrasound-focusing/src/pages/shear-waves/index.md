@@ -1,8 +1,80 @@
 ---
-layout: ../layouts/Layout.astro
+layout: ../../layouts/Layout.astro
 title: "Shear Waves - Learn Ultrasound Focusing"
 description: "Understanding shear wave generation and propagation in ultrasound applications"
 ---
+
+<style>
+/* Shear Waves Page Specific Styles */
+
+.image-text-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.text-content {
+    flex: 1;
+    min-width: 300px;
+    order: 2;
+}
+
+.image-content {
+    flex: 0 0 auto;
+    max-width: 400px;
+    order: 1;
+}
+
+.image-content img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+/* Desktop layout - image on the right */
+@media (min-width: 769px) {
+    .text-content {
+        order: 1;
+    }
+    
+    .image-content {
+        order: 2;
+    }
+}
+
+/* Mobile layout - image before text (natural order) */
+@media (max-width: 768px) {
+    .image-text-section {
+        flex-direction: column;
+    }
+
+    .image-content {
+        max-width: 100%;
+        order: 1;
+    }
+    
+    .text-content {
+        order: 2;
+    }
+}
+
+/* Additional spacing for better readability */
+.image-text-section h3 {
+    margin-top: 0;
+    color: #1e293b;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.image-text-section p {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+}
+</style>
 
 # 🌊 Ultrasonic Observation of Shear Waves
 
@@ -27,7 +99,13 @@ diagnostics.
 
 ### Mechanical Vibration
 
+<div class="image-text-section">
+<div class="image-content">
+
 ![Mechanical Vibration Shear Waves](./mech_shaker_schematic.svg)
+
+</div>
+<div class="text-content">
 
 One way to generate shear waves is through mechanical vibration: you can
 literally shake the tissue to make the shear waves. This is actually done as
@@ -35,10 +113,18 @@ part of the proof-of-concept in a number of papers on shear wave elastography.
 However, it clearly isn't practical for clinical use: you're not going to cut
 open a patient and shake their liver to measure its stiffness!
 
+</div>
+</div>
 
 ### Acoustic Radiation Force
 
+<div class="image-text-section">
+<div class="image-content">
+
 ![Acoustic Radiation Force](./arf_schematic.svg)
+
+</div>
+<div class="text-content">
 
 A more practical method for clinical use is to use the acoustic radiation force
 to cause shear waves. The basic idea is to use a focused ultrasound beam to
@@ -49,6 +135,9 @@ In general, ultrasound shear wave elastography uses time-of-flight methods,
 which assume a constant shear wave speed, to measure the shear wave velocity.
 The shear wave speed is then related to tissue stiffness or viscoelastic
 properties.
+
+</div>
+</div>
 
 This site has a couple additional pages about aspects of how ultrasound can
 create shear waves:
