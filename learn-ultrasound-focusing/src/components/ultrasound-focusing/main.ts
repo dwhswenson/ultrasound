@@ -565,6 +565,18 @@ function renderFrame(idx: number) {
 }
 
 /**
+ * Simple function to update the canvas with the initial frame
+ */
+async function updateInitialFrame(): Promise<void> {
+  try {
+    // Just call the existing function that works
+    await generateAndRenderInitialFrame();
+  } catch (error) {
+    console.error("Error in updateInitialFrame:", error);
+  }
+}
+
+/**
  * Generates and renders the initial frame (t=0) based on current UI parameters.
  * This is called on initialization and when parameters change.
  */
@@ -845,8 +857,13 @@ function initializeUI(): void {
     }
   });
 
+  // Simple helper that updates the frame
+  const refreshInitialFrame = async () => {
+    await updateInitialFrame();
+  };
+
   // Add click-to-set-target functionality
-  canvas.addEventListener("click", (event) => {
+  canvas.addEventListener("click", async (event) => {
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
@@ -858,8 +875,15 @@ function initializeUI(): void {
     // Update unset button state
     updateUnsetButton();
 
-    // Show visual feedback
-    showTargetSetFeedback(x, y);
+    // Update initial frame with new target - wait for it to complete
+    await refreshInitialFrame();
+
+    // Show visual feedback after updating frame
+    try {
+      showTargetSetFeedback(x, y);
+    } catch (error) {
+      console.error("Error in showTargetSetFeedback:", error);
+    }
   });
 
   // Add mouse move tracking for coordinate display
@@ -872,47 +896,56 @@ function initializeUI(): void {
     updateCoordinateDisplay(x, y);
   });
 
-  // Add speed display update
+  if (numElementsInput) {
+    numElementsInput.addEventListener("input", () => {
+      refreshInitialFrame();
+    });
+  }
+  if (pitchInput) {
+    pitchInput.addEventListener("input", () => {
+      refreshInitialFrame();
+    });
+  }
   if (speedOfSoundInput) {
     speedOfSoundInput.addEventListener("input", () => {
       updateSpeedDisplay();
+      refreshInitialFrame();
     });
   }
-
-  // Add event listeners to regenerate first frame when parameters change
-  const regenerateInitialFrame = () => {
-    generateAndRenderInitialFrame().catch(console.error);
-  };
-
-  if (numElementsInput) {
-    numElementsInput.addEventListener("input", regenerateInitialFrame);
-  }
-  if (pitchInput) {
-    pitchInput.addEventListener("input", regenerateInitialFrame);
-  }
-  if (speedOfSoundInput) {
-    speedOfSoundInput.addEventListener("input", regenerateInitialFrame);
-  }
   if (targetXInput) {
-    targetXInput.addEventListener("input", regenerateInitialFrame);
+    targetXInput.addEventListener("input", () => {
+      updateUnsetButton();
+      refreshInitialFrame();
+    });
   }
   if (targetYInput) {
-    targetYInput.addEventListener("input", regenerateInitialFrame);
+    targetYInput.addEventListener("input", () => {
+      updateUnsetButton();
+      refreshInitialFrame();
+    });
   }
 
   // Also regenerate when target is unset
   if (unsetTargetBtn && targetXInput && targetYInput) {
-    unsetTargetBtn.addEventListener("click", () => {
+    unsetTargetBtn.addEventListener("click", async () => {
       targetXInput.value = "";
       targetYInput.value = "";
       unsetTargetBtn.disabled = true;
-      showTargetSetFeedback(false, "Target unset - using linear mode");
-      regenerateInitialFrame();
+
+      // Update frame first
+      await refreshInitialFrame();
+
+      // Then show feedback
+      try {
+        showTargetSetFeedback(false, "Target unset - using linear mode");
+      } catch (error) {
+        console.error("Error in showTargetSetFeedback:", error);
+      }
     });
   }
 
   // Generate and render the initial first frame
-  generateAndRenderInitialFrame().catch(console.error);
+  refreshInitialFrame();
 }
 
 // Note: Initialization is now handled by client.ts for Astro compatibility
@@ -933,6 +966,7 @@ export {
   downloadMovie,
   initializeUI,
   generateAndRenderInitialFrame,
+  updateInitialFrame,
 };
 
 /**
