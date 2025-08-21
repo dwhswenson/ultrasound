@@ -118,7 +118,6 @@ import Layout from "../../layouts/Layout.astro";
 
             <div class="visualization-section">
                 <div id="movie" class="visualization-panel">
-                    <h3>🎬 Animation Canvas</h3>
                     <canvas
                         id="animationCanvas"
                         width="640"
@@ -126,6 +125,7 @@ import Layout from "../../layouts/Layout.astro";
                         title="Click to set target point when Point focus is selected"
                     ></canvas>
 
+                    <!--
                     <div id="coordinateInfo">
                         <strong>Canvas Information:</strong><br />
                         • Canvas size: 640×480 pixels<br />
@@ -138,6 +138,8 @@ import Layout from "../../layouts/Layout.astro";
                         > px/sec<br />
                         • Green circle = wave convergence at target
                     </div>
+                    -->
+
 
                     <div class="movie-controls">
                         <button type="button" id="playMovie"
@@ -149,11 +151,6 @@ import Layout from "../../layouts/Layout.astro";
                         <button id="downloadMovie">🎥 Download Movie</button>
                     </div>
 
-                    <div class="download-info">
-                        <strong>Download Movie:</strong> Chrome/Firefox download
-                        WebM videos. Safari downloads MP4 videos. Both playable in
-                        VLC/QuickTime.
-                    </div>
                 </div>
             </div>
         </div>
