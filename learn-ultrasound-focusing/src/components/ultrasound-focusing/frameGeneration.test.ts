@@ -1,4 +1,5 @@
 import { ArrayElement } from "./arrayElement";
+import { generateAndRenderInitialFrame } from "./main";
 
 // Mock canvas context for testing
 const createMockCanvas = () => {

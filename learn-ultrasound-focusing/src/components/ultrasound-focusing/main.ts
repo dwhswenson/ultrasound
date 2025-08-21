@@ -4,6 +4,7 @@ import {
   DEFAULT_ELEMENT_RADIUS,
   DEFAULT_LINE_LENGTH,
   DEFAULT_ELEMENT_X_POSITION,
+  VISUAL_SPEED_PX_PER_SEC,
 } from "./shared/constants";
 
 // Global variables for DOM elements (initialized in initializeUI)
@@ -564,6 +565,145 @@ function renderFrame(idx: number) {
 }
 
 /**
+ * Generates and renders the initial frame (t=0) based on current UI parameters.
+ * This is called on initialization and when parameters change.
+ */
+async function generateAndRenderInitialFrame(): Promise<void> {
+  // Get DOM elements dynamically
+  const canvasElement = document.getElementById(
+    "animationCanvas",
+  ) as HTMLCanvasElement;
+  if (!canvasElement) return;
+
+  const canvasContext = canvasElement.getContext("2d");
+  if (!canvasContext) return;
+
+  const speedOfSoundElement = document.getElementById(
+    "speedOfSound",
+  ) as HTMLInputElement;
+  const numElementsElement = document.getElementById(
+    "numElements",
+  ) as HTMLInputElement;
+  const pitchElement = document.getElementById("pitch") as HTMLInputElement;
+  const targetXElement = document.getElementById("targetX") as HTMLInputElement;
+  const targetYElement = document.getElementById("targetY") as HTMLInputElement;
+
+  // Check if required DOM elements are available
+  if (
+    !speedOfSoundElement ||
+    !numElementsElement ||
+    !pitchElement ||
+    !targetXElement ||
+    !targetYElement
+  ) {
+    return;
+  }
+
+  const numElements = parseInt(numElementsElement.value, 10);
+  const pitch = parseFloat(pitchElement.value);
+
+  // Check if target is set
+  const hasTarget = targetXElement.value && targetYElement.value;
+  const targetType = hasTarget ? "point" : "linear";
+
+  let targetX, targetY;
+  let elements: ArrayElement[];
+  let maxDelayTime: number;
+
+  if (hasTarget) {
+    targetX = parseFloat(targetXElement.value);
+    targetY = parseFloat(targetYElement.value);
+
+    // Validate target point
+    const elementX = canvasElement.width * DEFAULT_ELEMENT_X_POSITION;
+    const validation = validateTargetPoint(
+      targetX,
+      targetY,
+      canvasElement.width,
+      canvasElement.height,
+      elementX,
+    );
+
+    if (validation.isValid) {
+      // Point targeting: calculate individual delays
+      const totalHeight = (numElements - 1) * pitch;
+      const startY = (canvasElement.height - totalHeight) / 2;
+
+      const positions = [];
+      for (let i = 0; i < numElements; i++) {
+        positions.push({ x: elementX, y: startY + i * pitch });
+      }
+
+      // Calculate delays using visual speed
+      const visualSpeed =
+        parseFloat(speedOfSoundElement.value) || VISUAL_SPEED_PX_PER_SEC;
+      const distances = positions.map((pos) =>
+        Math.sqrt((targetX! - pos.x) ** 2 + (targetY! - pos.y) ** 2),
+      );
+      const maxDistance = Math.max(...distances);
+      const visualDelays = distances.map(
+        (distance) => (maxDistance - distance) / visualSpeed,
+      );
+
+      elements = createElementArray(
+        numElements,
+        pitch,
+        visualDelays,
+        canvasElement,
+      );
+      maxDelayTime = Math.max(...visualDelays);
+    } else {
+      // Invalid target - fall back to linear mode
+      const visualSpeed =
+        parseFloat(speedOfSoundElement.value) || VISUAL_SPEED_PX_PER_SEC;
+      const lineLength = DEFAULT_LINE_LENGTH;
+      const radius = DEFAULT_ELEMENT_RADIUS;
+      const linearDelay = (lineLength - radius) / visualSpeed;
+      elements = createElementArray(
+        numElements,
+        pitch,
+        linearDelay,
+        canvasElement,
+      );
+      maxDelayTime = linearDelay;
+    }
+  } else {
+    // Linear targeting
+    const visualSpeed =
+      parseFloat(speedOfSoundElement.value) || VISUAL_SPEED_PX_PER_SEC;
+    const lineLength = DEFAULT_LINE_LENGTH;
+    const radius = DEFAULT_ELEMENT_RADIUS;
+    const linearDelay = (lineLength - radius) / visualSpeed;
+    elements = createElementArray(
+      numElements,
+      pitch,
+      linearDelay,
+      canvasElement,
+    );
+    maxDelayTime = linearDelay;
+  }
+
+  // Generate and render the first frame (t=0)
+  const initialFrame = await createMultiElementFrameWithElements(
+    elements,
+    maxDelayTime,
+    0, // currentTime = 0 for initial frame
+    targetType,
+    canvasElement,
+    canvasContext,
+    targetX,
+    targetY,
+  );
+
+  // Render directly to canvas
+  canvasContext.clearRect(0, 0, canvasElement.width, canvasElement.height);
+  canvasContext.drawImage(initialFrame, 0, 0);
+
+  // Clean up the bitmap
+  initialFrame.close();
+}
+
+/**
  * Initialize UI event listeners and DOM references.
  * Call this when the DOM is ready.
  */
@@ -594,16 +734,14 @@ function initializeUI(): void {
     unsetTargetBtn.disabled = !hasTarget;
   };
 
-  // Unset target button functionality
-  unsetTargetBtn.addEventListener("click", () => {
-    targetXInput.value = "";
-    targetYInput.value = "";
-    unsetTargetBtn.disabled = true;
-    showTargetSetFeedback(false, "Target unset - using linear mode");
-  });
+  // Unset target button functionality will be handled later with regenerateInitialFrame
 
-  targetXInput.addEventListener("input", updateUnsetButton);
-  targetYInput.addEventListener("input", updateUnsetButton);
+  if (targetXInput) {
+    targetXInput.addEventListener("input", updateUnsetButton);
+  }
+  if (targetYInput) {
+    targetYInput.addEventListener("input", updateUnsetButton);
+  }
 
   // Initialize the unset button state
   updateUnsetButton();
@@ -735,9 +873,46 @@ function initializeUI(): void {
   });
 
   // Add speed display update
-  speedOfSoundInput.addEventListener("input", () => {
-    updateSpeedDisplay();
-  });
+  if (speedOfSoundInput) {
+    speedOfSoundInput.addEventListener("input", () => {
+      updateSpeedDisplay();
+    });
+  }
+
+  // Add event listeners to regenerate first frame when parameters change
+  const regenerateInitialFrame = () => {
+    generateAndRenderInitialFrame().catch(console.error);
+  };
+
+  if (numElementsInput) {
+    numElementsInput.addEventListener("input", regenerateInitialFrame);
+  }
+  if (pitchInput) {
+    pitchInput.addEventListener("input", regenerateInitialFrame);
+  }
+  if (speedOfSoundInput) {
+    speedOfSoundInput.addEventListener("input", regenerateInitialFrame);
+  }
+  if (targetXInput) {
+    targetXInput.addEventListener("input", regenerateInitialFrame);
+  }
+  if (targetYInput) {
+    targetYInput.addEventListener("input", regenerateInitialFrame);
+  }
+
+  // Also regenerate when target is unset
+  if (unsetTargetBtn && targetXInput && targetYInput) {
+    unsetTargetBtn.addEventListener("click", () => {
+      targetXInput.value = "";
+      targetYInput.value = "";
+      unsetTargetBtn.disabled = true;
+      showTargetSetFeedback(false, "Target unset - using linear mode");
+      regenerateInitialFrame();
+    });
+  }
+
+  // Generate and render the initial first frame
+  generateAndRenderInitialFrame().catch(console.error);
 }
 
 // Note: Initialization is now handled by client.ts for Astro compatibility
@@ -757,6 +932,7 @@ export {
   updateSpeedDisplay,
   downloadMovie,
   initializeUI,
+  generateAndRenderInitialFrame,
 };
 
 /**
