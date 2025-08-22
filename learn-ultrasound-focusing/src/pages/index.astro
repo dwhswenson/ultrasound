@@ -9,17 +9,22 @@ import Layout from "../layouts/Layout.astro";
             Some teaching materials and visualization related to ultrasound, in
             particular shear-wave ultrasound vibrometry.
         </p>
-        <div class="hero-actions">
-            <a href="/visualization" class="cta-button primary">
-                Start Visualization
-            </a>
-            <a href="/theory" class="cta-button secondary"> Learn Theory </a>
-        </div>
     </div>
 
     <section class="features">
-        <h2>What You'll Learn</h2>
         <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🌊</div>
+                <h3>Shear Wave Generation</h3>
+                <p>
+                  Understand ways that shear waves can be generated with
+                  mechanical motion or with ultrasound.
+                </p>
+                <a href="/shear-waves" class="feature-link"
+                    >Explore Shear Waves →</a
+                >
+            </div>
+
             <div class="feature-card">
                 <div class="feature-icon">🎯</div>
                 <h3>Array Focusing</h3>
@@ -33,23 +38,11 @@ import Layout from "../layouts/Layout.astro";
             </div>
 
             <div class="feature-card">
-                <div class="feature-icon">🌊</div>
-                <h3>Wave Propagation</h3>
-                <p>
-                    Visualize how ultrasound waves propagate through media and
-                    interfere constructively to create focused beams.
-                </p>
-                <a href="/shear-waves" class="feature-link"
-                    >Explore Shear Waves →</a
-                >
-            </div>
-
-            <div class="feature-card">
                 <div class="feature-icon">📊</div>
                 <h3>Pulse Harmonics</h3>
                 <p>
-                    Explore radiation force spectra from pulsed ultrasound using
-                    Equation 18. Adjust frequency and pulse duration parameters
+                    Explore radiation force spectra from pulsed ultrasound.
+                    Adjust frequency and pulse duration parameters
                     interactively.
                 </p>
                 <a href="/pulse_harmonics" class="feature-link"
@@ -57,55 +50,9 @@ import Layout from "../layouts/Layout.astro";
                 >
             </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">📐</div>
-                <h3>Mathematical Theory</h3>
-                <p>
-                    Learn the underlying physics and mathematics that govern
-                    ultrasound focusing, beamforming, and wave interference.
-                </p>
-                <a href="/theory" class="feature-link">Study Theory →</a>
-            </div>
         </div>
     </section>
 
-    <section class="getting-started">
-        <h2>Getting Started</h2>
-        <div class="steps">
-            <div class="step">
-                <div class="step-number">1</div>
-                <div class="step-content">
-                    <h3>Start with Visualization</h3>
-                    <p>
-                        Jump right into our interactive ultrasound focusing
-                        simulator to see the concepts in action.
-                    </p>
-                </div>
-            </div>
-
-            <div class="step">
-                <div class="step-number">2</div>
-                <div class="step-content">
-                    <h3>Experiment with Parameters</h3>
-                    <p>
-                        Adjust array parameters, target positions, and timing to
-                        understand how they affect the focused beam.
-                    </p>
-                </div>
-            </div>
-
-            <div class="step">
-                <div class="step-number">3</div>
-                <div class="step-content">
-                    <h3>Learn the Theory</h3>
-                    <p>
-                        Dive deeper into the physics and mathematics behind
-                        ultrasound focusing techniques.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
 </Layout>
 
 <style>

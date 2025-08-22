@@ -144,7 +144,7 @@ create shear waves:
 
 * [Ultrasound Focusing](/ultrasound-focusing/): This page contains an interactive tool to show how 
   ultrasound can be focused to a specific point in the tissue.
-* [Harmonic Generation](): This page explains how the square-wave pulse
+* [Harmonic Generation](/pulse-harmonics/): This page explains how the square-wave pulse
   sequence used in, for example, shear wave dispersion ultrasound vibrometry
   (SDUV) can create harmonics of a fundamental frequency, allowing a single ARF
   excitation to be used to sample shear wave speed at multiple frequencies.
