@@ -46,13 +46,10 @@ export function radiationSpectrum(
 
   for (let n = 1; n <= N; n++) {
     const f = n * fr;
-    const A = 2 * a * Tb * sinc(Math.PI * Tb * f);
-
-    // Stop when the envelope is essentially zero to save work
-    if (A < 1e-3 * 2 * a * Tb) break;
+    const A = a * Tb * fr * sinc(Math.PI * Tb * f);
 
     freq.push(f);
-    amp.push(A);
+    amp.push(Math.abs(A));
   }
 
   return { freq, amp };
@@ -62,6 +59,7 @@ class RadiationSpectrumPlot {
   private u: any;
   private frInput!: HTMLInputElement;
   private TbInput!: HTMLInputElement;
+  private maxFreqInput!: HTMLInputElement;
   private container: HTMLElement;
 
   constructor(container: HTMLElement) {
@@ -81,10 +79,14 @@ class RadiationSpectrumPlot {
     controls.className = "controls flex gap-2 mb-2";
     controls.innerHTML = `
       <label>Base freq (Hz):
-        <input id="fr" type="number" value="500" min="1" step="10" />
+        <input id="fr" type="number" value="200" min="1" step="10" />
       </label>
       <label>Pulse duration T<sub>b</sub> (s):
-        <input id="Tb" type="number" value="0.001" min="0.00005" step="0.00005" />
+        <input id="Tb" type="number" value="0.0001" min="0.00005" step="0.00005" />
+      </label>
+      <label>Max freq (Hz):
+        <input id="maxFreq" type="range" value="2500" min="1000" max="100000" step="100" />
+        <span id="maxFreqValue">2500</span>
       </label>
       <button id="resetZoom">Reset zoom</button>
     `;
@@ -92,6 +94,7 @@ class RadiationSpectrumPlot {
 
     this.frInput = controls.querySelector("#fr") as HTMLInputElement;
     this.TbInput = controls.querySelector("#Tb") as HTMLInputElement;
+    this.maxFreqInput = controls.querySelector("#maxFreq") as HTMLInputElement;
 
     const plotDiv = document.createElement("div");
     this.container.appendChild(plotDiv);
@@ -102,6 +105,13 @@ class RadiationSpectrumPlot {
     // Event handlers
     this.frInput.addEventListener("input", () => this.update());
     this.TbInput.addEventListener("input", () => this.update());
+    this.maxFreqInput.addEventListener("input", () => {
+      const maxFreqValue = controls.querySelector(
+        "#maxFreqValue",
+      ) as HTMLSpanElement;
+      maxFreqValue.textContent = this.maxFreqInput.value;
+      this.update();
+    });
     controls.querySelector("#resetZoom")!.addEventListener("click", () => {
       const xscale = this.u.scales.x;
       this.u.setScale("x", { min: 0, max: xscale.max });
@@ -193,16 +203,29 @@ class RadiationSpectrumPlot {
 
     const fr = parseFloat(this.frInput.value);
     const Tb = parseFloat(this.TbInput.value);
+    const maxFreq = parseFloat(this.maxFreqInput.value);
 
     const { freq, amp } = radiationSpectrum(fr, Tb, 1000);
 
-    // Ensure we have data before setting
-    if (freq.length > 0 && amp.length > 0) {
-      this.u.setData([freq, amp]);
+    // Filter data to only show frequencies up to maxFreq
+    const filteredFreq: number[] = [];
+    const filteredAmp: number[] = [];
 
-      // Auto-adjust X scale to fit data
-      const maxF = freq[freq.length - 1] || 1;
-      this.u.setScale("x", { min: 0, max: maxF * 1.05 });
+    for (let i = 0; i < freq.length; i++) {
+      if (freq[i] <= maxFreq) {
+        filteredFreq.push(freq[i]);
+        filteredAmp.push(amp[i]);
+      } else {
+        break;
+      }
+    }
+
+    // Ensure we have data before setting
+    if (filteredFreq.length > 0 && filteredAmp.length > 0) {
+      this.u.setData([filteredFreq, filteredAmp]);
+
+      // Set X scale to match the max frequency slider
+      this.u.setScale("x", { min: 0, max: maxFreq * 1.05 });
     }
   }
 }
