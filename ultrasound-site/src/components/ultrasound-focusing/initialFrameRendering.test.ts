@@ -80,8 +80,12 @@ describe("Initial Frame Rendering", () => {
         addEventListener: jest.fn(),
         click: jest.fn(),
       } as unknown as HTMLButtonElement,
-      playMovie: {
+      playPauseMovie: {
         addEventListener: jest.fn(),
+      } as unknown as HTMLButtonElement,
+      stopMovie: {
+        addEventListener: jest.fn(),
+        disabled: true,
       } as unknown as HTMLButtonElement,
       prevFrame: {
         addEventListener: jest.fn(),
@@ -92,9 +96,10 @@ describe("Initial Frame Rendering", () => {
       downloadFrame: {
         addEventListener: jest.fn(),
       } as unknown as HTMLButtonElement,
-      downloadMovie: {
-        addEventListener: jest.fn(),
-      } as unknown as HTMLButtonElement,
+      // TEMPORARILY DISABLED: Download Movie button
+      // downloadMovie: {
+      //   addEventListener: jest.fn(),
+      // } as unknown as HTMLButtonElement,
     };
 
     // Mock document.getElementById
@@ -102,6 +107,8 @@ describe("Initial Frame Rendering", () => {
       if (id === "animationCanvas") return mockCanvas;
       if (mockInputs[id]) return mockInputs[id];
       if (mockButtons[id]) return mockButtons[id];
+      // Handle temporarily disabled downloadMovie button
+      if (id === "downloadMovie") return null;
       return null;
     });
 

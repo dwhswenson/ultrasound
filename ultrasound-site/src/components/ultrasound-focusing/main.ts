@@ -16,11 +16,13 @@ let pitchInput: HTMLInputElement;
 let targetXInput: HTMLInputElement;
 let targetYInput: HTMLInputElement;
 let unsetTargetBtn: HTMLElement;
-let playMovieBtn: HTMLElement;
+let playPauseMovieBtn: HTMLElement;
+let stopMovieBtn: HTMLElement;
 let prevFrameBtn: HTMLElement;
 let nextFrameBtn: HTMLElement;
 let downloadFrameBtn: HTMLElement;
-let downloadMovieBtn: HTMLElement;
+// TEMPORARILY DISABLED: Download Movie button
+// let downloadMovieBtn: HTMLElement;
 let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D;
 let frames: ImageBitmap[] = [];
@@ -511,10 +513,10 @@ function playMovie(): void {
   if (frames.length === 0) return;
 
   isPlaying = true;
-  playMovieBtn.textContent = "Stop Movie";
+  playPauseMovieBtn.textContent = "⏸️ Pause";
+  stopMovieBtn.disabled = false;
 
-  // Reset to first frame and render immediately
-  currentFrame = 0;
+  // Render current frame immediately (important when resuming from pause)
   renderFrame(currentFrame);
 
   // Use consistent frame rate for playback
@@ -522,6 +524,7 @@ function playMovie(): void {
   playInterval = window.setInterval(() => {
     currentFrame++;
     if (currentFrame >= frames.length) {
+      // Movie finished, stop and reset
       stopMovie();
       return;
     }
@@ -532,14 +535,29 @@ function playMovie(): void {
 /**
  * Stops the movie playback.
  */
-function stopMovie(): void {
+function pauseMovie(): void {
   isPlaying = false;
-  playMovieBtn.textContent = "Play Movie";
+  playPauseMovieBtn.textContent = "▶️ Play";
 
   if (playInterval !== null) {
     clearInterval(playInterval);
     playInterval = null;
   }
+}
+
+function stopMovie(): void {
+  isPlaying = false;
+  playPauseMovieBtn.textContent = "▶️ Play Movie";
+  stopMovieBtn.disabled = true;
+
+  if (playInterval !== null) {
+    clearInterval(playInterval);
+    playInterval = null;
+  }
+
+  // Reset to frame 0 and regenerate initial frame
+  currentFrame = 0;
+  updateInitialFrame();
 }
 
 /**
@@ -732,11 +750,13 @@ function initializeUI(): void {
   targetXInput = document.getElementById("targetX") as HTMLInputElement;
   targetYInput = document.getElementById("targetY") as HTMLInputElement;
   unsetTargetBtn = document.getElementById("unsetTarget")!;
-  playMovieBtn = document.getElementById("playMovie")!;
+  playPauseMovieBtn = document.getElementById("playPauseMovie")!;
+  stopMovieBtn = document.getElementById("stopMovie")!;
   prevFrameBtn = document.getElementById("prevFrame")!;
   nextFrameBtn = document.getElementById("nextFrame")!;
   downloadFrameBtn = document.getElementById("downloadFrame")!;
-  downloadMovieBtn = document.getElementById("downloadMovie")!;
+  // TEMPORARILY DISABLED: Download Movie button
+  // downloadMovieBtn = document.getElementById("downloadMovie")!;
   canvas = document.getElementById("animationCanvas") as HTMLCanvasElement;
   ctx = canvas.getContext("2d")!;
 
@@ -758,10 +778,16 @@ function initializeUI(): void {
   // Initialize the unset button state
   updateUnsetButton();
 
-  // Play movie functionality
-  playMovieBtn.addEventListener("click", async () => {
+  // Play/Pause movie functionality
+  playPauseMovieBtn.addEventListener("click", async () => {
     if (isPlaying) {
-      stopMovie();
+      pauseMovie();
+      return;
+    }
+
+    // If we have frames already and not at the beginning, just resume
+    if (frames.length > 0 && currentFrame > 0) {
+      playMovie();
       return;
     }
 
@@ -794,6 +820,8 @@ function initializeUI(): void {
       }
     }
 
+    // Reset to beginning for new movie
+    currentFrame = 0;
     await generateMovie(
       numElements,
       pitch,
@@ -805,10 +833,20 @@ function initializeUI(): void {
     playMovie();
   });
 
+  // Stop movie functionality
+  stopMovieBtn.addEventListener("click", () => {
+    stopMovie();
+  });
+
   prevFrameBtn.addEventListener("click", () => {
     if (currentFrame > 0) {
       currentFrame--;
       renderFrame(currentFrame);
+
+      // Update stop button state
+      if (currentFrame === 0) {
+        stopMovieBtn.disabled = true;
+      }
     }
   });
 
@@ -816,6 +854,11 @@ function initializeUI(): void {
     if (currentFrame < frames.length - 1) {
       currentFrame++;
       renderFrame(currentFrame);
+
+      // Update stop button state
+      if (currentFrame > 0) {
+        stopMovieBtn.disabled = false;
+      }
     }
   });
 
@@ -843,6 +886,8 @@ function initializeUI(): void {
     });
   });
 
+  // TEMPORARILY DISABLED: Download Movie button functionality
+  /*
   downloadMovieBtn.addEventListener("click", async () => {
     if (frames.length === 0) {
       alert("No movie to download. Please generate a movie first.");
@@ -856,6 +901,7 @@ function initializeUI(): void {
       alert("Failed to download movie. Please try again.");
     }
   });
+  */
 
   // Simple helper that updates the frame
   const refreshInitialFrame = async () => {
@@ -973,6 +1019,8 @@ export {
  * Downloads the current movie frames as a video file.
  * Safari-compatible implementation with fallback methods.
  */
+// TEMPORARILY DISABLED: Download Movie functionality
+/*
 async function downloadMovie(): Promise<void> {
   // Check if MediaRecorder is supported and working
   const isMediaRecorderSupported = () => {
@@ -1044,7 +1092,10 @@ async function downloadMovie(): Promise<void> {
   // Fallback: Download frames as individual images
   await downloadMovieAsFrameSequence();
 }
+*/
 
+// TEMPORARILY DISABLED: Download Movie functionality
+/*
 /**
  * Downloads movie using MediaRecorder (Chrome, Firefox)
  * Records in background without affecting visible canvas
@@ -1278,9 +1329,8 @@ async function downloadMovieWithMediaRecorder(): Promise<void> {
   });
 }
 
-/**
- * Downloads movie as a sequence of PNG frames (Safari fallback)
- */
+// TEMPORARILY DISABLED: Download Movie functionality
+/*
 async function downloadMovieAsFrameSequence(): Promise<void> {
   const zip = await createFrameSequenceZip();
 
@@ -1293,9 +1343,6 @@ async function downloadMovieAsFrameSequence(): Promise<void> {
   URL.revokeObjectURL(url);
 }
 
-/**
- * Creates a ZIP file containing all frames as PNG images
- */
 async function createFrameSequenceZip(): Promise<Blob> {
   // Simple ZIP implementation for frame sequence
 
@@ -1347,6 +1394,7 @@ async function createFrameSequenceZip(): Promise<Blob> {
   // Return empty blob since we're downloading individual files
   return new Blob([], { type: "application/zip" });
 }
+*/
 
 /**
  * Shows visual feedback when a target point is set by clicking.

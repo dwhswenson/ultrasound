@@ -11,8 +11,9 @@ import Layout from "../../layouts/Layout.astro";
             <h1>🔊 Ultrasound Array Focusing Visualization</h1>
             <p>
                 Explore how ultrasound transducer arrays focus acoustic energy
-                through precise timing control. Adjust parameters in real-time
-                to see how they affect the focused beam pattern.
+                through precise timing control.<br /> Adjust parameters in real-time
+                to see how they affect the focused beam pattern.<br /> Click to set
+                the target!
             </p>
         </div>
 
@@ -138,13 +139,18 @@ import Layout from "../../layouts/Layout.astro";
                     -->
 
                     <div class="movie-controls">
-                        <button type="button" id="playMovie"
-                            >▶️ Play Movie</button
+                        <button type="button" id="playPauseMovie"
+                            >▶️ Play</button
+                        >
+                        <button type="button" id="stopMovie" disabled
+                            >⏹️ Stop</button
                         >
                         <button id="prevFrame">⏮ Prev Frame</button>
                         <button id="nextFrame">Next Frame ⏭</button>
+                        <br />
                         <button id="downloadFrame">💾 Download Frame</button>
-                        <button id="downloadMovie">🎥 Download Movie</button>
+                        <!-- TEMPORARILY DISABLED: Download Movie button -->
+                        <!-- <button id="downloadMovie">🎥 Download Movie</button> -->
                         <button type="button" id="unsetTarget" disabled
                             >Unset Target</button
                         >
