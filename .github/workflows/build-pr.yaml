@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  ASTRO_SOURCE_DIR: "ultrasound-site"
+  ASTRO_SOURCE_DIR: "."
   ASTRO_BASE_URL: ""
   ASTRO_OUTPUT_DIR: "dist"
   # if you change ASTRO_OUTPUT_DIR, also add a repository variable for it
