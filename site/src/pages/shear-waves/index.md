@@ -102,7 +102,7 @@ diagnostics.
 <div class="image-text-section">
 <div class="image-content">
 
-![Mechanical Vibration Shear Waves](./mech_shaker_schematic.svg)
+![Mechanical Vibration Shear Waves](/shear-waves/mech_shaker_schematic.svg)
 
 </div>
 <div class="text-content">
@@ -121,7 +121,7 @@ open a patient and shake their liver to measure its stiffness!
 <div class="image-text-section">
 <div class="image-content">
 
-![Acoustic Radiation Force](./arf_schematic.svg)
+![Acoustic Radiation Force](/shear-waves/arf_schematic.svg)
 
 </div>
 <div class="text-content">
