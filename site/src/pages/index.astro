@@ -13,31 +13,27 @@ import Layout from "../layouts/Layout.astro";
 
     <section class="features">
         <div class="feature-grid">
-            <div class="feature-card">
+            <a href="/shear-waves" class="feature-card">
                 <div class="feature-icon">🌊</div>
                 <h3>Shear Wave Generation</h3>
                 <p>
-                  Understand ways that shear waves can be generated with
-                  mechanical motion or with ultrasound.
+                    Understand ways that shear waves can be generated with
+                    mechanical motion or with ultrasound.
                 </p>
-                <a href="/shear-waves" class="feature-link"
-                    >Explore Shear Waves →</a
-                >
-            </div>
+                <span class="feature-link">Explore Shear Waves →</span>
+            </a>
 
-            <div class="feature-card">
+            <a href="/ultrasound-focusing" class="feature-card">
                 <div class="feature-icon">🎯</div>
                 <h3>Array Focusing</h3>
                 <p>
                     Understand how ultrasound transducer arrays focus acoustic
                     energy at specific points through precise timing control.
                 </p>
-                <a href="/ultrasound-focusing" class="feature-link"
-                    >Try Interactive Demo →</a
-                >
-            </div>
+                <span class="feature-link">Try Interactive Demo →</span>
+            </a>
 
-            <div class="feature-card">
+            <a href="/pulse-harmonics" class="feature-card">
                 <div class="feature-icon">📊</div>
                 <h3>Pulse Harmonics</h3>
                 <p>
@@ -45,14 +41,10 @@ import Layout from "../layouts/Layout.astro";
                     Adjust frequency and pulse duration parameters
                     interactively.
                 </p>
-                <a href="/pulse_harmonics" class="feature-link"
-                    >Analyze Spectrum →</a
-                >
-            </div>
-
+                <span class="feature-link">Analyze Spectrum →</span>
+            </a>
         </div>
     </section>
-
 </Layout>
 
 <style>
@@ -147,6 +139,8 @@ import Layout from "../layouts/Layout.astro";
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         border: 1px solid #e2e8f0;
         transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
     }
 
     .feature-card:hover {
@@ -165,10 +159,18 @@ import Layout from "../layouts/Layout.astro";
         color: #1e293b;
     }
 
+    .feature-card:hover h3 {
+        color: #1e293b;
+    }
+
     .feature-card p {
         color: #64748b;
         line-height: 1.7;
         margin-bottom: 1.5rem;
+    }
+
+    .feature-card:hover p {
+        color: #64748b;
     }
 
     .feature-link {
