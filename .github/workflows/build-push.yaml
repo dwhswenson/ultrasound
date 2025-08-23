@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  ASTRO_SOURCE_DIR: "example-astro"
+  ASTRO_SOURCE_DIR: "site"
   ASTRO_BASE_URL: ""
   ASTRO_OUTPUT_DIR: "dist"
 
