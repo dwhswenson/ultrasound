@@ -1,6 +1,11 @@
 # pixi environments
+pixi.toml
+pixi.lock
 .pixi
 *.egg-info
+
+.terraform
+terraform.tfstate
 
 # Logs
 logs
