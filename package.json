@@ -7,18 +7,34 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test": "jest"
+    "test": "jest",
+    "sync-lockfiles": "./scripts/sync-lockfiles.sh"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.12",
-    "canvas": "^2.11.2",
+    "canvas": "^3.2.0",
     "gif.js": "^0.2.0",
     "jest": "^30.0.5",
     "jest-canvas-mock": "^2.5.2",
-    "jest-environment-jsdom": "^29.7.0",
+    "jest-environment-jsdom": "^30.0.5",
     "ts-jest": "^29.4.0",
+    "@types/jest": "^30.0.0",
     "typescript": "~5.8.3",
     "vite": "^7.0.4"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.0.0",
+    "@rollup/rollup-linux-arm64-gnu": "^4.0.0",
+    "@rollup/rollup-darwin-x64": "^4.0.0",
+    "@rollup/rollup-darwin-arm64": "^4.0.0",
+    "@esbuild/linux-x64": "^0.25.0",
+    "@esbuild/linux-arm64": "^0.25.0",
+    "@esbuild/darwin-x64": "^0.25.0",
+    "@esbuild/darwin-arm64": "^0.25.0"
+  },
+  "overrides": {
+    "jackspeak": {
+      "@isaacs/cliui": "npm:cliui@^8.0.1"
+    }
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.3",
