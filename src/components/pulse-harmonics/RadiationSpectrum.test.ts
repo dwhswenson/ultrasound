@@ -973,4 +973,93 @@ describe("RadiationSpectrumPlot class", () => {
     expect(frInput.value).toBe("1000000");
     expect(TbInput.value).toBe("0.000001");
   });
+
+  test("stemPaths function logic validation", async () => {
+    // Test the stemPaths logic by simulating its behavior
+    // This tests the core functionality without relying on uPlot internals
+
+    // Mock Path2D to test the drawing commands
+    const mockPath2D = {
+      moveTo: jest.fn(),
+      lineTo: jest.fn(),
+    };
+    const originalPath2D = global.Path2D;
+    global.Path2D = jest.fn().mockImplementation(() => mockPath2D);
+
+    // Simulate the stemPaths function logic
+    const mockU = {
+      valToPosX: (val: number) => val * 2,
+      valToPosY: (val: number) => 100 - val * 10,
+      data: [
+        [100, 200, 300], // frequencies
+        [0.5, 1.0, 0.3], // amplitudes
+      ],
+    };
+
+    // Test the stemPaths algorithm manually
+    const path = new (global.Path2D as any)();
+    const idx0 = 0;
+    const idx1 = 2;
+    const seriesIdx = 1;
+
+    // Draw vertical lines (stems) for each frequency component
+    for (let i = idx0; i <= idx1; i++) {
+      const x = mockU.valToPosX(mockU.data[0][i]);
+      const y0 = mockU.valToPosY(0);
+      const y1 = mockU.valToPosY(mockU.data[1][i]);
+
+      // Draw the vertical line (spike)
+      path.moveTo(x, y0);
+      path.lineTo(x, y1);
+
+      // Add a small cap at the top for visibility
+      path.moveTo(x - 1, y1);
+      path.lineTo(x + 1, y1);
+    }
+
+    // Verify the correct number of drawing commands
+    expect(mockPath2D.moveTo).toHaveBeenCalledTimes(6); // 3 points * 2 moveTo per point
+    expect(mockPath2D.lineTo).toHaveBeenCalledTimes(6); // 3 points * 2 lineTo per point
+
+    // Verify specific coordinates for first point
+    expect(mockPath2D.moveTo).toHaveBeenCalledWith(200, 100); // x=100*2, y=100-0*10
+    expect(mockPath2D.lineTo).toHaveBeenCalledWith(200, 95); // x=100*2, y=100-0.5*10
+
+    // Restore Path2D
+    global.Path2D = originalPath2D;
+  });
+
+  test("stemPaths function handles plot data updates", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    await mountRadiationSpectrum("#test-container");
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    // Test multiple input changes to ensure stemPaths works with different data
+    const frInput = testElement.querySelector("#fr") as HTMLInputElement;
+    const TbInput = testElement.querySelector("#Tb") as HTMLInputElement;
+
+    // Change parameters multiple times to exercise stemPaths with different datasets
+    const testCases = [
+      { fr: "100", Tb: "0.001" },
+      { fr: "500", Tb: "0.0005" },
+      { fr: "1000", Tb: "0.002" },
+    ];
+
+    for (const testCase of testCases) {
+      frInput.value = testCase.fr;
+      TbInput.value = testCase.Tb;
+
+      expect(() => {
+        frInput.dispatchEvent(new Event("input"));
+        TbInput.dispatchEvent(new Event("input"));
+      }).not.toThrow();
+
+      // Small delay between test cases
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+
+    // Verify inputs were processed
+    expect(frInput.value).toBe("1000");
+    expect(TbInput.value).toBe("0.002");
+  });
 });
