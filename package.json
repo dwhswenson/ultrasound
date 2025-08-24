@@ -18,7 +18,11 @@
     "ts-jest": "^29.4.0",
     "@types/jest": "^30.0.0",
     "typescript": "~5.8.3",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "string-width-cjs": "npm:string-width@^4.2.0",
+    "strip-ansi-cjs":   "npm:strip-ansi@^6.0.1",
+    "wrap-ansi-cjs":    "npm:wrap-ansi@^7.0.0"
+
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.3",
