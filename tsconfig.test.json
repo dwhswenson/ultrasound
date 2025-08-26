@@ -7,7 +7,7 @@
     "noEmit": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["jest", "node", "@types/jest"]
+    "types": ["vitest/globals", "node"]
   },
   "include": ["src/**/*", "src/**/*.test.ts"],
   "exclude": ["node_modules", "dist"]

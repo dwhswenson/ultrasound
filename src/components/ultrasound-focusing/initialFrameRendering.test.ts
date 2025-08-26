@@ -1,3 +1,4 @@
+import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { generateAndRenderInitialFrame } from "./main";
 
 describe("Initial Frame Rendering", () => {
@@ -17,21 +18,21 @@ describe("Initial Frame Rendering", () => {
 
     // Create comprehensive mock context
     mockCtx = {
-      clearRect: jest.fn(),
-      fillRect: jest.fn(),
-      drawImage: jest.fn(),
-      beginPath: jest.fn(),
-      arc: jest.fn(),
-      moveTo: jest.fn(),
-      lineTo: jest.fn(),
-      stroke: jest.fn(),
-      fill: jest.fn(),
-      fillText: jest.fn(),
-      save: jest.fn(),
-      restore: jest.fn(),
-      translate: jest.fn(),
-      rotate: jest.fn(),
-      setLineDash: jest.fn(),
+      clearRect: vi.fn(),
+      fillRect: vi.fn(),
+      drawImage: vi.fn(),
+      beginPath: vi.fn(),
+      arc: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      stroke: vi.fn(),
+      fill: vi.fn(),
+      fillText: vi.fn(),
+      save: vi.fn(),
+      restore: vi.fn(),
+      translate: vi.fn(),
+      rotate: vi.fn(),
+      setLineDash: vi.fn(),
       fillStyle: "",
       strokeStyle: "",
       lineWidth: 0,
@@ -40,36 +41,36 @@ describe("Initial Frame Rendering", () => {
     } as unknown as CanvasRenderingContext2D;
 
     // Mock canvas getContext and event methods
-    jest.spyOn(mockCanvas, "getContext").mockReturnValue(mockCtx);
-    mockCanvas.addEventListener = jest.fn();
-    mockCanvas.dispatchEvent = jest.fn();
+    vi.spyOn(mockCanvas, "getContext").mockReturnValue(mockCtx);
+    mockCanvas.addEventListener = vi.fn();
+    mockCanvas.dispatchEvent = vi.fn();
 
     // Create mock input elements
     mockInputs = {
       speedOfSound: {
         value: "150",
-        addEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       } as unknown as HTMLInputElement,
       numElements: {
         value: "16",
-        addEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       } as unknown as HTMLInputElement,
       pitch: {
         value: "50",
-        addEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       } as unknown as HTMLInputElement,
       targetX: {
         value: "",
-        addEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       } as unknown as HTMLInputElement,
       targetY: {
         value: "",
-        addEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       } as unknown as HTMLInputElement,
     };
 
@@ -77,33 +78,33 @@ describe("Initial Frame Rendering", () => {
     const mockButtons = {
       unsetTarget: {
         disabled: true,
-        addEventListener: jest.fn(),
-        click: jest.fn(),
+        addEventListener: vi.fn(),
+        click: vi.fn(),
       } as unknown as HTMLButtonElement,
       playPauseMovie: {
-        addEventListener: jest.fn(),
+        addEventListener: vi.fn(),
       } as unknown as HTMLButtonElement,
       stopMovie: {
-        addEventListener: jest.fn(),
+        addEventListener: vi.fn(),
         disabled: true,
       } as unknown as HTMLButtonElement,
       prevFrame: {
-        addEventListener: jest.fn(),
+        addEventListener: vi.fn(),
       } as unknown as HTMLButtonElement,
       nextFrame: {
-        addEventListener: jest.fn(),
+        addEventListener: vi.fn(),
       } as unknown as HTMLButtonElement,
       downloadFrame: {
-        addEventListener: jest.fn(),
+        addEventListener: vi.fn(),
       } as unknown as HTMLButtonElement,
       // TEMPORARILY DISABLED: Download Movie button
       // downloadMovie: {
-      //   addEventListener: jest.fn(),
+      //   addEventListener: vi.fn(),
       // } as unknown as HTMLButtonElement,
     };
 
     // Mock document.getElementById
-    document.getElementById = jest.fn((id: string) => {
+    document.getElementById = vi.fn((id: string) => {
       if (id === "animationCanvas") return mockCanvas;
       if (mockInputs[id]) return mockInputs[id];
       if (mockButtons[id]) return mockButtons[id];
@@ -113,18 +114,18 @@ describe("Initial Frame Rendering", () => {
     });
 
     // Mock createImageBitmap
-    global.createImageBitmap = jest.fn().mockResolvedValue({
+    global.createImageBitmap = vi.fn().mockResolvedValue({
       width: 640,
       height: 480,
-      close: jest.fn(),
+      close: vi.fn(),
     });
 
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
     document.getElementById = originalGetElementById;
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it("should render initial frame with linear targeting", async () => {
@@ -159,7 +160,7 @@ describe("Initial Frame Rendering", () => {
 
   it("should handle missing canvas gracefully", async () => {
     // Arrange - no canvas element
-    document.getElementById = jest.fn(() => null);
+    document.getElementById = vi.fn(() => null);
 
     // Act & Assert - should not throw
     await expect(generateAndRenderInitialFrame()).resolves.not.toThrow();
@@ -171,7 +172,7 @@ describe("Initial Frame Rendering", () => {
 
   it("should handle missing input elements gracefully", async () => {
     // Arrange - canvas exists but inputs don't
-    document.getElementById = jest.fn((id: string) => {
+    document.getElementById = vi.fn((id: string) => {
       if (id === "animationCanvas") return mockCanvas;
       return null;
     });
@@ -189,9 +190,9 @@ describe("Initial Frame Rendering", () => {
     const mockBitmap = {
       width: 640,
       height: 480,
-      close: jest.fn(),
+      close: vi.fn(),
     };
-    (global.createImageBitmap as jest.Mock).mockResolvedValue(mockBitmap);
+    (global.createImageBitmap as vi.Mock).mockResolvedValue(mockBitmap);
 
     // Act
     await generateAndRenderInitialFrame();
@@ -273,7 +274,7 @@ describe("Initial Frame Rendering", () => {
     const { updateInitialFrame } = await import("./main");
 
     // Clear previous calls
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Set up some test values
     mockInputs.numElements.value = "8";
@@ -299,7 +300,7 @@ describe("Initial Frame Rendering", () => {
     mockInputs.targetX.value = "";
     mockInputs.targetY.value = "";
 
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Act
     await updateInitialFrame();
@@ -319,14 +320,14 @@ describe("Initial Frame Rendering", () => {
 
     // Mock getBoundingClientRect before initializing UI
     Object.defineProperty(mockCanvas, "getBoundingClientRect", {
-      value: jest.fn(() => ({ left: 50, top: 50, width: 640, height: 480 })),
+      value: vi.fn(() => ({ left: 50, top: 50, width: 640, height: 480 })),
       writable: true,
     });
 
     // Set up a proper click handler that calls the regeneration function
     let clickHandler: (event: MouseEvent) => void;
     const originalAddEventListener = mockCanvas.addEventListener;
-    mockCanvas.addEventListener = jest.fn((event: string, handler: any) => {
+    mockCanvas.addEventListener = vi.fn((event: string, handler: any) => {
       if (event === "click") {
         clickHandler = handler;
       }
@@ -339,7 +340,7 @@ describe("Initial Frame Rendering", () => {
     initializeUI();
 
     // Clear canvas operations from initialization
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Simulate click by calling handler directly
     if (clickHandler) {
@@ -374,30 +375,30 @@ describe("Initial Frame Rendering", () => {
     // Enhanced mocks with operation tracking
     const trackedCtx = {
       ...mockCtx,
-      clearRect: jest.fn((...args) => {
+      clearRect: vi.fn((...args) => {
         operationOrder.push("clearRect");
-        return (mockCtx.clearRect as jest.Mock)(...args);
+        return (mockCtx.clearRect as vi.Mock)(...args);
       }),
-      drawImage: jest.fn((...args) => {
+      drawImage: vi.fn((...args) => {
         operationOrder.push("drawImage");
-        return (mockCtx.drawImage as jest.Mock)(...args);
+        return (mockCtx.drawImage as vi.Mock)(...args);
       }),
-      fillRect: jest.fn((...args) => {
+      fillRect: vi.fn((...args) => {
         operationOrder.push("fillRect");
-        return (mockCtx.fillRect as jest.Mock)(...args);
+        return (mockCtx.fillRect as vi.Mock)(...args);
       }),
     };
 
-    jest.spyOn(mockCanvas, "getContext").mockReturnValue(trackedCtx as any);
+    vi.spyOn(mockCanvas, "getContext").mockReturnValue(trackedCtx as any);
 
     Object.defineProperty(mockCanvas, "getBoundingClientRect", {
-      value: jest.fn(() => ({ left: 0, top: 0, width: 640, height: 480 })),
+      value: vi.fn(() => ({ left: 0, top: 0, width: 640, height: 480 })),
       writable: true,
     });
 
     // Set up click handler capture
     let asyncClickHandler: (event: MouseEvent) => Promise<void>;
-    mockCanvas.addEventListener = jest.fn((event: string, handler: any) => {
+    mockCanvas.addEventListener = vi.fn((event: string, handler: any) => {
       if (event === "click") {
         asyncClickHandler = handler;
       }
@@ -408,7 +409,7 @@ describe("Initial Frame Rendering", () => {
 
     // Clear tracking after initialization
     operationOrder.length = 0;
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Simulate canvas click with proper async handling
     if (asyncClickHandler) {
@@ -448,7 +449,7 @@ describe("Initial Frame Rendering", () => {
     mockInputs.targetX.value = "400";
     mockInputs.targetY.value = "240";
 
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Act - call updateInitialFrame which should handle the logic
     await updateInitialFrame();
@@ -461,7 +462,7 @@ describe("Initial Frame Rendering", () => {
     // Test with cleared target (simulating unset)
     mockInputs.targetX.value = "";
     mockInputs.targetY.value = "";
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     await updateInitialFrame();
 

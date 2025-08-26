@@ -1,21 +1,22 @@
+import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { radiationSpectrum, mountRadiationSpectrum } from "./RadiationSpectrum";
 
 // Mock uPlot for testing
 const mockUPlotInstance = {
-  setData: jest.fn(),
-  setScale: jest.fn(),
+  setData: vi.fn(),
+  setScale: vi.fn(),
   scales: { x: { max: 1000 } },
 };
 
 // Create a proper constructor mock
-const MockUPlot = jest
+const MockUPlot = vi
   .fn()
   .mockImplementation((options: any, data: any, element: any) => {
     return mockUPlotInstance;
   });
 
 // Mock the dynamic import module
-jest.mock("uplot", () => ({
+vi.mock("uplot", () => ({
   __esModule: true,
   default: MockUPlot,
 }));
@@ -23,7 +24,7 @@ jest.mock("uplot", () => ({
 // Mock the loadUPlot function by intercepting the import
 const originalImport = global.import;
 // @ts-ignore
-global.import = jest.fn().mockImplementation((moduleName) => {
+global.import = vi.fn().mockImplementation((moduleName) => {
   if (moduleName === "uplot") {
     return Promise.resolve({
       default: MockUPlot,
@@ -683,7 +684,7 @@ describe("RadiationSpectrumPlot class", () => {
   beforeEach(() => {
     // Clear DOM and reset mocks
     document.body.innerHTML = "";
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Create test container
     testElement = document.createElement("div");
@@ -870,14 +871,14 @@ describe("RadiationSpectrumPlot class", () => {
   test("CSS loading behavior", async () => {
     // Mock document.querySelector to simulate no existing CSS
     const originalQuerySelector = document.querySelector;
-    document.querySelector = jest.fn().mockImplementation((selector) => {
+    document.querySelector = vi.fn().mockImplementation((selector) => {
       if (typeof selector === "string" && selector.includes("uPlot"))
         return null;
       return originalQuerySelector.call(document, selector);
     });
 
-    const createElementSpy = jest.spyOn(document, "createElement");
-    const appendChildSpy = jest.spyOn(document.head, "appendChild");
+    const createElementSpy = vi.spyOn(document, "createElement");
+    const appendChildSpy = vi.spyOn(document.head, "appendChild");
 
     await new Promise((resolve) => setTimeout(resolve, 100));
     await mountRadiationSpectrum("#test-container");
@@ -896,13 +897,13 @@ describe("RadiationSpectrumPlot class", () => {
     // Mock document.querySelector to return existing CSS
     const mockLink = document.createElement("link");
     const originalQuerySelector = document.querySelector;
-    document.querySelector = jest.fn().mockImplementation((selector) => {
+    document.querySelector = vi.fn().mockImplementation((selector) => {
       if (typeof selector === "string" && selector.includes("uPlot"))
         return mockLink;
       return originalQuerySelector.call(document, selector);
     });
 
-    const createElementSpy = jest.spyOn(document, "createElement");
+    const createElementSpy = vi.spyOn(document, "createElement");
 
     await new Promise((resolve) => setTimeout(resolve, 100));
     await mountRadiationSpectrum("#test-container");
@@ -918,7 +919,7 @@ describe("RadiationSpectrumPlot class", () => {
 
   test("warns in non-browser environment", async () => {
     const originalWindow = global.window;
-    const consoleSpy = jest.spyOn(console, "warn").mockImplementation();
+    const consoleSpy = vi.spyOn(console, "warn").mockImplementation();
 
     // @ts-ignore
     delete global.window;
@@ -982,11 +983,11 @@ describe("RadiationSpectrumPlot class", () => {
 
     // Mock Path2D to test the drawing commands
     const mockPath2D = {
-      moveTo: jest.fn(),
-      lineTo: jest.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
     };
     const originalPath2D = global.Path2D;
-    global.Path2D = jest.fn().mockImplementation(() => mockPath2D);
+    global.Path2D = vi.fn().mockImplementation(() => mockPath2D);
 
     // Simulate the stemPaths function logic
     const mockU = {
@@ -1083,14 +1084,14 @@ describe("RadiationSpectrumPlot class", () => {
 
     // Mock ResizeObserver
     const mockResizeObserver = {
-      observe: jest.fn(),
-      disconnect: jest.fn(),
-      unobserve: jest.fn(),
+      observe: vi.fn(),
+      disconnect: vi.fn(),
+      unobserve: vi.fn(),
     };
 
     beforeEach(() => {
       // Mock ResizeObserver globally
-      (global as any).ResizeObserver = jest
+      (global as any).ResizeObserver = vi
         .fn()
         .mockImplementation((callback) => {
           mockResizeObserver.callback = callback;
@@ -1098,23 +1099,23 @@ describe("RadiationSpectrumPlot class", () => {
         });
 
       // Mock uPlot setSize method
-      mockUPlotInstance.setSize = jest.fn();
+      mockUPlotInstance.setSize = vi.fn();
       mockUPlotInstance.over = {
-        getBoundingClientRect: jest.fn().mockReturnValue({ width: 640 }),
+        getBoundingClientRect: vi.fn().mockReturnValue({ width: 640 }),
       };
-      mockUPlotInstance.destroy = jest.fn();
+      mockUPlotInstance.destroy = vi.fn();
 
       // Clear MockUPlot calls
       MockUPlot.mockClear();
     });
 
     afterEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     test("calculates appropriate plot width for large containers", async () => {
       // Mock large container (1200px width)
-      testElement.getBoundingClientRect = jest
+      testElement.getBoundingClientRect = vi
         .fn()
         .mockReturnValue(mockContainerRect(1200));
 
@@ -1134,7 +1135,7 @@ describe("RadiationSpectrumPlot class", () => {
 
     test("calculates appropriate plot width for medium containers", async () => {
       // Mock medium container (600px width)
-      testElement.getBoundingClientRect = jest
+      testElement.getBoundingClientRect = vi
         .fn()
         .mockReturnValue(mockContainerRect(600));
 
@@ -1154,7 +1155,7 @@ describe("RadiationSpectrumPlot class", () => {
 
     test("calculates appropriate plot width for small containers", async () => {
       // Mock small container (400px width)
-      testElement.getBoundingClientRect = jest
+      testElement.getBoundingClientRect = vi
         .fn()
         .mockReturnValue(mockContainerRect(400));
 
@@ -1174,7 +1175,7 @@ describe("RadiationSpectrumPlot class", () => {
 
     test("enforces minimum plot dimensions for very small containers", async () => {
       // Mock very small container (200px width)
-      testElement.getBoundingClientRect = jest
+      testElement.getBoundingClientRect = vi
         .fn()
         .mockReturnValue(mockContainerRect(200));
 
@@ -1203,7 +1204,7 @@ describe("RadiationSpectrumPlot class", () => {
 
     test("handles container resize events properly", async () => {
       // Start with a medium container
-      testElement.getBoundingClientRect = jest
+      testElement.getBoundingClientRect = vi
         .fn()
         .mockReturnValue(mockContainerRect(600));
 
@@ -1211,10 +1212,10 @@ describe("RadiationSpectrumPlot class", () => {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Reset mock to track setSize calls
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Simulate container resize to small
-      testElement.getBoundingClientRect = jest
+      testElement.getBoundingClientRect = vi
         .fn()
         .mockReturnValue(mockContainerRect(400));
 
@@ -1232,21 +1233,21 @@ describe("RadiationSpectrumPlot class", () => {
 
     test("avoids unnecessary redraws for small size changes", async () => {
       // Mock current plot width
-      mockUPlotInstance.over.getBoundingClientRect = jest
+      mockUPlotInstance.over.getBoundingClientRect = vi
         .fn()
         .mockReturnValue({ width: 560 });
 
-      testElement.getBoundingClientRect = jest
+      testElement.getBoundingClientRect = vi
         .fn()
         .mockReturnValue(mockContainerRect(600));
 
       await mountRadiationSpectrum("#test-container");
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Simulate small resize (605px -> 600px change should not trigger resize)
-      testElement.getBoundingClientRect = jest
+      testElement.getBoundingClientRect = vi
         .fn()
         .mockReturnValue(mockContainerRect(605));
 
@@ -1275,17 +1276,17 @@ describe("RadiationSpectrumPlot class", () => {
       // Mock scenario where ResizeObserver is not available
       delete (global as any).ResizeObserver;
 
-      testElement.getBoundingClientRect = jest
+      testElement.getBoundingClientRect = vi
         .fn()
         .mockReturnValue(mockContainerRect(600));
 
       await mountRadiationSpectrum("#test-container");
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Change container size
-      testElement.getBoundingClientRect = jest
+      testElement.getBoundingClientRect = vi
         .fn()
         .mockReturnValue(mockContainerRect(400));
 
@@ -1310,9 +1311,9 @@ describe("RadiationSpectrumPlot class", () => {
       ];
 
       for (const testCase of testSizes) {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
 
-        testElement.getBoundingClientRect = jest
+        testElement.getBoundingClientRect = vi
           .fn()
           .mockReturnValue(mockContainerRect(testCase.containerWidth));
 

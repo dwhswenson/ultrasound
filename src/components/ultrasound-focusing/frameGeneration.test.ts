@@ -1,3 +1,4 @@
+import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { ArrayElement } from "./arrayElement";
 import { generateAndRenderInitialFrame } from "./main";
 
@@ -6,25 +7,25 @@ const createMockCanvas = () => {
   const canvas = {
     width: 640,
     height: 480,
-    getContext: jest.fn(),
+    getContext: vi.fn(),
   } as unknown as HTMLCanvasElement;
 
   const ctx = {
-    beginPath: jest.fn(),
-    arc: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    stroke: jest.fn(),
-    fill: jest.fn(),
-    clearRect: jest.fn(),
-    fillText: jest.fn(),
-    drawImage: jest.fn(),
-    fillRect: jest.fn(),
-    save: jest.fn(),
-    restore: jest.fn(),
-    translate: jest.fn(),
-    rotate: jest.fn(),
-    setLineDash: jest.fn(),
+    beginPath: vi.fn(),
+    arc: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    stroke: vi.fn(),
+    fill: vi.fn(),
+    clearRect: vi.fn(),
+    fillText: vi.fn(),
+    drawImage: vi.fn(),
+    fillRect: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    translate: vi.fn(),
+    rotate: vi.fn(),
+    setLineDash: vi.fn(),
     fillStyle: "",
     strokeStyle: "",
     lineWidth: 0,
@@ -32,7 +33,7 @@ const createMockCanvas = () => {
     textAlign: "start",
   } as unknown as CanvasRenderingContext2D;
 
-  (canvas.getContext as jest.Mock).mockReturnValue(ctx);
+  (canvas.getContext as vi.Mock).mockReturnValue(ctx);
   return { canvas, ctx };
 };
 
@@ -106,8 +107,8 @@ describe("Frame Generation Functions", () => {
       const elements = [element1, element2];
 
       // Spy on the draw methods
-      const drawSpy1 = jest.spyOn(element1, "draw");
-      const drawSpy2 = jest.spyOn(element2, "draw");
+      const drawSpy1 = vi.spyOn(element1, "draw");
+      const drawSpy2 = vi.spyOn(element2, "draw");
 
       const testTime = 0.0015;
       drawElementsAtTime(ctx, elements, testTime);
@@ -122,7 +123,7 @@ describe("Frame Generation Functions", () => {
 
     it("should handle single element array", () => {
       const element = new ArrayElement(100, 200, 0.001);
-      const drawSpy = jest.spyOn(element, "draw");
+      const drawSpy = vi.spyOn(element, "draw");
 
       drawElementsAtTime(ctx, [element], 0.0005);
 
@@ -343,7 +344,7 @@ describe("Frame Generation Functions", () => {
       expect(ctx.fillText).toHaveBeenCalledWith("Canvas: 640×480 px", 10, 60);
 
       // Reset mocks
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Test post-delay phase
       createSingleElementFrameLogic(ctx, 640, 480, 0.001, 0.002);
@@ -360,7 +361,7 @@ describe("Frame Generation Functions", () => {
         new ArrayElement(300, 200, 0.003),
       ];
 
-      const drawSpies = elements.map((el) => jest.spyOn(el, "draw"));
+      const drawSpies = elements.map((el) => vi.spyOn(el, "draw"));
 
       drawElementsAtTime(ctx, elements, 0.0015);
 
