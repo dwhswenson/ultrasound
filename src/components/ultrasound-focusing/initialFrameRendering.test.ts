@@ -319,7 +319,7 @@ describe("Initial Frame Rendering", () => {
 
     // Mock getBoundingClientRect before initializing UI
     Object.defineProperty(mockCanvas, "getBoundingClientRect", {
-      value: jest.fn(() => ({ left: 50, top: 50 })),
+      value: jest.fn(() => ({ left: 50, top: 50, width: 640, height: 480 })),
       writable: true,
     });
 
@@ -391,7 +391,7 @@ describe("Initial Frame Rendering", () => {
     jest.spyOn(mockCanvas, "getContext").mockReturnValue(trackedCtx as any);
 
     Object.defineProperty(mockCanvas, "getBoundingClientRect", {
-      value: jest.fn(() => ({ left: 0, top: 0 })),
+      value: jest.fn(() => ({ left: 0, top: 0, width: 640, height: 480 })),
       writable: true,
     });
 

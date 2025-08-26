@@ -55,12 +55,21 @@ export function radiationSpectrum(
   return { freq, amp };
 }
 
+/**
+ * Interactive plot for radiation spectrum visualization with responsive design.
+ * The plot automatically adjusts its dimensions based on the container size:
+ * - Min width: 320px, Max width: 800px
+ * - Min height: 240px, Max height: 480px
+ * - Maintains 3:5 aspect ratio (height = width * 0.6) when possible
+ * - Uses ResizeObserver for efficient responsive updates
+ */
 class RadiationSpectrumPlot {
   private u: any;
   private frInput!: HTMLInputElement;
   private TbInput!: HTMLInputElement;
   private maxFreqInput!: HTMLInputElement;
   private container: HTMLElement;
+  private resizeObserver?: ResizeObserver;
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -102,6 +111,9 @@ class RadiationSpectrumPlot {
     // Initialize with empty data first
     this.u = new UPlot(this.defaultOptions(), [[], []], plotDiv);
 
+    // Set up responsive behavior
+    this.setupResponsiveBehavior();
+
     // Event handlers
     this.frInput.addEventListener("input", () => this.update());
     this.TbInput.addEventListener("input", () => this.update());
@@ -122,10 +134,15 @@ class RadiationSpectrumPlot {
   }
 
   private defaultOptions(): any {
+    // Calculate responsive dimensions based on container size
+    const containerWidth = this.container.getBoundingClientRect().width;
+    const plotWidth = Math.max(320, Math.min(containerWidth - 40, 800)); // Min 320px, max 800px, with 40px padding
+    const plotHeight = Math.max(240, Math.min(plotWidth * 0.6, 480)); // Maintain aspect ratio, max 480px
+
     return {
       title: "Radiation-force Spectrum |F(f)|",
-      width: 640,
-      height: 360,
+      width: plotWidth,
+      height: plotHeight,
       scales: {
         x: {
           time: false,
@@ -198,6 +215,41 @@ class RadiationSpectrumPlot {
     };
   };
 
+  /**
+   * Sets up responsive behavior using ResizeObserver (preferred) or window resize events (fallback).
+   * This ensures the plot adapts to container size changes on mobile devices and window resizing.
+   */
+  private setupResponsiveBehavior() {
+    // Set up ResizeObserver to handle container size changes
+    if (typeof ResizeObserver !== "undefined") {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.handleResize();
+      });
+      this.resizeObserver.observe(this.container);
+    }
+
+    // Also listen for window resize as a fallback
+    window.addEventListener("resize", () => this.handleResize());
+  }
+
+  /**
+   * Handles container resize events by recalculating and applying new plot dimensions.
+   * Includes throttling to avoid excessive redraws on small size changes.
+   */
+  private handleResize() {
+    if (!this.u) return;
+
+    const containerWidth = this.container.getBoundingClientRect().width;
+    const newWidth = Math.max(320, Math.min(containerWidth - 40, 800));
+    const newHeight = Math.max(240, Math.min(newWidth * 0.6, 480));
+
+    // Only resize if dimensions changed significantly (avoid unnecessary redraws)
+    const currentWidth = this.u.over.getBoundingClientRect().width;
+    if (Math.abs(currentWidth - newWidth) > 10) {
+      this.u.setSize({ width: newWidth, height: newHeight });
+    }
+  }
+
   private update() {
     if (!this.u) return;
 
@@ -226,6 +278,19 @@ class RadiationSpectrumPlot {
 
       // Set X scale to match the max frequency slider
       this.u.setScale("x", { min: 0, max: maxFreq * 1.05 });
+    }
+  }
+
+  /**
+   * Cleans up resources including ResizeObserver and uPlot instance.
+   * Should be called when the component is no longer needed to prevent memory leaks.
+   */
+  public destroy() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    if (this.u) {
+      this.u.destroy();
     }
   }
 }
