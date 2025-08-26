@@ -110,3 +110,14 @@ resource "aws_route53_record" "this" {
   ttl     = 300
   records = [module.cloudflare.cloudflare_subdomain]
 }
+
+# cloudflare analytics token
+resource "cloudflare_web_analytics_site" "main" {
+  account_id = var.cloudflare_account_id
+  host     = "${var.subdomain}.${var.domain}"
+}
+
+output "wa_token" {
+  value     = cloudflare_web_analytics_site.main.site_token
+  sensitive = false
+}
