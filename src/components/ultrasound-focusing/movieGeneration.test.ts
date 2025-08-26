@@ -1,3 +1,4 @@
+import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { createMultiElementFrame } from "./main";
 import { VISUAL_SPEED_PX_PER_SEC } from "./shared/constants";
 
@@ -6,25 +7,25 @@ const createMockCanvas = () => {
   const canvas = {
     width: 640,
     height: 480,
-    getContext: jest.fn(),
+    getContext: vi.fn(),
   } as unknown as HTMLCanvasElement;
 
   const ctx = {
-    beginPath: jest.fn(),
-    arc: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    stroke: jest.fn(),
-    fill: jest.fn(),
-    clearRect: jest.fn(),
-    fillText: jest.fn(),
-    drawImage: jest.fn(),
-    fillRect: jest.fn(),
-    save: jest.fn(),
-    restore: jest.fn(),
-    translate: jest.fn(),
-    rotate: jest.fn(),
-    setLineDash: jest.fn(),
+    beginPath: vi.fn(),
+    arc: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    stroke: vi.fn(),
+    fill: vi.fn(),
+    clearRect: vi.fn(),
+    fillText: vi.fn(),
+    drawImage: vi.fn(),
+    fillRect: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    translate: vi.fn(),
+    rotate: vi.fn(),
+    setLineDash: vi.fn(),
     fillStyle: "",
     strokeStyle: "",
     lineWidth: 0,
@@ -32,16 +33,16 @@ const createMockCanvas = () => {
     textAlign: "start",
   } as unknown as CanvasRenderingContext2D;
 
-  (canvas.getContext as jest.Mock).mockReturnValue(ctx);
+  (canvas.getContext as vi.Mock).mockReturnValue(ctx);
   return { canvas, ctx };
 };
 
 // Mock global functions
 beforeEach(() => {
-  (global as any).createImageBitmap = jest.fn().mockResolvedValue({
+  (global as any).createImageBitmap = vi.fn().mockResolvedValue({
     width: 640,
     height: 480,
-    close: jest.fn(),
+    close: vi.fn(),
   } as ImageBitmap);
 });
 
@@ -252,7 +253,7 @@ describe("Movie Generation Functionality", () => {
       const pitch = 5.0;
 
       // Frame just before delay
-      jest.clearAllMocks();
+      vi.clearAllMocks();
       await createMultiElementFrame(
         delayTime,
         delayTime - 0.0001,
@@ -268,7 +269,7 @@ describe("Movie Generation Functionality", () => {
       );
 
       // Frame just after delay
-      jest.clearAllMocks();
+      vi.clearAllMocks();
       await createMultiElementFrame(
         delayTime,
         delayTime + 0.0001,
@@ -306,7 +307,7 @@ describe("Movie Generation Functionality", () => {
         0,
       );
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Test with maximum elements
       await createMultiElementFrame(
@@ -344,7 +345,7 @@ describe("Movie Generation Functionality", () => {
         0,
       );
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Test with large pitch
       await createMultiElementFrame(

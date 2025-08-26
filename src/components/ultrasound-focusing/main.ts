@@ -911,8 +911,13 @@ function initializeUI(): void {
   // Add click-to-set-target functionality
   canvas.addEventListener("click", async (event) => {
     const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    // Calculate scaling factors to handle responsive canvas sizing
+    // Canvas has fixed internal dimensions (640x480) but may be displayed at different sizes
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    // Convert visual click coordinates to canvas coordinate system
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
 
     // Set target coordinates
     targetXInput.value = Math.round(x).toString();
@@ -935,8 +940,11 @@ function initializeUI(): void {
   // Add mouse move tracking for coordinate display
   canvas.addEventListener("mousemove", (event) => {
     const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    // Apply same coordinate scaling for consistent mouse tracking
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
 
     // Update cursor coordinate display
     updateCoordinateDisplay(x, y);
