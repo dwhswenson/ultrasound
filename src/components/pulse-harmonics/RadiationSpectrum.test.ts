@@ -8,7 +8,9 @@ const mockUPlotInstance = {
 };
 
 // Create a proper constructor mock
-  .mockImplementation((options: UPlotOptions, data: UPlotData, element: UPlotElement) => {
+const MockUPlot = jest
+  .fn()
+  .mockImplementation((options: any, data: any, element: any) => {
     return mockUPlotInstance;
   });
 
