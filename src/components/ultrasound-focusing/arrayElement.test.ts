@@ -1,3 +1,4 @@
+import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { ArrayElement } from "./arrayElement";
 import {
   VISUAL_SPEED_PX_PER_SEC,
@@ -8,21 +9,21 @@ import {
 // Mock canvas context
 const createMockContext = () => {
   const ctx = {
-    beginPath: jest.fn(),
-    arc: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    stroke: jest.fn(),
-    fill: jest.fn(),
-    clearRect: jest.fn(),
-    fillText: jest.fn(),
-    drawImage: jest.fn(),
-    fillRect: jest.fn(),
-    save: jest.fn(),
-    restore: jest.fn(),
-    translate: jest.fn(),
-    rotate: jest.fn(),
-    setLineDash: jest.fn(),
+    beginPath: vi.fn(),
+    arc: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    stroke: vi.fn(),
+    fill: vi.fn(),
+    clearRect: vi.fn(),
+    fillText: vi.fn(),
+    drawImage: vi.fn(),
+    fillRect: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    translate: vi.fn(),
+    rotate: vi.fn(),
+    setLineDash: vi.fn(),
     fillStyle: "",
     strokeStyle: "",
     lineWidth: 0,
@@ -176,7 +177,7 @@ describe("ArrayElement", () => {
       element.draw(ctx, 0.0005, VISUAL_SPEED_PX_PER_SEC);
 
       // Should not call arc for wave propagation (only for element and pulse)
-      const arcCalls = (ctx.arc as jest.Mock).mock.calls;
+      const arcCalls = (ctx.arc as vi.Mock).mock.calls;
       expect(arcCalls).toHaveLength(2); // main element + red pulse only
     });
 
@@ -187,7 +188,7 @@ describe("ArrayElement", () => {
 
       // With delay=2.0s, travel time = 1.2667s, start time = 0.7333s
       // At t=0.05s (before start time), should only draw main element
-      const arcCalls = (ctx.arc as jest.Mock).mock.calls;
+      const arcCalls = (ctx.arc as vi.Mock).mock.calls;
       expect(arcCalls).toHaveLength(1); // main element only
     });
 
@@ -198,12 +199,12 @@ describe("ArrayElement", () => {
       // Draw at two different times
       element.draw(ctx, t1, VISUAL_SPEED_PX_PER_SEC);
 
-      (ctx.arc as jest.Mock).mockClear();
+      (ctx.arc as vi.Mock).mockClear();
       element.draw(ctx, t2, VISUAL_SPEED_PX_PER_SEC);
 
       // Should have moved at constant speed (VISUAL_SPEED_PX_PER_SEC px/s)
       // Verify pulse is still being drawn
-      const arcCalls = (ctx.arc as jest.Mock).mock.calls;
+      const arcCalls = (ctx.arc as vi.Mock).mock.calls;
       expect(arcCalls.length).toBeGreaterThan(0);
     });
 
@@ -235,15 +236,15 @@ describe("ArrayElement", () => {
 
       // Draw each element at the same time
       element1.draw(ctx, testTime, VISUAL_SPEED_PX_PER_SEC);
-      const element1Calls = (ctx.arc as jest.Mock).mock.calls.length;
+      const element1Calls = (ctx.arc as vi.Mock).mock.calls.length;
 
-      (ctx.arc as jest.Mock).mockClear();
+      (ctx.arc as vi.Mock).mockClear();
       element2.draw(ctx, testTime, VISUAL_SPEED_PX_PER_SEC);
-      const element2Calls = (ctx.arc as jest.Mock).mock.calls.length;
+      const element2Calls = (ctx.arc as vi.Mock).mock.calls.length;
 
-      (ctx.arc as jest.Mock).mockClear();
+      (ctx.arc as vi.Mock).mockClear();
       element3.draw(ctx, testTime, VISUAL_SPEED_PX_PER_SEC);
-      const element3Calls = (ctx.arc as jest.Mock).mock.calls.length;
+      const element3Calls = (ctx.arc as vi.Mock).mock.calls.length;
 
       // Element 1 (delay=0.001s): pulse should be visible, very close to element
       expect(element1Calls).toBe(2); // main element + red pulse
@@ -278,7 +279,7 @@ describe("ArrayElement", () => {
       element.draw(ctx, 0.002, VISUAL_SPEED_PX_PER_SEC); // after delay
 
       // Should only have 2 arc calls: main element + wave (no red pulse)
-      const arcCalls = (ctx.arc as jest.Mock).mock.calls;
+      const arcCalls = (ctx.arc as vi.Mock).mock.calls;
       expect(arcCalls).toHaveLength(2); // main element + wave propagation
     });
 
@@ -320,7 +321,7 @@ describe("ArrayElement", () => {
     it("should not draw wave when radius would be zero or negative", () => {
       element.draw(ctx, 0.001, VISUAL_SPEED_PX_PER_SEC); // exactly at delay time
 
-      const arcCalls = (ctx.arc as jest.Mock).mock.calls;
+      const arcCalls = (ctx.arc as vi.Mock).mock.calls;
       // Should only have main element circle, no wave propagation
       expect(arcCalls).toHaveLength(1);
     });
@@ -352,7 +353,7 @@ describe("ArrayElement", () => {
 
       // With negative time, red pulse calculation may go backwards
       // Just verify that arc is called for the red pulse (second call after main element)
-      const arcCalls = (ctx.arc as jest.Mock).mock.calls;
+      const arcCalls = (ctx.arc as vi.Mock).mock.calls;
       expect(arcCalls).toHaveLength(2); // main element + red pulse
       expect(arcCalls[1][2]).toBe(5); // radius/2 for red pulse
     });

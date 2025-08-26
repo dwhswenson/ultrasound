@@ -1,14 +1,20 @@
+import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { initializeUI } from "./main";
 
 // Mock DOM elements
-const createMockCanvas = (width: number, height: number, displayWidth: number, displayHeight: number) => {
+const createMockCanvas = (
+  width: number,
+  height: number,
+  displayWidth: number,
+  displayHeight: number,
+) => {
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
   canvas.id = "animationCanvas";
 
   // Mock getBoundingClientRect to simulate responsive scaling
-  canvas.getBoundingClientRect = jest.fn().mockReturnValue({
+  canvas.getBoundingClientRect = vi.fn().mockReturnValue({
     left: 10,
     top: 20,
     width: displayWidth,
@@ -20,21 +26,21 @@ const createMockCanvas = (width: number, height: number, displayWidth: number, d
   });
 
   const ctx = {
-    clearRect: jest.fn(),
-    drawImage: jest.fn(),
-    beginPath: jest.fn(),
-    arc: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    stroke: jest.fn(),
-    fill: jest.fn(),
-    fillText: jest.fn(),
-    fillRect: jest.fn(),
-    setLineDash: jest.fn(),
-    save: jest.fn(),
-    restore: jest.fn(),
-    translate: jest.fn(),
-    rotate: jest.fn(),
+    clearRect: vi.fn(),
+    drawImage: vi.fn(),
+    beginPath: vi.fn(),
+    arc: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    stroke: vi.fn(),
+    fill: vi.fn(),
+    fillText: vi.fn(),
+    fillRect: vi.fn(),
+    setLineDash: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    translate: vi.fn(),
+    rotate: vi.fn(),
     fillStyle: "",
     strokeStyle: "",
     lineWidth: 0,
@@ -42,7 +48,7 @@ const createMockCanvas = (width: number, height: number, displayWidth: number, d
     textAlign: "start" as CanvasTextAlign,
   } as unknown as CanvasRenderingContext2D;
 
-  canvas.getContext = jest.fn().mockReturnValue(ctx);
+  canvas.getContext = vi.fn().mockReturnValue(ctx);
   return { canvas, ctx };
 };
 
@@ -63,10 +69,10 @@ const createMockButton = (id: string) => {
 
 // Mock global functions
 beforeEach(() => {
-  (global as any).createImageBitmap = jest.fn().mockResolvedValue({
+  (global as any).createImageBitmap = vi.fn().mockResolvedValue({
     width: 640,
     height: 480,
-    close: jest.fn(),
+    close: vi.fn(),
   } as ImageBitmap);
 
   // Clear any existing event listeners
@@ -89,9 +95,17 @@ describe("Responsive Canvas Coordinate Scaling", () => {
   let numElementsInput: HTMLInputElement;
   let pitchInput: HTMLInputElement;
 
-  const setupDOM = (canvasDisplayWidth: number, canvasDisplayHeight: number) => {
+  const setupDOM = (
+    canvasDisplayWidth: number,
+    canvasDisplayHeight: number,
+  ) => {
     // Create canvas with fixed internal dimensions but variable display size
-    const canvasMock = createMockCanvas(640, 480, canvasDisplayWidth, canvasDisplayHeight);
+    const canvasMock = createMockCanvas(
+      640,
+      480,
+      canvasDisplayWidth,
+      canvasDisplayHeight,
+    );
     canvas = canvasMock.canvas;
     ctx = canvasMock.ctx;
 
@@ -128,7 +142,7 @@ describe("Responsive Canvas Coordinate Scaling", () => {
 
     // Mock getElementById to return our elements
     const originalGetElementById = document.getElementById;
-    document.getElementById = jest.fn((id: string) => {
+    document.getElementById = vi.fn((id: string) => {
       const elements: { [key: string]: HTMLElement } = {
         animationCanvas: canvas,
         targetX: targetXInput,
@@ -165,7 +179,7 @@ describe("Responsive Canvas Coordinate Scaling", () => {
       // Simulate click at visual position (100, 50)
       const clickEvent = new MouseEvent("click", {
         clientX: 110, // 10 (rect.left) + 100
-        clientY: 70,  // 20 (rect.top) + 50
+        clientY: 70, // 20 (rect.top) + 50
         bubbles: true,
       });
 
@@ -185,7 +199,7 @@ describe("Responsive Canvas Coordinate Scaling", () => {
       // Simulate click at visual position (100, 50) on the scaled canvas
       const clickEvent = new MouseEvent("click", {
         clientX: 110, // 10 (rect.left) + 100
-        clientY: 70,  // 20 (rect.top) + 50
+        clientY: 70, // 20 (rect.top) + 50
         bubbles: true,
       });
 
@@ -239,17 +253,19 @@ describe("Responsive Canvas Coordinate Scaling", () => {
 
   describe("MouseMove Event Coordinate Scaling", () => {
     // Mock updateCoordinateDisplay function
-    let mockUpdateCoordinateDisplay: jest.Mock;
+    let mockUpdateCoordinateDisplay: vi.Mock;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       // Mock the updateCoordinateDisplay function
-      mockUpdateCoordinateDisplay = jest.fn();
+      mockUpdateCoordinateDisplay = vi.fn();
       (window as any).updateCoordinateDisplay = mockUpdateCoordinateDisplay;
 
       // Mock the function in the main module
-      const mainModule = require("./main");
+      const mainModule = await import("./main");
       if (mainModule.updateCoordinateDisplay) {
-        jest.spyOn(mainModule, "updateCoordinateDisplay").mockImplementation(mockUpdateCoordinateDisplay);
+        vi.spyOn(mainModule, "updateCoordinateDisplay").mockImplementation(
+          mockUpdateCoordinateDisplay,
+        );
       }
     });
 
@@ -293,8 +309,8 @@ describe("Responsive Canvas Coordinate Scaling", () => {
       });
 
       const mouseMoveEvent = new MouseEvent("mousemove", {
-        clientX: 85,  // 10 (rect.left) + 75
-        clientY: 70,  // 20 (rect.top) + 50
+        clientX: 85, // 10 (rect.left) + 75
+        clientY: 70, // 20 (rect.top) + 50
         bubbles: true,
       });
 

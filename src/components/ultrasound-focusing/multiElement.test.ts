@@ -1,3 +1,4 @@
+import { vi, describe, test, expect, beforeEach, afterEach } from "vitest";
 import { ArrayElement } from "./arrayElement";
 import {
   createElementArray,
@@ -10,25 +11,25 @@ const createMockCanvas = () => {
   const canvas = {
     width: 640,
     height: 480,
-    getContext: jest.fn(),
+    getContext: vi.fn(),
   } as unknown as HTMLCanvasElement;
 
   const ctx = {
-    beginPath: jest.fn(),
-    arc: jest.fn(),
-    moveTo: jest.fn(),
-    lineTo: jest.fn(),
-    stroke: jest.fn(),
-    fill: jest.fn(),
-    clearRect: jest.fn(),
-    fillText: jest.fn(),
-    drawImage: jest.fn(),
-    fillRect: jest.fn(),
-    save: jest.fn(),
-    restore: jest.fn(),
-    translate: jest.fn(),
-    rotate: jest.fn(),
-    setLineDash: jest.fn(),
+    beginPath: vi.fn(),
+    arc: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    stroke: vi.fn(),
+    fill: vi.fn(),
+    clearRect: vi.fn(),
+    fillText: vi.fn(),
+    drawImage: vi.fn(),
+    fillRect: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    translate: vi.fn(),
+    rotate: vi.fn(),
+    setLineDash: vi.fn(),
     fillStyle: "",
     strokeStyle: "",
     lineWidth: 0,
@@ -36,7 +37,7 @@ const createMockCanvas = () => {
     textAlign: "start",
   } as unknown as CanvasRenderingContext2D;
 
-  (canvas.getContext as jest.Mock).mockReturnValue(ctx);
+  (canvas.getContext as vi.Mock).mockReturnValue(ctx);
   return { canvas, ctx };
 };
 
@@ -166,7 +167,7 @@ describe("Multi-Element ArrayElement Functionality", () => {
   describe("createMultiElementFrame", () => {
     beforeEach(() => {
       // Mock createImageBitmap
-      (global as any).createImageBitmap = jest.fn().mockResolvedValue({
+      (global as any).createImageBitmap = vi.fn().mockResolvedValue({
         width: 640,
         height: 480,
       });
@@ -195,7 +196,7 @@ describe("Multi-Element ArrayElement Functionality", () => {
       );
 
       // Should draw main circles for all elements (plus red pulses)
-      const arcCalls = (ctx.arc as jest.Mock).mock.calls;
+      const arcCalls = (ctx.arc as vi.Mock).mock.calls;
       expect(arcCalls.length).toBeGreaterThanOrEqual(numElements);
     });
 
@@ -250,7 +251,7 @@ describe("Multi-Element ArrayElement Functionality", () => {
         0,
       );
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Test maximum
       await createMultiElementFrame(0.001, 0.0005, 64, 3.0, mockCanvas, ctx);
@@ -278,7 +279,7 @@ describe("Multi-Element ArrayElement Functionality", () => {
   describe("Integration with drawElementsAtTime", () => {
     it("should draw all elements at specified time", () => {
       const elements = createElementArray(6, 4.0, 0.001, mockCanvas);
-      const drawSpies = elements.map((el) => jest.spyOn(el, "draw"));
+      const drawSpies = elements.map((el) => vi.spyOn(el, "draw"));
 
       const testTime = 0.0007;
       drawElementsAtTime(ctx, elements, testTime);
@@ -295,16 +296,16 @@ describe("Multi-Element ArrayElement Functionality", () => {
       drawElementsAtTime(ctx, elements, 0.0005);
 
       // Should have drawn main circles and red pulses
-      const arcCalls = (ctx.arc as jest.Mock).mock.calls;
+      const arcCalls = (ctx.arc as vi.Mock).mock.calls;
       expect(arcCalls.length).toBe(8); // 4 main circles + 4 red pulses
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Test post-delay phase
       drawElementsAtTime(ctx, elements, 0.002);
 
       // Should have drawn main circles and wave propagations
-      const arcCallsPost = (ctx.arc as jest.Mock).mock.calls;
+      const arcCallsPost = (ctx.arc as vi.Mock).mock.calls;
       expect(arcCallsPost.length).toBe(8); // 4 main circles + 4 wave propagations
     });
   });
