@@ -117,6 +117,23 @@ resource "cloudflare_web_analytics_site" "main" {
   host     = "${var.subdomain}.${var.domain}"
 }
 
+resource "github_actions_variable" "wa_token" {
+  repository       = var.github_repo
+  variable_name      = "CLOUDFLARE_WA_TOKEN"
+  value  = cloudflare_web_analytics_site.main.site_token
+}
+
+resource "cloudflare_web_analytics_site" "preview" {
+  account_id = var.cloudflare_account_id
+  host       = module.cloudflare.cloudflare_subdomain
+}
+
+resource "github_actions_variable" "wa_token_preview" {
+  repository       = var.github_repo
+  variable_name      = "CLOUDFLARE_WA_TOKEN_PREVIEW"
+  value  = cloudflare_web_analytics_site.preview.site_token
+}
+
 output "wa_token" {
   value     = cloudflare_web_analytics_site.main.site_token
   sensitive = false
