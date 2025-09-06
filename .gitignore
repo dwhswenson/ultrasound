@@ -34,5 +34,11 @@ dist-ssr
 *.sln
 *.sw?
 
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
 # astro
 .astro
