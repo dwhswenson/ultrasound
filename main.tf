@@ -2,7 +2,7 @@
 # project. This is essentially a one-time deployment that sets up the
 # Cloudflare Pages project and the GitHub secrets/variables that are needed
 # for our static site tooling to work. This does *not* get deployed through
-# a GitHub action, but rather is run manually by the project owner. 
+# a GitHub action, but rather is run manually by the project owner.
 
 terraform {
   required_providers {
@@ -20,7 +20,7 @@ provider "aws" {
   region = "us-east-2"
 }
 
-provider "cloudflare" {}
+provider "cloudflare" { }
 
 provider "github" {
   owner = "dwhswenson"
@@ -59,6 +59,16 @@ variable "github_repo" {
   type        = string
   description = "GitHub repository for the project"
   default     = "dwhswenson/ultrasound"
+}
+
+variable "cf_beacon_token" {
+  type        = string
+  description = "Cloudflare Web Analytics beacon token (set via TF_VAR_cf_beacon_token)"
+}
+
+variable "clarity_id" {
+  type        = string
+  description = "Microsoft Clarity tracking ID (set via TF_VAR_clarity_id)"
 }
 
 module "cloudflare" {
@@ -111,30 +121,20 @@ resource "aws_route53_record" "this" {
   records = [module.cloudflare.cloudflare_subdomain]
 }
 
-# cloudflare analytics token
-resource "cloudflare_web_analytics_site" "main" {
-  account_id = var.cloudflare_account_id
-  host     = "${var.subdomain}.${var.domain}"
+# Analytics secrets
+# Use TF_VAR_cf_beacon_token and TF_VAR_clarity_id environment variables
+data "github_repository" "repo" {
+  full_name = var.github_repo
 }
 
-resource "github_actions_variable" "wa_token" {
-  repository       = var.github_repo
-  variable_name      = "CLOUDFLARE_WA_TOKEN"
-  value  = cloudflare_web_analytics_site.main.site_token
+resource "github_actions_secret" "cf_beacon_token" {
+  repository      = data.github_repository.repo.name
+  secret_name     = "PUBLIC_CF_BEACON_TOKEN"
+  plaintext_value = var.cf_beacon_token
 }
 
-resource "cloudflare_web_analytics_site" "preview" {
-  account_id = var.cloudflare_account_id
-  host       = module.cloudflare.cloudflare_subdomain
-}
-
-resource "github_actions_variable" "wa_token_preview" {
-  repository       = var.github_repo
-  variable_name      = "CLOUDFLARE_WA_TOKEN_PREVIEW"
-  value  = cloudflare_web_analytics_site.preview.site_token
-}
-
-output "wa_token" {
-  value     = cloudflare_web_analytics_site.main.site_token
-  sensitive = false
+resource "github_actions_secret" "clarity_id" {
+  repository      = data.github_repository.repo.name
+  secret_name     = "PUBLIC_CLARITY_ID"
+  plaintext_value = var.clarity_id
 }

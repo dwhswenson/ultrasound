@@ -1,26 +1,29 @@
 name: Build Astro site from push
 
-on: 
+on:
   push:
     branches:
       - main
   # SCHEDULE AND WORKFLOW DISPATCH ARE FOR TESTING
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 env:
   ASTRO_SOURCE_DIR: "."
   ASTRO_BASE_URL: ""
   ASTRO_OUTPUT_DIR: "dist"
+  NODE_ENV: "production"
+  PUBLIC_CF_BEACON_TOKEN: ${{ secrets.PUBLIC_CF_BEACON_TOKEN }}
+  PUBLIC_CLARITY_ID: ${{ secrets.PUBLIC_CLARITY_ID }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps: 
+    steps:
       - uses: actions/checkout@v4
         with:
-          submodules: 'recursive'
+          submodules: "recursive"
 
       - name: Build site
         uses: omsf/static-site-tools/build/astro@main
