@@ -36,5 +36,7 @@ dist-ssr
 *.tfstate.*
 .terraform/
 terraform.tfvars
+backend.hcl
+
 # astro
 .astro

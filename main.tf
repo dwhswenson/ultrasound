@@ -11,16 +11,16 @@ terraform {
       version = "~> 4.0"
     }
   }
-  #backend "s3" {
-  #key            = "ultrasound/terraform.tfstate"
-  #}
+  backend "s3" {
+    key = "ultrasound/terraform.tfstate"
+  }
 }
 
 provider "aws" {
   region = "us-east-2"
 }
 
-provider "cloudflare" { }
+provider "cloudflare" {}
 
 provider "github" {
   owner = "dwhswenson"
@@ -72,7 +72,7 @@ variable "clarity_id" {
 }
 
 module "cloudflare" {
-  source                  = "./modules/cloudflare_pages"
+  source                  = "github.com/omsf/static-site-tools//modules/cloudflare_pages"
   cloudflare_token_name   = "${var.cloudflare_project_name}_token"
   cloudflare_project_name = var.cloudflare_project_name
   cloudflare_account_id   = var.cloudflare_account_id
@@ -91,7 +91,7 @@ output "subdomain" {
 }
 
 module "github" {
-  source                           = "./modules/github_vars"
+  source                           = "github.com/omsf/static-site-tools//modules/github_vars"
   github_repository                = var.github_repo
   cloudflare_project_name_var_name = var.cloudflare_project_name_var_name
   cloudflare_project_name          = var.cloudflare_project_name
