@@ -1,5 +1,5 @@
 // Mock canvas and related APIs for testing
-import { vi } from "vitest";
+import { vi, afterEach } from "vitest";
 
 // Mock Canvas API manually since we don't have jest-canvas-mock
 const mockCanvasContext = {
@@ -62,11 +62,50 @@ global.createImageBitmap = vi.fn().mockImplementation(() =>
 global.URL.createObjectURL = vi.fn().mockReturnValue("mock-url");
 global.URL.revokeObjectURL = vi.fn();
 
-// Mock animation frame methods
+// Mock Path2D for canvas path operations
+global.Path2D = vi.fn().mockImplementation(() => ({
+  moveTo: vi.fn(),
+  lineTo: vi.fn(),
+  closePath: vi.fn(),
+  arc: vi.fn(),
+  rect: vi.fn(),
+  bezierCurveTo: vi.fn(),
+  quadraticCurveTo: vi.fn(),
+}));
+
+// Mock animation frame methods with proper cleanup tracking
+const pendingAnimationFrames = new Map<number, NodeJS.Timeout>();
+let frameIdCounter = 1;
+
 global.requestAnimationFrame = vi.fn().mockImplementation((cb) => {
-  return setTimeout(cb, 16);
+  const id = frameIdCounter++;
+  const timeoutId = setTimeout(() => {
+    // Remove from tracking when callback executes
+    pendingAnimationFrames.delete(id);
+    cb(Date.now());
+  }, 16); // Use 16ms to simulate ~60fps
+
+  // Track the timeout so we can clean it up
+  pendingAnimationFrames.set(id, timeoutId);
+  return id;
 });
 
 global.cancelAnimationFrame = vi.fn().mockImplementation((id) => {
-  clearTimeout(id);
+  const timeoutId = pendingAnimationFrames.get(id);
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+    pendingAnimationFrames.delete(id);
+  }
+});
+
+// Automatically cleanup all pending animation frames after each test
+afterEach(() => {
+  // Cancel all pending animation frames
+  for (const [id, timeoutId] of pendingAnimationFrames) {
+    clearTimeout(timeoutId);
+  }
+  pendingAnimationFrames.clear();
+
+  // Reset the counter for the next test
+  frameIdCounter = 1;
 });

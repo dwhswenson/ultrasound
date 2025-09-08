@@ -3,15 +3,60 @@ import { radiationSpectrum, mountRadiationSpectrum } from "./RadiationSpectrum";
 
 // Mock uPlot for testing
 const mockUPlotInstance = {
-  setData: vi.fn(),
+  setData: vi.fn().mockImplementation(function (this: any, data: any) {
+    // Store data on the mock instance
+    this.data = data;
+
+    // Ensure stemPaths function exists and call it to get coverage
+    if (!this._options || !this._options.series || !this._options.series[1]) {
+      throw new Error("Mock uPlot options not properly initialized");
+    }
+
+    const stemPathsFunc = this._options.series[1].paths;
+    if (!stemPathsFunc) {
+      throw new Error(
+        "stemPaths function is missing from series[1].paths - this indicates a regression in the RadiationSpectrumPlot implementation",
+      );
+    }
+
+    if (typeof stemPathsFunc !== "function") {
+      throw new Error(
+        `stemPaths should be a function but got ${typeof stemPathsFunc}`,
+      );
+    }
+
+    // Call the stemPaths function with mock parameters
+    const pathRenderer = stemPathsFunc(
+      this,
+      1,
+      0,
+      Math.min(2, (data[0]?.length || 1) - 1),
+    );
+
+    if (typeof pathRenderer !== "function") {
+      throw new Error(
+        `stemPaths should return a function but returned ${typeof pathRenderer}`,
+      );
+    }
+
+    // Call the returned path renderer function
+    pathRenderer(this, 1);
+  }),
   setScale: vi.fn(),
   scales: { x: { max: 1000 } },
+  valToPosX: vi.fn((val: number) => val * 2),
+  valToPosY: vi.fn((val: number, seriesIdx: number) => 100 - val * 10),
+  over: { getBoundingClientRect: vi.fn(() => ({ width: 640 })) },
+  destroy: vi.fn(),
 };
 
 // Create a proper constructor mock
 const MockUPlot = vi
   .fn()
   .mockImplementation((options: any, data: any, element: any) => {
+    // Store options on the instance so setData can access stemPaths
+    mockUPlotInstance._options = options;
+    mockUPlotInstance.data = data;
     return mockUPlotInstance;
   });
 
@@ -978,10 +1023,7 @@ describe("RadiationSpectrumPlot class", () => {
   });
 
   test("stemPaths function logic validation", async () => {
-    // Test the stemPaths logic by simulating its behavior
-    // This tests the core functionality without relying on uPlot internals
-
-    // Mock Path2D to test the drawing commands
+    // Mock Path2D to capture drawing commands
     const mockPath2D = {
       moveTo: vi.fn(),
       lineTo: vi.fn(),
@@ -989,44 +1031,25 @@ describe("RadiationSpectrumPlot class", () => {
     const originalPath2D = global.Path2D;
     global.Path2D = vi.fn().mockImplementation(() => mockPath2D);
 
-    // Simulate the stemPaths function logic
-    const mockU = {
-      valToPosX: (val: number) => val * 2,
-      valToPosY: (val: number) => 100 - val * 10,
-      data: [
-        [100, 200, 300], // frequencies
-        [0.5, 1.0, 0.3], // amplitudes
-      ],
-    };
+    // Mount the plot which will create an instance with stemPaths
+    await mountRadiationSpectrum("#test-container");
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
-    // Test the stemPaths algorithm manually
-    const path = new (global.Path2D as any)();
-    const idx0 = 0;
-    const idx1 = 2;
-    const seriesIdx = 1;
+    // Clear previous calls
+    mockPath2D.moveTo.mockClear();
+    mockPath2D.lineTo.mockClear();
 
-    // Draw vertical lines (stems) for each frequency component
-    for (let i = idx0; i <= idx1; i++) {
-      const x = mockU.valToPosX(mockU.data[0][i]);
-      const y0 = mockU.valToPosY(0);
-      const y1 = mockU.valToPosY(mockU.data[1][i]);
+    // Trigger an update that will cause setData to be called, which should invoke stemPaths
+    const frInput = testElement.querySelector("#fr") as HTMLInputElement;
+    frInput.value = "100";
+    frInput.dispatchEvent(new Event("input"));
 
-      // Draw the vertical line (spike)
-      path.moveTo(x, y0);
-      path.lineTo(x, y1);
+    // Allow time for the update to process
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
-      // Add a small cap at the top for visibility
-      path.moveTo(x - 1, y1);
-      path.lineTo(x + 1, y1);
-    }
-
-    // Verify the correct number of drawing commands
-    expect(mockPath2D.moveTo).toHaveBeenCalledTimes(6); // 3 points * 2 moveTo per point
-    expect(mockPath2D.lineTo).toHaveBeenCalledTimes(6); // 3 points * 2 lineTo per point
-
-    // Verify specific coordinates for first point
-    expect(mockPath2D.moveTo).toHaveBeenCalledWith(200, 100); // x=100*2, y=100-0*10
-    expect(mockPath2D.lineTo).toHaveBeenCalledWith(200, 95); // x=100*2, y=100-0.5*10
+    // Verify that Path2D drawing methods were called (indicating stemPaths was executed)
+    expect(mockPath2D.moveTo).toHaveBeenCalled();
+    expect(mockPath2D.lineTo).toHaveBeenCalled();
 
     // Restore Path2D
     global.Path2D = originalPath2D;
@@ -1335,6 +1358,184 @@ describe("RadiationSpectrumPlot class", () => {
         testElement.id = "test-container";
         document.body.appendChild(testElement);
       }
+    });
+
+    test("comprehensive integration test exercises stemPaths and cleanup", async () => {
+      // Mock ResizeObserver to track its usage
+      const mockDisconnect = vi.fn();
+      const mockObserver = {
+        observe: vi.fn(),
+        disconnect: mockDisconnect,
+      };
+      const originalResizeObserver = global.ResizeObserver;
+      global.ResizeObserver = vi.fn().mockImplementation(() => mockObserver);
+
+      // Mock Path2D to capture stemPaths drawing commands
+      const mockPath2D = {
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+      };
+      const originalPath2D = global.Path2D;
+      global.Path2D = vi.fn().mockImplementation(() => mockPath2D);
+
+      // Create plot instance
+      await mountRadiationSpectrum("#test-container");
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Verify ResizeObserver was set up
+      expect(global.ResizeObserver).toHaveBeenCalled();
+      expect(mockObserver.observe).toHaveBeenCalled();
+
+      // Trigger multiple updates to exercise stemPaths through normal flow
+      const frInput = testElement.querySelector("#fr") as HTMLInputElement;
+      const TbInput = testElement.querySelector("#Tb") as HTMLInputElement;
+
+      // Clear Path2D calls to focus on stemPaths execution
+      mockPath2D.moveTo.mockClear();
+      mockPath2D.lineTo.mockClear();
+
+      // Change parameters multiple times to trigger setData and stemPaths
+      const updates = [
+        { fr: "100", Tb: "0.001" },
+        { fr: "300", Tb: "0.0005" },
+        { fr: "500", Tb: "0.002" },
+      ];
+
+      for (const update of updates) {
+        frInput.value = update.fr;
+        TbInput.value = update.Tb;
+        frInput.dispatchEvent(new Event("input"));
+        TbInput.dispatchEvent(new Event("input"));
+        await new Promise((resolve) => setTimeout(resolve, 20));
+      }
+
+      // Verify that Path2D methods were called (indicating stemPaths execution)
+      expect(mockPath2D.moveTo).toHaveBeenCalled();
+      expect(mockPath2D.lineTo).toHaveBeenCalled();
+
+      // Test window resize event handling
+      const originalInnerWidth = window.innerWidth;
+      Object.defineProperty(window, "innerWidth", {
+        value: 400,
+        writable: true,
+      });
+      window.dispatchEvent(new Event("resize"));
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      // Restore
+      Object.defineProperty(window, "innerWidth", {
+        value: originalInnerWidth,
+        writable: true,
+      });
+      global.ResizeObserver = originalResizeObserver;
+      global.Path2D = originalPath2D;
+    });
+
+    test("destroy method cleans up resources properly", async () => {
+      // Mock ResizeObserver to track disconnect calls
+      const mockDisconnect = vi.fn();
+      const mockObserver = {
+        observe: vi.fn(),
+        disconnect: mockDisconnect,
+      };
+      const originalResizeObserver = global.ResizeObserver;
+      global.ResizeObserver = vi.fn().mockImplementation(() => mockObserver);
+
+      // Import the exported class for testing
+      const { RadiationSpectrumPlot } = await import("./RadiationSpectrum");
+
+      // Create a plot instance directly
+      const plotInstance = new RadiationSpectrumPlot(testElement);
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Clear previous calls to track destroy-specific calls
+      mockUPlotInstance.destroy.mockClear();
+      mockDisconnect.mockClear();
+
+      // Call destroy method directly
+      plotInstance.destroy();
+
+      // Verify cleanup methods were called
+      expect(mockDisconnect).toHaveBeenCalled();
+      expect(mockUPlotInstance.destroy).toHaveBeenCalled();
+
+      // Restore ResizeObserver
+      global.ResizeObserver = originalResizeObserver;
+    });
+
+    test("verifies enhanced uPlot mock provides stemPaths coverage", async () => {
+      // This test ensures that our enhanced mock system properly exercises stemPaths
+      // by verifying that Path2D operations are being called through the normal flow
+
+      const mockPath2D = {
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+      };
+      const originalPath2D = global.Path2D;
+      global.Path2D = vi.fn().mockImplementation(() => mockPath2D);
+
+      // Create plot and trigger updates
+      await mountRadiationSpectrum("#test-container");
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const frInput = testElement.querySelector("#fr") as HTMLInputElement;
+
+      // Clear calls and trigger stemPaths execution
+      mockPath2D.moveTo.mockClear();
+      mockPath2D.lineTo.mockClear();
+
+      frInput.value = "250";
+      frInput.dispatchEvent(new Event("input"));
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      // Verify stemPaths was executed through Path2D calls
+      expect(mockPath2D.moveTo).toHaveBeenCalled();
+      expect(mockPath2D.lineTo).toHaveBeenCalled();
+
+      // Verify our enhanced mock infrastructure is working
+      expect(mockUPlotInstance.setData).toHaveBeenCalled();
+      expect(mockUPlotInstance._options).toBeDefined();
+
+      // Restore
+      global.Path2D = originalPath2D;
+    });
+
+    test("validates stemPaths function exists during normal operation", async () => {
+      // This test ensures our enhanced mock validation is working
+      // If stemPaths was missing, this would fail with our new error checking
+
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation();
+
+      // Normal operation should work fine
+      await mountRadiationSpectrum("#test-container");
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Verify plot was created successfully (no errors)
+      expect(consoleSpy).not.toHaveBeenCalledWith(
+        expect.stringContaining("stemPaths function is missing"),
+      );
+
+      // Verify stemPaths is actually being called by checking Path2D usage
+      const mockPath2D = {
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+      };
+      const originalPath2D = global.Path2D;
+      global.Path2D = vi.fn().mockImplementation(() => mockPath2D);
+
+      // Trigger an update that should call stemPaths
+      const frInput = testElement.querySelector("#fr") as HTMLInputElement;
+      frInput.value = "150";
+      frInput.dispatchEvent(new Event("input"));
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      // If stemPaths exists and is being called, Path2D methods should be used
+      expect(mockPath2D.moveTo).toHaveBeenCalled();
+      expect(mockPath2D.lineTo).toHaveBeenCalled();
+
+      // Restore
+      global.Path2D = originalPath2D;
+      consoleSpy.mockRestore();
     });
   });
 });

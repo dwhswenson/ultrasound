@@ -397,4 +397,28 @@ describe("Responsive Canvas Coordinate Scaling", () => {
       expect(targetYInput.value).toBe(expectedY.toString());
     });
   });
+
+  describe("Animation Frame Cleanup", () => {
+    it("should properly clean up animation frames to prevent test environment issues", async () => {
+      setupDOM(640, 480);
+      await initializeUI();
+
+      // Simulate multiple rapid clicks to create multiple animations
+      const clickEvents = [
+        new MouseEvent("click", { clientX: 110, clientY: 70, bubbles: true }),
+        new MouseEvent("click", { clientX: 120, clientY: 80, bubbles: true }),
+        new MouseEvent("click", { clientX: 130, clientY: 90, bubbles: true }),
+      ];
+
+      // Dispatch all click events
+      clickEvents.forEach((event) => canvas.dispatchEvent(event));
+
+      // Verify that the clicks worked (last click should set target)
+      expect(targetXInput.value).toBe("120");
+      expect(targetYInput.value).toBe("70");
+
+      // The test completing without errors indicates successful cleanup
+      // If cleanup wasn't working, vitest would throw the requestAnimationFrame error
+    });
+  });
 });

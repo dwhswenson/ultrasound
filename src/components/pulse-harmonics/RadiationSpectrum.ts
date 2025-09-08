@@ -308,5 +308,8 @@ export async function mountRadiationSpectrum(selector: string) {
 
   const el = document.querySelector(selector);
   if (!el) throw new Error(`Container '${selector}' not found`);
-  new RadiationSpectrumPlot(el as HTMLElement);
+  return new RadiationSpectrumPlot(el as HTMLElement);
 }
+
+// Export for testing purposes
+export { RadiationSpectrumPlot };
