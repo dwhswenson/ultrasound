@@ -62,6 +62,17 @@ global.createImageBitmap = vi.fn().mockImplementation(() =>
 global.URL.createObjectURL = vi.fn().mockReturnValue("mock-url");
 global.URL.revokeObjectURL = vi.fn();
 
+// Mock Path2D for canvas path operations
+global.Path2D = vi.fn().mockImplementation(() => ({
+  moveTo: vi.fn(),
+  lineTo: vi.fn(),
+  closePath: vi.fn(),
+  arc: vi.fn(),
+  rect: vi.fn(),
+  bezierCurveTo: vi.fn(),
+  quadraticCurveTo: vi.fn(),
+}));
+
 // Mock animation frame methods with proper cleanup tracking
 const pendingAnimationFrames = new Map<number, NodeJS.Timeout>();
 let frameIdCounter = 1;
