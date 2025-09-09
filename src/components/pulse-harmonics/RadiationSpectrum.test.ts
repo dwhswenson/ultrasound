@@ -753,6 +753,10 @@ describe("RadiationSpectrumPlot class", () => {
     expect(controls).toBeTruthy();
     expect(controls?.className).toContain("controls");
 
+    // Check for control groups
+    const controlGroups = testElement.querySelectorAll(".control-group");
+    expect(controlGroups.length).toBe(2);
+
     // Check for input elements
     const frInput = testElement.querySelector("#fr") as HTMLInputElement;
     const TbInput = testElement.querySelector("#Tb") as HTMLInputElement;

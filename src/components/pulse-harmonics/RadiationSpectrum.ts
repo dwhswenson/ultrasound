@@ -87,16 +87,18 @@ class RadiationSpectrumPlot {
     const controls = document.createElement("div");
     controls.className = "controls flex gap-2 mb-2";
     controls.innerHTML = `
-      <label>Base freq (Hz):
+      <div class="control-group">
+        <label for="fr">Base freq (Hz)</label>
         <input id="fr" type="number" value="200" min="1" step="10" />
-      </label>
-      <label>Pulse duration T<sub>b</sub> (s):
+      </div>
+      <div class="control-group">
+        <label for="Tb">Pulse duration T<sub>b</sub> (s)</label>
         <input id="Tb" type="number" value="0.0001" min="0.00005" step="0.00005" />
-      </label>
+      </div>
       <div class="max-freq-control">
-        <label>Max freq (Hz):</label>
-        <input id="maxFreq" type="range" value="2500" min="1000" max="50000" step="100" />
+        <label for="maxFreq">Max freq (Hz)</label>
         <input id="maxFreqValue" type="number" value="2500" min="1000" max="50000" step="100" />
+        <input id="maxFreq" type="range" value="2500" min="1000" max="50000" step="100" />
       </div>
     `;
     this.container.appendChild(controls);

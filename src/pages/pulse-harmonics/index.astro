@@ -91,15 +91,22 @@ import Layout from "../../layouts/Layout.astro";
         border-radius: 8px;
         border: 1px solid #e2e8f0;
         flex-wrap: wrap;
-        align-items: center;
+        align-items: flex-start;
     }
 
-    :global(.controls label) {
+    :global(.control-group) {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
         font-weight: 500;
         color: #374151;
+        align-items: center;
+    }
+
+    :global(.control-group label) {
+        font-weight: 500;
+        color: #374151;
+        white-space: nowrap;
     }
 
     :global(.controls input[type="number"]) {
@@ -129,6 +136,7 @@ import Layout from "../../layouts/Layout.astro";
         gap: 0.5rem;
         font-weight: 500;
         color: #374151;
+        align-items: center;
     }
 
     :global(.max-freq-control label) {
@@ -172,10 +180,11 @@ import Layout from "../../layouts/Layout.astro";
             gap: 1rem;
         }
 
-        :global(.controls label) {
+        :global(.control-group) {
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem;
         }
 
         :global(.controls input[type="number"]) {
