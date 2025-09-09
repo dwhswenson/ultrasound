@@ -93,17 +93,20 @@ class RadiationSpectrumPlot {
       <label>Pulse duration T<sub>b</sub> (s):
         <input id="Tb" type="number" value="0.0001" min="0.00005" step="0.00005" />
       </label>
-      <label>Max freq (Hz):
-        <input id="maxFreq" type="range" value="2500" min="1000" max="100000" step="100" />
-        <span id="maxFreqValue">2500</span>
-      </label>
-      <button id="resetZoom">Reset zoom</button>
+      <div class="max-freq-control">
+        <label>Max freq (Hz):</label>
+        <input id="maxFreq" type="range" value="2500" min="1000" max="50000" step="100" />
+        <input id="maxFreqValue" type="number" value="2500" min="1000" max="50000" step="100" />
+      </div>
     `;
     this.container.appendChild(controls);
 
     this.frInput = controls.querySelector("#fr") as HTMLInputElement;
     this.TbInput = controls.querySelector("#Tb") as HTMLInputElement;
     this.maxFreqInput = controls.querySelector("#maxFreq") as HTMLInputElement;
+    const maxFreqValueInput = controls.querySelector(
+      "#maxFreqValue",
+    ) as HTMLInputElement;
 
     const plotDiv = document.createElement("div");
     this.container.appendChild(plotDiv);
@@ -118,15 +121,12 @@ class RadiationSpectrumPlot {
     this.frInput.addEventListener("input", () => this.update());
     this.TbInput.addEventListener("input", () => this.update());
     this.maxFreqInput.addEventListener("input", () => {
-      const maxFreqValue = controls.querySelector(
-        "#maxFreqValue",
-      ) as HTMLSpanElement;
-      maxFreqValue.textContent = this.maxFreqInput.value;
+      maxFreqValueInput.value = this.maxFreqInput.value;
       this.update();
     });
-    controls.querySelector("#resetZoom")!.addEventListener("click", () => {
-      const xscale = this.u.scales.x;
-      this.u.setScale("x", { min: 0, max: xscale.max });
+    maxFreqValueInput.addEventListener("input", () => {
+      this.maxFreqInput.value = maxFreqValueInput.value;
+      this.update();
     });
 
     // Initial render
@@ -161,8 +161,8 @@ class RadiationSpectrumPlot {
       ],
       cursor: {
         drag: {
-          x: true,
-          y: true,
+          x: false,
+          y: false,
         },
       },
       series: [

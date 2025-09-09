@@ -759,21 +759,21 @@ describe("RadiationSpectrumPlot class", () => {
     const maxFreqInput = testElement.querySelector(
       "#maxFreq",
     ) as HTMLInputElement;
-    const maxFreqValue = testElement.querySelector("#maxFreqValue");
-    const resetButton = testElement.querySelector("#resetZoom");
+    const maxFreqValueInput = testElement.querySelector(
+      "#maxFreqValue",
+    ) as HTMLInputElement;
 
     expect(frInput).toBeTruthy();
     expect(TbInput).toBeTruthy();
     expect(maxFreqInput).toBeTruthy();
-    expect(maxFreqValue).toBeTruthy();
-    expect(resetButton).toBeTruthy();
+    expect(maxFreqValueInput).toBeTruthy();
 
     // Check default values
     expect(frInput.value).toBe("200");
     expect(TbInput.value).toBe("0.0001");
     // Check that range input has a valid numeric value
     expect(parseInt(maxFreqInput.value)).toBeGreaterThan(0);
-    expect(maxFreqValue?.textContent).toBeTruthy();
+    expect(maxFreqValueInput.value).toBeTruthy();
   });
 
   test("initializes plotting functionality", async () => {
@@ -799,7 +799,9 @@ describe("RadiationSpectrumPlot class", () => {
     const maxFreqInput = testElement.querySelector(
       "#maxFreq",
     ) as HTMLInputElement;
-    const maxFreqValue = testElement.querySelector("#maxFreqValue");
+    const maxFreqValueInput = testElement.querySelector(
+      "#maxFreqValue",
+    ) as HTMLInputElement;
 
     // Test fr input change
     frInput.value = "300";
@@ -813,7 +815,7 @@ describe("RadiationSpectrumPlot class", () => {
     maxFreqInput.value = "5000";
     maxFreqInput.dispatchEvent(new Event("input"));
 
-    expect(maxFreqValue?.textContent).toBe("5000");
+    expect(maxFreqValueInput.value).toBe("5000");
 
     // Verify inputs maintain their values
     expect(frInput.value).toBe("300");
@@ -821,21 +823,27 @@ describe("RadiationSpectrumPlot class", () => {
     expect(maxFreqInput.value).toBe("5000");
   });
 
-  test("reset zoom button functionality", async () => {
+  test("max frequency input synchronization", async () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
     await mountRadiationSpectrum("#test-container");
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    const resetButton = testElement.querySelector(
-      "#resetZoom",
-    ) as HTMLButtonElement;
+    const maxFreqSlider = testElement.querySelector(
+      "#maxFreq",
+    ) as HTMLInputElement;
+    const maxFreqInput = testElement.querySelector(
+      "#maxFreqValue",
+    ) as HTMLInputElement;
 
-    // Click reset button - should not throw
-    expect(() => resetButton.click()).not.toThrow();
+    // Test slider changing input field
+    maxFreqSlider.value = "3000";
+    maxFreqSlider.dispatchEvent(new Event("input"));
+    expect(maxFreqInput.value).toBe("3000");
 
-    // Verify button exists and is clickable
-    expect(resetButton).toBeTruthy();
-    expect(resetButton.textContent).toContain("Reset zoom");
+    // Test input field changing slider
+    maxFreqInput.value = "4000";
+    maxFreqInput.dispatchEvent(new Event("input"));
+    expect(maxFreqSlider.value).toBe("4000");
   });
 
   test("data filtering works correctly", async () => {
@@ -855,8 +863,10 @@ describe("RadiationSpectrumPlot class", () => {
     expect(maxFreqInput.value).toBe("1500");
 
     // Verify the max freq value display is updated
-    const maxFreqValue = testElement.querySelector("#maxFreqValue");
-    expect(maxFreqValue?.textContent).toBe("1500");
+    const maxFreqValue = testElement.querySelector(
+      "#maxFreqValue",
+    ) as HTMLInputElement;
+    expect(maxFreqValue?.value).toBe("1500");
   });
 
   test("handles edge case inputs gracefully", async () => {
@@ -909,7 +919,7 @@ describe("RadiationSpectrumPlot class", () => {
     expect(TbInput.min).toBe("0.00005");
     expect(TbInput.step).toBe("0.00005");
     expect(maxFreqInput.min).toBe("1000");
-    expect(maxFreqInput.max).toBe("100000");
+    expect(maxFreqInput.max).toBe("50000");
     expect(maxFreqInput.step).toBe("100");
   });
 
