@@ -52,6 +52,14 @@ export function radiationSpectrum(
     amp.push(Math.abs(A));
   }
 
+  // Normalize by analytic maximum: a * Tb * fr (the amplitude at f = 0)
+  const analyticMax = a * Tb * fr;
+  if (analyticMax > 0) {
+    for (let i = 0; i < amp.length; i++) {
+      amp[i] = amp[i] / analyticMax;
+    }
+  }
+
   return { freq, amp };
 }
 
@@ -158,7 +166,7 @@ class RadiationSpectrumPlot {
           label: "Frequency (Hz)",
         },
         {
-          label: "Amplitude (linear)",
+          label: "Normalized Amplitude",
         },
       ],
       cursor: {
