@@ -91,15 +91,22 @@ import Layout from "../../layouts/Layout.astro";
         border-radius: 8px;
         border: 1px solid #e2e8f0;
         flex-wrap: wrap;
-        align-items: center;
+        align-items: flex-start;
     }
 
-    :global(.controls label) {
+    :global(.control-group) {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
         font-weight: 500;
         color: #374151;
+        align-items: center;
+    }
+
+    :global(.control-group label) {
+        font-weight: 500;
+        color: #374151;
+        white-space: nowrap;
     }
 
     :global(.controls input[type="number"]) {
@@ -117,22 +124,36 @@ import Layout from "../../layouts/Layout.astro";
         box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
     }
 
-    :global(.controls button) {
-        background: #06b6d4;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    :global(.controls input[type="range"]) {
+        flex: 1;
+        margin: 0 0.5rem;
+        min-width: 120px;
     }
 
-    :global(.controls button:hover) {
-        background: #0891b2;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    :global(.max-freq-control) {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        font-weight: 500;
+        color: #374151;
+        align-items: center;
+    }
+
+    :global(.max-freq-control label) {
+        margin-bottom: 0.25rem;
+    }
+
+    :global(.max-freq-control input[type="range"]) {
+        margin: 0.25rem 0;
+    }
+
+    :global(.max-freq-control input[type="number"]) {
+        width: 80px;
+        padding: 0.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        transition: border-color 0.3s ease;
     }
 
     /* Responsive design */
@@ -159,13 +180,22 @@ import Layout from "../../layouts/Layout.astro";
             gap: 1rem;
         }
 
-        :global(.controls label) {
+        :global(.control-group) {
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem;
         }
 
         :global(.controls input[type="number"]) {
+            width: 100px;
+        }
+
+        :global(.max-freq-control) {
+            align-items: stretch;
+        }
+
+        :global(.max-freq-control input[type="number"]) {
             width: 100px;
         }
     }

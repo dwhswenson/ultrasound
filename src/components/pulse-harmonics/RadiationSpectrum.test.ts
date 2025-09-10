@@ -110,7 +110,8 @@ describe("radiationSpectrum", () => {
 
       for (let i = 0; i < N; i++) {
         const f = freq[i];
-        const expected = Math.abs(a * Tb * fr * sinc(Math.PI * Tb * f));
+        // After normalization by a * Tb * fr, expected value is |sinc(pi * Tb * f)|
+        const expected = Math.abs(sinc(Math.PI * Tb * f));
         expect(amp[i]).toBeCloseTo(expected, 12);
       }
     });
@@ -320,49 +321,53 @@ describe("radiationSpectrum", () => {
 
   describe("amplitude scaling", () => {
     test("scales linearly with amplitude parameter a", () => {
-      const fr = 150;
-      const Tb = 0.0015;
-      const N = 8;
+      const fr = 100;
+      const Tb = 0.001;
+      const N = 10;
 
       const { amp: amp1 } = radiationSpectrum(fr, Tb, N, 1);
       const { amp: amp3 } = radiationSpectrum(fr, Tb, N, 3);
 
+      // After normalization by a * Tb * fr, amplitudes should be identical regardless of 'a'
       for (let i = 0; i < N; i++) {
-        if (Math.abs(amp1[i]) < 1e-14 && Math.abs(amp3[i]) < 1e-14) continue;
-        expect(amp3[i] / amp1[i]).toBeCloseTo(3, 12);
+        expect(amp3[i]).toBeCloseTo(amp1[i], 12);
       }
     });
 
     test("amplitude relationship with Tb", () => {
       const fr = 100;
-      const N = 5;
+      const N = 10;
       const a = 1;
 
       const { amp: amp1 } = radiationSpectrum(fr, 0.001, N, a);
       const { amp: amp2 } = radiationSpectrum(fr, 0.002, N, a);
 
-      // Amplitude should increase with Tb (though not necessarily linearly due to sinc)
-      expect(amp2[0]).toBeGreaterThan(amp1[0]);
-      // The ratio should be approximately 2, but sinc function affects exact scaling
-      const ratio = amp2[0] / amp1[0];
-      expect(ratio).toBeGreaterThan(1.5);
-      expect(ratio).toBeLessThan(2.5);
+      // After normalization, the relationship depends on sinc function behavior
+      // The first harmonic amplitude = |sinc(π * Tb * fr)|
+      const sinc = (x: number) => (x === 0 ? 1 : Math.sin(x) / x);
+      const expected1 = Math.abs(sinc(Math.PI * 0.001 * fr));
+      const expected2 = Math.abs(sinc(Math.PI * 0.002 * fr));
+
+      expect(amp1[0]).toBeCloseTo(expected1, 12);
+      expect(amp2[0]).toBeCloseTo(expected2, 12);
     });
 
     test("amplitude relationship with fr", () => {
       const Tb = 0.001;
-      const N = 5;
+      const N = 10;
       const a = 1;
 
       const { amp: amp1 } = radiationSpectrum(100, Tb, N, a);
       const { amp: amp2 } = radiationSpectrum(200, Tb, N, a);
 
-      // Amplitude should increase with fr (though not necessarily linearly due to sinc)
-      expect(amp2[0]).toBeGreaterThan(amp1[0]);
-      // The ratio should be approximately 2, but sinc function affects exact scaling
-      const ratio = amp2[0] / amp1[0];
-      expect(ratio).toBeGreaterThan(1.5);
-      expect(ratio).toBeLessThan(2.5);
+      // After normalization, the relationship depends on sinc function behavior
+      // The first harmonic amplitude = |sinc(π * Tb * fr)|
+      const sinc = (x: number) => (x === 0 ? 1 : Math.sin(x) / x);
+      const expected1 = Math.abs(sinc(Math.PI * Tb * 100));
+      const expected2 = Math.abs(sinc(Math.PI * Tb * 200));
+
+      expect(amp1[0]).toBeCloseTo(expected1, 12);
+      expect(amp2[0]).toBeCloseTo(expected2, 12);
     });
 
     test("handles very large amplitude parameter", () => {
@@ -482,7 +487,8 @@ describe("radiationSpectrum", () => {
       // For n=1, f = 100 Hz, sinc argument is π * 0.001 * 100 = π/10
       const x = Math.PI / 10;
       const expectedSinc = Math.sin(x) / x;
-      const expectedAmp = Math.abs(a * Tb * fr * expectedSinc);
+      // After normalization by a * Tb * fr, expected value is |sinc(x)|
+      const expectedAmp = Math.abs(expectedSinc);
 
       expect(amp[0]).toBeCloseTo(expectedAmp, 12);
     });
@@ -496,8 +502,8 @@ describe("radiationSpectrum", () => {
 
       const { amp } = radiationSpectrum(fr, Tb, N, a);
 
-      // Should approach a * Tb * fr * 1 = a * Tb * fr
-      const expected = Math.abs(a * Tb * fr);
+      // After normalization by a * Tb * fr, should approach 1.0
+      const expected = 1.0;
       expect(amp[0]).toBeCloseTo(expected, 10);
     });
   });
@@ -554,9 +560,10 @@ describe("radiationSpectrum", () => {
       // Test the sinc function indirectly through radiationSpectrum
       // with parameters that stress different parts of the sinc calculation
 
-      // Case 1: Very small argument (near sinc(0))
+      // Case 1: Very small argument (near sinc(0) = 1)
       const result1 = radiationSpectrum(1, 1e-15, 1, 1);
-      expect(result1.amp[0]).toBeCloseTo(1e-15, 20);
+      // After normalization, should approach 1.0
+      expect(result1.amp[0]).toBeCloseTo(1.0, 10);
 
       // Case 2: Argument that causes sinc to be exactly zero
       const result2 = radiationSpectrum(1000, 0.001, 1, 1); // π * 0.001 * 1000 = π
@@ -610,7 +617,8 @@ describe("radiationSpectrum", () => {
         baseParams.N,
         2,
       );
-      expect(diffA.amp).not.toEqual(base.amp);
+      // After normalization, amplitude parameter 'a' doesn't affect the result
+      expect(diffA.amp).toEqual(base.amp);
     });
 
     test("boundary value analysis", () => {
@@ -753,27 +761,31 @@ describe("RadiationSpectrumPlot class", () => {
     expect(controls).toBeTruthy();
     expect(controls?.className).toContain("controls");
 
+    // Check for control groups
+    const controlGroups = testElement.querySelectorAll(".control-group");
+    expect(controlGroups.length).toBe(2);
+
     // Check for input elements
     const frInput = testElement.querySelector("#fr") as HTMLInputElement;
     const TbInput = testElement.querySelector("#Tb") as HTMLInputElement;
     const maxFreqInput = testElement.querySelector(
       "#maxFreq",
     ) as HTMLInputElement;
-    const maxFreqValue = testElement.querySelector("#maxFreqValue");
-    const resetButton = testElement.querySelector("#resetZoom");
+    const maxFreqValueInput = testElement.querySelector(
+      "#maxFreqValue",
+    ) as HTMLInputElement;
 
     expect(frInput).toBeTruthy();
     expect(TbInput).toBeTruthy();
     expect(maxFreqInput).toBeTruthy();
-    expect(maxFreqValue).toBeTruthy();
-    expect(resetButton).toBeTruthy();
+    expect(maxFreqValueInput).toBeTruthy();
 
     // Check default values
     expect(frInput.value).toBe("200");
     expect(TbInput.value).toBe("0.0001");
     // Check that range input has a valid numeric value
     expect(parseInt(maxFreqInput.value)).toBeGreaterThan(0);
-    expect(maxFreqValue?.textContent).toBeTruthy();
+    expect(maxFreqValueInput.value).toBeTruthy();
   });
 
   test("initializes plotting functionality", async () => {
@@ -799,7 +811,9 @@ describe("RadiationSpectrumPlot class", () => {
     const maxFreqInput = testElement.querySelector(
       "#maxFreq",
     ) as HTMLInputElement;
-    const maxFreqValue = testElement.querySelector("#maxFreqValue");
+    const maxFreqValueInput = testElement.querySelector(
+      "#maxFreqValue",
+    ) as HTMLInputElement;
 
     // Test fr input change
     frInput.value = "300";
@@ -813,7 +827,7 @@ describe("RadiationSpectrumPlot class", () => {
     maxFreqInput.value = "5000";
     maxFreqInput.dispatchEvent(new Event("input"));
 
-    expect(maxFreqValue?.textContent).toBe("5000");
+    expect(maxFreqValueInput.value).toBe("5000");
 
     // Verify inputs maintain their values
     expect(frInput.value).toBe("300");
@@ -821,21 +835,27 @@ describe("RadiationSpectrumPlot class", () => {
     expect(maxFreqInput.value).toBe("5000");
   });
 
-  test("reset zoom button functionality", async () => {
+  test("max frequency input synchronization", async () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
     await mountRadiationSpectrum("#test-container");
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    const resetButton = testElement.querySelector(
-      "#resetZoom",
-    ) as HTMLButtonElement;
+    const maxFreqSlider = testElement.querySelector(
+      "#maxFreq",
+    ) as HTMLInputElement;
+    const maxFreqInput = testElement.querySelector(
+      "#maxFreqValue",
+    ) as HTMLInputElement;
 
-    // Click reset button - should not throw
-    expect(() => resetButton.click()).not.toThrow();
+    // Test slider changing input field
+    maxFreqSlider.value = "3000";
+    maxFreqSlider.dispatchEvent(new Event("input"));
+    expect(maxFreqInput.value).toBe("3000");
 
-    // Verify button exists and is clickable
-    expect(resetButton).toBeTruthy();
-    expect(resetButton.textContent).toContain("Reset zoom");
+    // Test input field changing slider
+    maxFreqInput.value = "4000";
+    maxFreqInput.dispatchEvent(new Event("input"));
+    expect(maxFreqSlider.value).toBe("4000");
   });
 
   test("data filtering works correctly", async () => {
@@ -855,8 +875,10 @@ describe("RadiationSpectrumPlot class", () => {
     expect(maxFreqInput.value).toBe("1500");
 
     // Verify the max freq value display is updated
-    const maxFreqValue = testElement.querySelector("#maxFreqValue");
-    expect(maxFreqValue?.textContent).toBe("1500");
+    const maxFreqValue = testElement.querySelector(
+      "#maxFreqValue",
+    ) as HTMLInputElement;
+    expect(maxFreqValue?.value).toBe("1500");
   });
 
   test("handles edge case inputs gracefully", async () => {
@@ -909,7 +931,7 @@ describe("RadiationSpectrumPlot class", () => {
     expect(TbInput.min).toBe("0.00005");
     expect(TbInput.step).toBe("0.00005");
     expect(maxFreqInput.min).toBe("1000");
-    expect(maxFreqInput.max).toBe("100000");
+    expect(maxFreqInput.max).toBe("50000");
     expect(maxFreqInput.step).toBe("100");
   });
 

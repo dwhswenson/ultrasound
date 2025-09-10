@@ -52,6 +52,14 @@ export function radiationSpectrum(
     amp.push(Math.abs(A));
   }
 
+  // Normalize by analytic maximum: a * Tb * fr (the amplitude at f = 0)
+  const analyticMax = a * Tb * fr;
+  if (analyticMax > 0) {
+    for (let i = 0; i < amp.length; i++) {
+      amp[i] = amp[i] / analyticMax;
+    }
+  }
+
   return { freq, amp };
 }
 
@@ -87,23 +95,28 @@ class RadiationSpectrumPlot {
     const controls = document.createElement("div");
     controls.className = "controls flex gap-2 mb-2";
     controls.innerHTML = `
-      <label>Base freq (Hz):
+      <div class="control-group">
+        <label for="fr">Base freq (Hz)</label>
         <input id="fr" type="number" value="200" min="1" step="10" />
-      </label>
-      <label>Pulse duration T<sub>b</sub> (s):
+      </div>
+      <div class="control-group">
+        <label for="Tb">Pulse duration T<sub>b</sub> (s)</label>
         <input id="Tb" type="number" value="0.0001" min="0.00005" step="0.00005" />
-      </label>
-      <label>Max freq (Hz):
-        <input id="maxFreq" type="range" value="2500" min="1000" max="100000" step="100" />
-        <span id="maxFreqValue">2500</span>
-      </label>
-      <button id="resetZoom">Reset zoom</button>
+      </div>
+      <div class="max-freq-control">
+        <label for="maxFreq">Max freq (Hz)</label>
+        <input id="maxFreqValue" type="number" value="2500" min="1000" max="50000" step="100" />
+        <input id="maxFreq" type="range" value="2500" min="1000" max="50000" step="100" />
+      </div>
     `;
     this.container.appendChild(controls);
 
     this.frInput = controls.querySelector("#fr") as HTMLInputElement;
     this.TbInput = controls.querySelector("#Tb") as HTMLInputElement;
     this.maxFreqInput = controls.querySelector("#maxFreq") as HTMLInputElement;
+    const maxFreqValueInput = controls.querySelector(
+      "#maxFreqValue",
+    ) as HTMLInputElement;
 
     const plotDiv = document.createElement("div");
     this.container.appendChild(plotDiv);
@@ -118,15 +131,12 @@ class RadiationSpectrumPlot {
     this.frInput.addEventListener("input", () => this.update());
     this.TbInput.addEventListener("input", () => this.update());
     this.maxFreqInput.addEventListener("input", () => {
-      const maxFreqValue = controls.querySelector(
-        "#maxFreqValue",
-      ) as HTMLSpanElement;
-      maxFreqValue.textContent = this.maxFreqInput.value;
+      maxFreqValueInput.value = this.maxFreqInput.value;
       this.update();
     });
-    controls.querySelector("#resetZoom")!.addEventListener("click", () => {
-      const xscale = this.u.scales.x;
-      this.u.setScale("x", { min: 0, max: xscale.max });
+    maxFreqValueInput.addEventListener("input", () => {
+      this.maxFreqInput.value = maxFreqValueInput.value;
+      this.update();
     });
 
     // Initial render
@@ -156,13 +166,13 @@ class RadiationSpectrumPlot {
           label: "Frequency (Hz)",
         },
         {
-          label: "Amplitude (linear)",
+          label: "Normalized Amplitude",
         },
       ],
       cursor: {
         drag: {
-          x: true,
-          y: true,
+          x: false,
+          y: false,
         },
       },
       series: [
