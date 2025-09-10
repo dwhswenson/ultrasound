@@ -23,8 +23,10 @@ import Layout from "../../layouts/Layout.astro";
                     <fieldset>
                         <legend>Animation Timing</legend>
                         <div class="control-group">
-                            <label>
-                                Speed of Sound (px/s):
+                            <div class="control-field">
+                                <label for="speedOfSound"
+                                    >Speed of Sound (px/s):</label
+                                >
                                 <input
                                     type="number"
                                     id="speedOfSound"
@@ -34,10 +36,12 @@ import Layout from "../../layouts/Layout.astro";
                                     max="500"
                                     title="Controls animation speed - lower is slower, higher is faster"
                                 />
-                            </label>
+                            </div>
 
-                            <label>
-                                Movie Duration (seconds):
+                            <div class="control-field">
+                                <label for="movieDuration"
+                                    >Movie Duration (seconds):</label
+                                >
                                 <input
                                     type="number"
                                     id="movieDuration"
@@ -45,15 +49,17 @@ import Layout from "../../layouts/Layout.astro";
                                     step="0.5"
                                     min="1.0"
                                 />
-                            </label>
+                            </div>
                         </div>
                     </fieldset>
 
                     <fieldset>
                         <legend>Transducer Parameters</legend>
                         <div class="control-group">
-                            <label>
-                                Number of elements:
+                            <div class="control-field">
+                                <label for="numElements"
+                                    >Number of elements:</label
+                                >
                                 <input
                                     type="number"
                                     id="numElements"
@@ -62,9 +68,9 @@ import Layout from "../../layouts/Layout.astro";
                                     max="64"
                                     step="1"
                                 />
-                            </label>
-                            <label>
-                                Pitch (px):
+                            </div>
+                            <div class="control-field">
+                                <label for="pitch">Pitch (px):</label>
                                 <input
                                     type="number"
                                     id="pitch"
@@ -73,15 +79,15 @@ import Layout from "../../layouts/Layout.astro";
                                     min="10"
                                     title="Distance between element centers"
                                 />
-                            </label>
+                            </div>
                         </div>
                     </fieldset>
 
                     <fieldset style="display: none;">
                         <legend>🎯 Focusing Target</legend>
                         <div class="control-group">
-                            <label>
-                                Target X (px):
+                            <div class="control-field">
+                                <label for="targetX">Target X (px):</label>
                                 <input
                                     type="number"
                                     id="targetX"
@@ -90,9 +96,9 @@ import Layout from "../../layouts/Layout.astro";
                                     min="0"
                                     max="640"
                                 />
-                            </label>
-                            <label>
-                                Target Y (px):
+                            </div>
+                            <div class="control-field">
+                                <label for="targetY">Target Y (px):</label>
                                 <input
                                     type="number"
                                     id="targetY"
@@ -101,7 +107,7 @@ import Layout from "../../layouts/Layout.astro";
                                     min="0"
                                     max="480"
                                 />
-                            </label>
+                            </div>
                         </div>
                         <div id="targetStatus" style="margin-top: 10px;">
                             <span class="status-indicator status-neutral"
@@ -256,7 +262,6 @@ import Layout from "../../layouts/Layout.astro";
         display: flex;
         flex-wrap: wrap;
         gap: 1.5rem;
-        align-items: center;
         margin-bottom: 1rem;
     }
 
@@ -264,13 +269,21 @@ import Layout from "../../layouts/Layout.astro";
         margin-bottom: 0;
     }
 
-    .control-group label {
-        margin-bottom: 0;
+    .control-field {
         display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        align-items: flex-start;
+        gap: 1rem;
+        min-width: 200px;
+        flex: 1;
+    }
+
+    .control-field label {
         color: #374151;
         font-weight: 500;
+        font-size: 0.875rem;
+        margin-bottom: 0;
+        flex: 0 0 140px;
+        line-height: 1.4;
     }
 
     input[type="number"] {
@@ -280,6 +293,7 @@ import Layout from "../../layouts/Layout.astro";
         border-radius: 6px;
         font-size: 0.875rem;
         transition: border-color 0.3s ease;
+        box-sizing: border-box;
     }
 
     input[type="number"]:focus {
@@ -440,19 +454,24 @@ import Layout from "../../layouts/Layout.astro";
 
         .control-group {
             flex-direction: column;
-            align-items: flex-start;
             gap: 1rem;
         }
 
-        .control-group label {
+        .control-field {
+            min-width: auto;
+            width: 100%;
             flex-direction: column;
             align-items: flex-start;
-            gap: 0.25rem;
+            gap: 0.5rem;
+        }
+
+        .control-field label {
+            flex: none;
         }
 
         input[type="number"] {
             width: 100%;
-            max-width: 200px;
+            max-width: 300px;
         }
 
         .button-group,
