@@ -139,6 +139,13 @@ import Layout from "../../layouts/Layout.astro";
         align-items: center;
     }
 
+    :global(.max-freq-control-top) {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
     :global(.max-freq-control label) {
         margin-bottom: 0.25rem;
     }
@@ -193,6 +200,13 @@ import Layout from "../../layouts/Layout.astro";
 
         :global(.max-freq-control) {
             align-items: stretch;
+        }
+
+        :global(.max-freq-control-top) {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
         }
 
         :global(.max-freq-control input[type="number"]) {

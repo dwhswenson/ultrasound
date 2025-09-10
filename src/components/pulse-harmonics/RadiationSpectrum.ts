@@ -104,8 +104,10 @@ class RadiationSpectrumPlot {
         <input id="Tb" type="number" value="0.0001" min="0.00005" step="0.00005" />
       </div>
       <div class="max-freq-control">
-        <label for="maxFreq">Max freq (Hz)</label>
-        <input id="maxFreqValue" type="number" value="2500" min="1000" max="50000" step="100" />
+        <div class="max-freq-control-top">
+          <label for="maxFreq">Max freq (Hz)</label>
+          <input id="maxFreqValue" type="number" value="2500" min="1000" max="50000" step="100" />
+        </div>
         <input id="maxFreq" type="range" value="2500" min="1000" max="50000" step="100" />
       </div>
     `;
