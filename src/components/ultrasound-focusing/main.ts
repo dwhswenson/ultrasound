@@ -513,7 +513,7 @@ function playMovie(): void {
 
   isPlaying = true;
   playPauseMovieBtn.textContent = "⏸️ Pause";
-  (stopMovieBtn as HTMLButtonElement).disabled = false;
+  stopMovieBtn.disabled = false;
 
   // Render current frame immediately (important when resuming from pause)
   renderFrame(currentFrame);
@@ -547,7 +547,7 @@ function pauseMovie(): void {
 function stopMovie(): void {
   isPlaying = false;
   playPauseMovieBtn.textContent = "▶️ Play Movie";
-  (stopMovieBtn as HTMLButtonElement).disabled = true;
+  stopMovieBtn.disabled = true;
 
   if (playInterval !== null) {
     clearInterval(playInterval);
@@ -737,6 +737,66 @@ async function generateAndRenderInitialFrame(): Promise<void> {
 }
 
 /**
+ * Resets the download movie button to its default state
+ */
+function resetDownloadMovieButton(): void {
+  downloadMovieBtn.textContent = "🎥 Download Movie";
+  downloadMovieBtn.disabled = false;
+}
+
+/**
+ * Gathers movie generation parameters from UI inputs and validates them
+ * @returns Movie parameters or null if validation fails
+ */
+function gatherMovieParameters(): {
+  numElements: number;
+  pitch: number;
+  movieDuration: number;
+  targetType: string;
+  targetX?: number;
+  targetY?: number;
+} | null {
+  const numElements = parseInt(numElementsInput.value, 10);
+  const pitch = parseFloat(pitchInput.value);
+  const movieDuration = parseFloat(movieDurationInput.value);
+
+  // Check if target is set
+  const hasTarget = targetXInput.value && targetYInput.value;
+  const targetType = hasTarget ? "point" : "linear";
+  let targetX: number | undefined;
+  let targetY: number | undefined;
+
+  if (hasTarget) {
+    targetX = parseFloat(targetXInput.value);
+    targetY = parseFloat(targetYInput.value);
+
+    // Validate target point before generating movie
+    const elementX = canvas.width * DEFAULT_ELEMENT_X_POSITION;
+    const validation = validateTargetPoint(
+      targetX,
+      targetY,
+      canvas.width,
+      canvas.height,
+      elementX,
+    );
+
+    if (!validation.isValid) {
+      alert(`Cannot generate movie: ${validation.errorMessage}`);
+      return null;
+    }
+  }
+
+  return {
+    numElements,
+    pitch,
+    movieDuration,
+    targetType,
+    targetX,
+    targetY,
+  };
+}
+
+/**
  * Initialize UI event listeners and DOM references.
  * Call this when the DOM is ready.
  */
@@ -799,44 +859,20 @@ async function initializeUI(): Promise<void> {
       return;
     }
 
-    const numElements = parseInt(numElementsInput.value, 10);
-    const pitch = parseFloat(pitchInput.value);
-    const movieDuration = parseFloat(movieDurationInput.value);
-
-    // Check if target is set
-    const hasTarget = targetXInput.value && targetYInput.value;
-    const targetType = hasTarget ? "point" : "linear";
-
-    let targetX, targetY;
-    if (hasTarget) {
-      targetX = parseFloat(targetXInput.value);
-      targetY = parseFloat(targetYInput.value);
-
-      // Validate target point before generating movie
-      const elementX = canvas.width * DEFAULT_ELEMENT_X_POSITION;
-      const validation = validateTargetPoint(
-        targetX,
-        targetY,
-        canvas.width,
-        canvas.height,
-        elementX,
-      );
-
-      if (!validation.isValid) {
-        alert(`Cannot generate movie: ${validation.errorMessage}`);
-        return;
-      }
+    const params = gatherMovieParameters();
+    if (!params) {
+      return; // Validation failed, error already shown
     }
 
     // Reset to beginning for new movie
     currentFrame = 0;
     await generateMovie(
-      numElements,
-      pitch,
-      movieDuration,
-      targetType,
-      targetX,
-      targetY,
+      params.numElements,
+      params.pitch,
+      params.movieDuration,
+      params.targetType,
+      params.targetX,
+      params.targetY,
     );
     playMovie();
   });
@@ -1020,6 +1056,8 @@ export {
   initializeUI,
   generateAndRenderInitialFrame,
   updateInitialFrame,
+  resetDownloadMovieButton,
+  gatherMovieParameters,
 };
 
 /**
@@ -1034,59 +1072,32 @@ async function downloadMovie(): Promise<void> {
     downloadMovieBtn.disabled = true;
 
     try {
-      const numElements = parseInt(numElementsInput.value, 10);
-      const pitch = parseFloat(pitchInput.value);
-      const movieDuration = parseFloat(movieDurationInput.value);
-
-      // Check if target is set
-      const hasTarget = targetXInput.value && targetYInput.value;
-      const targetType = hasTarget ? "point" : "linear";
-      let targetX: number | undefined;
-      let targetY: number | undefined;
-
-      if (hasTarget) {
-        targetX = parseFloat(targetXInput.value);
-        targetY = parseFloat(targetYInput.value);
-
-        // Validate target point before generating movie
-        const elementX = canvas.width * DEFAULT_ELEMENT_X_POSITION;
-        const validation = validateTargetPoint(
-          targetX,
-          targetY,
-          canvas.width,
-          canvas.height,
-          elementX,
-        );
-
-        if (!validation.isValid) {
-          alert(`Cannot generate movie: ${validation.errorMessage}`);
-          downloadMovieBtn.textContent = "🎥 Download Movie";
-          (downloadMovieBtn as HTMLButtonElement).disabled = false;
-          return;
-        }
+      const params = gatherMovieParameters();
+      if (!params) {
+        resetDownloadMovieButton();
+        return; // Validation failed, error already shown
       }
 
       await generateMovie(
-        numElements,
-        pitch,
-        movieDuration,
-        targetType,
-        targetX,
-        targetY,
+        params.numElements,
+        params.pitch,
+        params.movieDuration,
+        params.targetType,
+        params.targetX,
+        params.targetY,
       );
 
       const frameRateForLog = APP_FRAME_RATE;
       console.log(
-        `Generated ${frames.length} frames for ${movieDuration}s duration at ${frameRateForLog}fps`,
+        `Generated ${frames.length} frames for ${params.movieDuration}s duration at ${frameRateForLog}fps`,
       );
       console.log(
-        `Expected frames: ${Math.ceil(movieDuration * frameRateForLog)}, Actual frames: ${frames.length}`,
+        `Expected frames: ${Math.ceil(params.movieDuration * frameRateForLog)}, Actual frames: ${frames.length}`,
       );
     } catch (error) {
       console.error("Error generating movie frames:", error);
       alert("Failed to generate movie frames. Please try again.");
-      downloadMovieBtn.textContent = "🎥 Download Movie";
-      downloadMovieBtn.disabled = false;
+      resetDownloadMovieButton();
       return;
     }
   }
@@ -1262,21 +1273,18 @@ async function downloadMovieWithMediaRecorder(): Promise<void> {
         URL.revokeObjectURL(url);
 
         // Reset button state
-        downloadMovieBtn.textContent = "🎥 Download Movie";
-        (downloadMovieBtn as HTMLButtonElement).disabled = false;
+        resetDownloadMovieButton();
         resolve();
       } catch (error) {
         // Reset button state on error
-        downloadMovieBtn.textContent = "🎥 Download Movie";
-        (downloadMovieBtn as HTMLButtonElement).disabled = false;
+        resetDownloadMovieButton();
         reject(error);
       }
     };
 
     mediaRecorder.onerror = (event) => {
       // Reset button state on error
-      downloadMovieBtn.textContent = "🎥 Download Movie";
-      (downloadMovieBtn as HTMLButtonElement).disabled = false;
+      resetDownloadMovieButton();
       reject(new Error(`MediaRecorder error: ${event}`));
     };
 
