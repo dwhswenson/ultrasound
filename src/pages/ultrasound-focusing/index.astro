@@ -149,8 +149,7 @@ import Layout from "../../layouts/Layout.astro";
                         <button id="nextFrame">Next Frame ⏭</button>
                         <br />
                         <button id="downloadFrame">💾 Download Frame</button>
-                        <!-- TEMPORARILY DISABLED: Download Movie button -->
-                        <!-- <button id="downloadMovie">🎥 Download Movie</button> -->
+                        <button id="downloadMovie">🎥 Download Movie</button>
                         <button type="button" id="unsetTarget" disabled
                             >Unset Target</button
                         >
@@ -168,13 +167,15 @@ import Layout from "../../layouts/Layout.astro";
 
         // Initialize when DOM is ready
         if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", () => {
-                initializeUI();
+            document.addEventListener("DOMContentLoaded", async () => {
+                await initializeUI();
                 updateSpeedDisplay();
             });
         } else {
-            initializeUI();
-            updateSpeedDisplay();
+            (async () => {
+                await initializeUI();
+                updateSpeedDisplay();
+            })();
         }
     </script>
 </Layout>

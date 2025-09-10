@@ -90,6 +90,7 @@ describe("Responsive Canvas Coordinate Scaling", () => {
   let prevFrameBtn: HTMLButtonElement;
   let nextFrameBtn: HTMLButtonElement;
   let downloadFrameBtn: HTMLButtonElement;
+  let downloadMovieBtn: HTMLButtonElement;
   let speedOfSoundInput: HTMLInputElement;
   let movieDurationInput: HTMLInputElement;
   let numElementsInput: HTMLInputElement;
@@ -124,6 +125,7 @@ describe("Responsive Canvas Coordinate Scaling", () => {
     prevFrameBtn = createMockButton("prevFrame");
     nextFrameBtn = createMockButton("nextFrame");
     downloadFrameBtn = createMockButton("downloadFrame");
+    downloadMovieBtn = createMockButton("downloadMovie");
 
     // Add elements to DOM
     document.body.appendChild(canvas);
@@ -139,6 +141,7 @@ describe("Responsive Canvas Coordinate Scaling", () => {
     document.body.appendChild(prevFrameBtn);
     document.body.appendChild(nextFrameBtn);
     document.body.appendChild(downloadFrameBtn);
+    document.body.appendChild(downloadMovieBtn);
 
     // Mock getElementById to return our elements
     const originalGetElementById = document.getElementById;
@@ -157,6 +160,7 @@ describe("Responsive Canvas Coordinate Scaling", () => {
         prevFrame: prevFrameBtn,
         nextFrame: nextFrameBtn,
         downloadFrame: downloadFrameBtn,
+        downloadMovie: downloadMovieBtn,
       };
       return elements[id] || originalGetElementById.call(document, id);
     });

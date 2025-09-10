@@ -15,14 +15,13 @@ let numElementsInput: HTMLInputElement;
 let pitchInput: HTMLInputElement;
 let targetXInput: HTMLInputElement;
 let targetYInput: HTMLInputElement;
-let unsetTargetBtn: HTMLElement;
-let playPauseMovieBtn: HTMLElement;
-let stopMovieBtn: HTMLElement;
-let prevFrameBtn: HTMLElement;
-let nextFrameBtn: HTMLElement;
-let downloadFrameBtn: HTMLElement;
-// TEMPORARILY DISABLED: Download Movie button
-// let downloadMovieBtn: HTMLElement;
+let unsetTargetBtn: HTMLButtonElement;
+let playPauseMovieBtn: HTMLButtonElement;
+let stopMovieBtn: HTMLButtonElement;
+let prevFrameBtn: HTMLButtonElement;
+let nextFrameBtn: HTMLButtonElement;
+let downloadFrameBtn: HTMLButtonElement;
+let downloadMovieBtn: HTMLButtonElement;
 let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D;
 let frames: ImageBitmap[] = [];
@@ -514,7 +513,7 @@ function playMovie(): void {
 
   isPlaying = true;
   playPauseMovieBtn.textContent = "⏸️ Pause";
-  stopMovieBtn.disabled = false;
+  (stopMovieBtn as HTMLButtonElement).disabled = false;
 
   // Render current frame immediately (important when resuming from pause)
   renderFrame(currentFrame);
@@ -548,7 +547,7 @@ function pauseMovie(): void {
 function stopMovie(): void {
   isPlaying = false;
   playPauseMovieBtn.textContent = "▶️ Play Movie";
-  stopMovieBtn.disabled = true;
+  (stopMovieBtn as HTMLButtonElement).disabled = true;
 
   if (playInterval !== null) {
     clearInterval(playInterval);
@@ -603,10 +602,14 @@ async function generateAndRenderInitialFrame(): Promise<void> {
   const canvasElement = document.getElementById(
     "animationCanvas",
   ) as HTMLCanvasElement;
-  if (!canvasElement) return;
+  if (!canvasElement) {
+    return;
+  }
 
   const canvasContext = canvasElement.getContext("2d");
-  if (!canvasContext) return;
+  if (!canvasContext) {
+    return;
+  }
 
   const speedOfSoundElement = document.getElementById(
     "speedOfSound",
@@ -737,7 +740,7 @@ async function generateAndRenderInitialFrame(): Promise<void> {
  * Initialize UI event listeners and DOM references.
  * Call this when the DOM is ready.
  */
-function initializeUI(): void {
+async function initializeUI(): Promise<void> {
   // Get DOM element references
   speedOfSoundInput = document.getElementById(
     "speedOfSound",
@@ -749,14 +752,19 @@ function initializeUI(): void {
   pitchInput = document.getElementById("pitch") as HTMLInputElement;
   targetXInput = document.getElementById("targetX") as HTMLInputElement;
   targetYInput = document.getElementById("targetY") as HTMLInputElement;
-  unsetTargetBtn = document.getElementById("unsetTarget")!;
-  playPauseMovieBtn = document.getElementById("playPauseMovie")!;
-  stopMovieBtn = document.getElementById("stopMovie")!;
-  prevFrameBtn = document.getElementById("prevFrame")!;
-  nextFrameBtn = document.getElementById("nextFrame")!;
-  downloadFrameBtn = document.getElementById("downloadFrame")!;
-  // TEMPORARILY DISABLED: Download Movie button
-  // downloadMovieBtn = document.getElementById("downloadMovie")!;
+  unsetTargetBtn = document.getElementById("unsetTarget")! as HTMLButtonElement;
+  playPauseMovieBtn = document.getElementById(
+    "playPauseMovie",
+  )! as HTMLButtonElement;
+  stopMovieBtn = document.getElementById("stopMovie")! as HTMLButtonElement;
+  prevFrameBtn = document.getElementById("prevFrame")! as HTMLButtonElement;
+  nextFrameBtn = document.getElementById("nextFrame")! as HTMLButtonElement;
+  downloadFrameBtn = document.getElementById(
+    "downloadFrame",
+  )! as HTMLButtonElement;
+  downloadMovieBtn = document.getElementById(
+    "downloadMovie",
+  )! as HTMLButtonElement;
   canvas = document.getElementById("animationCanvas") as HTMLCanvasElement;
   ctx = canvas.getContext("2d")!;
 
@@ -886,14 +894,7 @@ function initializeUI(): void {
     });
   });
 
-  // TEMPORARILY DISABLED: Download Movie button functionality
-  /*
   downloadMovieBtn.addEventListener("click", async () => {
-    if (frames.length === 0) {
-      alert("No movie to download. Please generate a movie first.");
-      return;
-    }
-
     try {
       await downloadMovie();
     } catch (error) {
@@ -901,11 +902,14 @@ function initializeUI(): void {
       alert("Failed to download movie. Please try again.");
     }
   });
-  */
 
   // Simple helper that updates the frame
   const refreshInitialFrame = async () => {
-    await updateInitialFrame();
+    try {
+      await updateInitialFrame();
+    } catch (error) {
+      console.error("Error in refreshInitialFrame:", error);
+    }
   };
 
   // Add click-to-set-target functionality
@@ -951,31 +955,31 @@ function initializeUI(): void {
   });
 
   if (numElementsInput) {
-    numElementsInput.addEventListener("input", () => {
-      refreshInitialFrame();
+    numElementsInput.addEventListener("input", async () => {
+      await refreshInitialFrame();
     });
   }
   if (pitchInput) {
-    pitchInput.addEventListener("input", () => {
-      refreshInitialFrame();
+    pitchInput.addEventListener("input", async () => {
+      await refreshInitialFrame();
     });
   }
   if (speedOfSoundInput) {
-    speedOfSoundInput.addEventListener("input", () => {
+    speedOfSoundInput.addEventListener("input", async () => {
       updateSpeedDisplay();
-      refreshInitialFrame();
+      await refreshInitialFrame();
     });
   }
   if (targetXInput) {
-    targetXInput.addEventListener("input", () => {
+    targetXInput.addEventListener("input", async () => {
       updateUnsetButton();
-      refreshInitialFrame();
+      await refreshInitialFrame();
     });
   }
   if (targetYInput) {
-    targetYInput.addEventListener("input", () => {
+    targetYInput.addEventListener("input", async () => {
       updateUnsetButton();
-      refreshInitialFrame();
+      await refreshInitialFrame();
     });
   }
 
@@ -989,17 +993,12 @@ function initializeUI(): void {
       // Update frame first
       await refreshInitialFrame();
 
-      // Then show feedback
-      try {
-        showTargetSetFeedback(false, "Target unset - using linear mode");
-      } catch (error) {
-        console.error("Error in showTargetSetFeedback:", error);
-      }
+      // Target unset feedback is handled by the UI state change
     });
   }
 
   // Generate and render the initial first frame
-  refreshInitialFrame();
+  await refreshInitialFrame();
 }
 
 // Note: Initialization is now handled by client.ts for Astro compatibility
@@ -1027,9 +1026,71 @@ export {
  * Downloads the current movie frames as a video file.
  * Safari-compatible implementation with fallback methods.
  */
-// TEMPORARILY DISABLED: Download Movie functionality
-/*
 async function downloadMovie(): Promise<void> {
+  // Auto-generate frames if they don't exist
+  if (frames.length === 0) {
+    console.log("No frames found, generating movie first...");
+    downloadMovieBtn.textContent = "Generating frames...";
+    downloadMovieBtn.disabled = true;
+
+    try {
+      const numElements = parseInt(numElementsInput.value, 10);
+      const pitch = parseFloat(pitchInput.value);
+      const movieDuration = parseFloat(movieDurationInput.value);
+
+      // Check if target is set
+      const hasTarget = targetXInput.value && targetYInput.value;
+      const targetType = hasTarget ? "point" : "linear";
+      let targetX: number | undefined;
+      let targetY: number | undefined;
+
+      if (hasTarget) {
+        targetX = parseFloat(targetXInput.value);
+        targetY = parseFloat(targetYInput.value);
+
+        // Validate target point before generating movie
+        const elementX = canvas.width * DEFAULT_ELEMENT_X_POSITION;
+        const validation = validateTargetPoint(
+          targetX,
+          targetY,
+          canvas.width,
+          canvas.height,
+          elementX,
+        );
+
+        if (!validation.isValid) {
+          alert(`Cannot generate movie: ${validation.errorMessage}`);
+          downloadMovieBtn.textContent = "🎥 Download Movie";
+          (downloadMovieBtn as HTMLButtonElement).disabled = false;
+          return;
+        }
+      }
+
+      await generateMovie(
+        numElements,
+        pitch,
+        movieDuration,
+        targetType,
+        targetX,
+        targetY,
+      );
+
+      const frameRateForLog = APP_FRAME_RATE;
+      console.log(
+        `Generated ${frames.length} frames for ${movieDuration}s duration at ${frameRateForLog}fps`,
+      );
+      console.log(
+        `Expected frames: ${Math.ceil(movieDuration * frameRateForLog)}, Actual frames: ${frames.length}`,
+      );
+    } catch (error) {
+      console.error("Error generating movie frames:", error);
+      alert("Failed to generate movie frames. Please try again.");
+      downloadMovieBtn.textContent = "🎥 Download Movie";
+      downloadMovieBtn.disabled = false;
+      return;
+    }
+  }
+
   // Check if MediaRecorder is supported and working
   const isMediaRecorderSupported = () => {
     try {
@@ -1100,56 +1161,12 @@ async function downloadMovie(): Promise<void> {
   // Fallback: Download frames as individual images
   await downloadMovieAsFrameSequence();
 }
-*/
 
-// TEMPORARILY DISABLED: Download Movie functionality
-/*
 /**
  * Downloads movie using MediaRecorder (Chrome, Firefox)
  * Records in background without affecting visible canvas
  */
 async function downloadMovieWithMediaRecorder(): Promise<void> {
-  // Auto-generate frames if they don't exist
-  if (frames.length === 0) {
-    console.log("No frames found, generating movie first...");
-    downloadMovieBtn.textContent = "Generating frames...";
-    (downloadMovieBtn as HTMLButtonElement).disabled = true;
-    const numElements = parseInt(numElementsInput.value, 10);
-    const pitch = parseFloat(pitchInput.value);
-    const movieDuration = parseFloat(movieDurationInput.value);
-
-    const targetType =
-      (
-        document.querySelector(
-          'input[name="target"]:checked',
-        ) as HTMLInputElement
-      )?.value || "linear";
-    let targetX: number | undefined;
-    let targetY: number | undefined;
-
-    if (targetType === "point") {
-      targetX = parseFloat(targetXInput.value);
-      targetY = parseFloat(targetYInput.value);
-    }
-
-    await generateMovie(
-      numElements,
-      pitch,
-      movieDuration,
-      targetType,
-      targetX,
-      targetY,
-    );
-    const frameRateForLog = APP_FRAME_RATE;
-    console.log(
-      `Generated ${frames.length} frames for ${movieDuration}s duration at ${frameRateForLog}fps`,
-    );
-    console.log(
-      `Expected frames: ${Math.ceil(movieDuration * frameRateForLog)}, Actual frames: ${frames.length}`,
-    );
-    downloadMovieBtn.textContent = "Starting video encoding...";
-  }
-
   // Create off-screen canvas for recording
   const offscreenCanvas = document.createElement("canvas");
   offscreenCanvas.width = canvas.width;
@@ -1245,12 +1262,12 @@ async function downloadMovieWithMediaRecorder(): Promise<void> {
         URL.revokeObjectURL(url);
 
         // Reset button state
-        downloadMovieBtn.textContent = "Download Movie";
+        downloadMovieBtn.textContent = "🎥 Download Movie";
         (downloadMovieBtn as HTMLButtonElement).disabled = false;
         resolve();
       } catch (error) {
         // Reset button state on error
-        downloadMovieBtn.textContent = "Download Movie";
+        downloadMovieBtn.textContent = "🎥 Download Movie";
         (downloadMovieBtn as HTMLButtonElement).disabled = false;
         reject(error);
       }
@@ -1258,7 +1275,7 @@ async function downloadMovieWithMediaRecorder(): Promise<void> {
 
     mediaRecorder.onerror = (event) => {
       // Reset button state on error
-      downloadMovieBtn.textContent = "Download Movie";
+      downloadMovieBtn.textContent = "🎥 Download Movie";
       (downloadMovieBtn as HTMLButtonElement).disabled = false;
       reject(new Error(`MediaRecorder error: ${event}`));
     };
@@ -1337,8 +1354,6 @@ async function downloadMovieWithMediaRecorder(): Promise<void> {
   });
 }
 
-// TEMPORARILY DISABLED: Download Movie functionality
-/*
 async function downloadMovieAsFrameSequence(): Promise<void> {
   const zip = await createFrameSequenceZip();
 
@@ -1402,7 +1417,6 @@ async function createFrameSequenceZip(): Promise<Blob> {
   // Return empty blob since we're downloading individual files
   return new Blob([], { type: "application/zip" });
 }
-*/
 
 /**
  * Shows visual feedback when a target point is set by clicking.

@@ -45,33 +45,26 @@ describe("Initial Frame Rendering", () => {
     mockCanvas.addEventListener = vi.fn();
     mockCanvas.dispatchEvent = vi.fn();
 
-    // Create mock input elements
+    // Create mock input elements with proper value handling
+    const createMockInput = (initialValue: string) => ({
+      _value: initialValue,
+      get value() {
+        return this._value;
+      },
+      set value(val: string) {
+        this._value = val;
+      },
+      addEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    });
+
     mockInputs = {
-      speedOfSound: {
-        value: "150",
-        addEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      } as unknown as HTMLInputElement,
-      numElements: {
-        value: "16",
-        addEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      } as unknown as HTMLInputElement,
-      pitch: {
-        value: "50",
-        addEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      } as unknown as HTMLInputElement,
-      targetX: {
-        value: "",
-        addEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      } as unknown as HTMLInputElement,
-      targetY: {
-        value: "",
-        addEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      } as unknown as HTMLInputElement,
+      speedOfSound: createMockInput("150") as unknown as HTMLInputElement,
+      movieDuration: createMockInput("7.0") as unknown as HTMLInputElement,
+      numElements: createMockInput("16") as unknown as HTMLInputElement,
+      pitch: createMockInput("50") as unknown as HTMLInputElement,
+      targetX: createMockInput("") as unknown as HTMLInputElement,
+      targetY: createMockInput("") as unknown as HTMLInputElement,
     };
 
     // Create mock buttons
@@ -97,10 +90,11 @@ describe("Initial Frame Rendering", () => {
       downloadFrame: {
         addEventListener: vi.fn(),
       } as unknown as HTMLButtonElement,
-      // TEMPORARILY DISABLED: Download Movie button
-      // downloadMovie: {
-      //   addEventListener: vi.fn(),
-      // } as unknown as HTMLButtonElement,
+      downloadMovie: {
+        addEventListener: vi.fn(),
+        textContent: "🎥 Download Movie",
+        disabled: false,
+      } as unknown as HTMLButtonElement,
     };
 
     // Mock document.getElementById
@@ -108,8 +102,6 @@ describe("Initial Frame Rendering", () => {
       if (id === "animationCanvas") return mockCanvas;
       if (mockInputs[id]) return mockInputs[id];
       if (mockButtons[id]) return mockButtons[id];
-      // Handle temporarily disabled downloadMovie button
-      if (id === "downloadMovie") return null;
       return null;
     });
 
