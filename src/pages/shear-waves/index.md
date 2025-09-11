@@ -1,6 +1,6 @@
 ---
 layout: ../../layouts/Layout.astro
-title: "Shear Waves - Learn Ultrasound Focusing"
+title: "Shear Waves"
 description: "Understanding shear wave generation and propagation in ultrasound applications"
 ---
 
