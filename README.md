@@ -27,8 +27,8 @@ Explore how pulsed ultrasound generates radiation force spectra:
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- npm or yarn package manager
+- [Node.js](https://nodejs.org/) (v22 or higher)
+- npm package manager
 
 ### Local Development
 
@@ -57,14 +57,15 @@ Explore how pulsed ultrasound generates radiation force spectra:
 - `npm run build` - Build the site for production
 - `npm run preview` - Preview the production build locally
 - `npm run test` - Run the test suite
+- `npm run test:coverage` - Run tests with coverage reporting
 
 ## 🏗️ Technology Stack
 
 - **[Astro](https://astro.build/)** - Static site generator with component islands
-- **TypeScript** - Type-safe JavaScript development
-- **Canvas API** - Real-time 2D graphics and animations
-- **UPlot** - High-performance charting library
-- **Jest** - Testing framework
+- **[TypeScript](https://www.typescriptlang.org/)** - Type-safe JavaScript development
+- **[Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)** - Real-time 2D graphics and animations
+- **[UPlot](https://github.com/leeoniya/uPlot)** - High-performance charting library
+- **[Vitest](https://vitest.dev/)** - Testing framework with native TypeScript support
 
 ## 📁 Project Structure
 
@@ -84,6 +85,9 @@ src/
 │   └── pulse-harmonics/            # Spectrum analysis components
 ├── layouts/
 │   └── Layout.astro                # Base page layout
+├── shared/                         # Shared constants and utilities
+│   └── constants.ts                # Common configuration values
+├── setupTests.ts                   # Test environment configuration
 └── public/                         # Static assets
     └── shear-waves/                # SVG illustrations
         ├── mech_shaker_schematic.svg
@@ -95,10 +99,11 @@ src/
 This project uses automated deployment and infrastructure management:
 
 ### Infrastructure as Code
-The site infrastructure is managed using Terraform in `main.tf`:
-- **Cloudflare Pages** - Static site hosting and CDN
-- **AWS Route 53** - DNS management for custom domain
-- **GitHub Integration** - Automated secrets and variables setup
+The site infrastructure is managed using [Terraform](https://www.terraform.io/) in `main.tf`:
+
+- **[Cloudflare Pages](https://pages.cloudflare.com/)** - Static site hosting and CDN
+- **[AWS Route 53](https://aws.amazon.com/route53/)** - DNS management for custom domain
+- **[GitHub Integration](https://docs.github.com/en/actions)** - Automated secrets and variables setup
 
 To update infrastructure:
 ```bash
@@ -107,9 +112,10 @@ terraform apply
 ```
 
 ### Automated Deployment Pipeline
-The site uses GitHub Actions workflows from the [omsf/static-site-tools](https://github.com/omsf/static-site-tools) repository:
+The site uses [GitHub Actions](https://github.com/features/actions) workflows from the [omsf/static-site-tools](https://github.com/omsf/static-site-tools) repository:
 
 #### Core Workflows:
+
 - **`build-push.yaml`** - Builds the Astro site on every push to main
 - **`prod-cloudflare.yaml`** - Deploys successful builds to production
 - **`stage-cloudflare.yaml`** - Creates staging deployments for pull requests
@@ -118,6 +124,7 @@ The site uses GitHub Actions workflows from the [omsf/static-site-tools](https:/
 
 #### Environment Variables:
 The following GitHub secrets and variables are managed by Terraform:
+
 - `CLOUDFLARE_API_TOKEN` - API access for Cloudflare Pages
 - `CLOUDFLARE_ACCOUNT_ID` - Cloudflare account identifier
 - `CLOUDFLARE_ASTRO_PROJECT_NAME` - Project name for deployments
@@ -132,20 +139,24 @@ npm run build
 
 ## 🧪 Testing
 
-The project includes comprehensive testing:
+The project includes comprehensive testing using Vitest:
 ```bash
 npm test                    # Run all tests
-npm test -- --coverage     # Generate coverage report
+npm run test:coverage       # Generate coverage report
 ```
 
 Tests cover:
+
 - Component functionality
 - Mathematical calculations for wave physics
 - Canvas rendering operations
 
+The test suite runs on Node.js v22 and v24 in the CI pipeline and uses [happy-dom](https://github.com/capricorn86/happy-dom) for DOM simulation.
+
 ## 📚 Educational Use
 
-This site was created as educational material for ultrasound physics and shear wave elastography. All content is designed to:
+This site was created as educational material for [ultrasound physics](https://en.wikipedia.org/wiki/Ultrasound) and [shear wave elastography](https://en.wikipedia.org/wiki/Elastography). All content is designed to:
+
 - Provide interactive learning experiences
 - Visualize complex physics concepts
 - Support academic presentations and research
@@ -156,10 +167,22 @@ This site was created as educational material for ultrasound physics and shear w
 3. **Frequency Analysis**: Exploring harmonic generation in pulsed systems
 4. **Medical Applications**: Connecting physics to clinical ultrasound techniques
 
+## 🤖 Development Philosophy
+
+This project represents an experiment in balancing "vibe-coding" with professional software development practices. The entire codebase, including visualizations and SVG illustrations, was originally generated using AI assistance and then manually refined to achieve the desired educational outcomes.
+
+### AI-Assisted Development Approach:
+- **Code Generation**: All initial implementations were AI-generated, then iteratively improved
+- **Professional Guardrails**: Comprehensive test suites, CI/CD pipelines, and infrastructure as code
+- **Maintainability Focus**: Structured to remain manageable despite rapid AI-assisted development
+- **Quality Assurance**: Automated testing and deployment ensure continued functionality
+
+This approach allows for rapid prototyping and development while maintaining the reliability and maintainability expected in professional software projects. The project serves as a case study in how AI can accelerate development without sacrificing code quality or long-term sustainability.
+
 ## 📄 License
 
 - **Content** (text, images, visualizations): [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/)
-- **Code**: [MIT License](https://opensource.org/license/mit/)
+- **Code**: [MIT License](https://opensource.org/licenses/MIT)
 
 ## 🤝 Contributing
 
