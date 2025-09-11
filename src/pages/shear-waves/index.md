@@ -40,7 +40,7 @@ description: "Understanding shear wave generation and propagation in ultrasound 
     .text-content {
         order: 1;
     }
-    
+
     .image-content {
         order: 2;
     }
@@ -56,7 +56,7 @@ description: "Understanding shear wave generation and propagation in ultrasound 
         max-width: 100%;
         order: 1;
     }
-    
+
     .text-content {
         order: 2;
     }
@@ -80,7 +80,7 @@ description: "Understanding shear wave generation and propagation in ultrasound 
 
 Shear waves play a crucial role in ultrasound elastography and tissue
 characterization. Unlike compressional waves, shear waves propagate much slower
-and are highly sensitive to tissue mechanical properties. 
+and are highly sensitive to tissue mechanical properties.
 
 ## Introduction
 
@@ -113,6 +113,8 @@ part of the proof-of-concept in a number of papers on shear wave elastography.
 However, it clearly isn't practical for clinical use: you're not going to cut
 open a patient and shake their liver to measure its stiffness!
 
+Despite its clinical limitations, mechanical vibration offers some distinct advantages for research applications. External shakers can provide precise control over both frequency and amplitude, allowing researchers to study tissue properties across well-defined parameter ranges. This makes mechanical excitation particularly valuable for validating elastography algorithms, characterizing tissue phantoms, and conducting fundamental studies of tissue biomechanics where controlled experimental conditions are essential.
+
 </div>
 </div>
 
@@ -136,13 +138,23 @@ which assume a constant shear wave speed, to measure the shear wave velocity.
 The shear wave speed is then related to tissue stiffness or viscoelastic
 properties.
 
+The acoustic radiation force approach offers several advantages over mechanical vibration:
+- **Non-invasive**: No physical contact with the patient beyond normal ultrasound probe placement
+- **Localized excitation**: Shear waves can be generated at specific depths and locations
+- **Real-time capability**: Integration with conventional ultrasound imaging systems
+- **Quantitative measurements**: Precise control over excitation parameters
+
 </div>
 </div>
+
+
+## Related Topics
+
 
 This site has a couple additional pages about aspects of how ultrasound can
 create shear waves:
 
-* [Ultrasound Focusing](/ultrasound-focusing/): This page contains an interactive tool to show how 
+* [Ultrasound Focusing](/ultrasound-focusing/): This page contains an interactive tool to show how
   ultrasound can be focused to a specific point in the tissue.
 * [Harmonic Generation](/pulse-harmonics/): This page explains how the square-wave pulse
   sequence used in, for example, shear wave dispersion ultrasound vibrometry
