@@ -160,7 +160,8 @@ class RadiationSpectrumPlot {
           time: false,
         },
         y: {
-          auto: true,
+          auto: false,
+          range: [0, 1],
         },
       },
       axes: [
