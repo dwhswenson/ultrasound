@@ -1,5 +1,10 @@
 name: Upload Astro site to staging
 
+permissions:
+  actions: read
+  statuses: write
+  pull-requests: write
+
 on:
   workflow_run:
     workflows: ["Build Astro site from PR"]

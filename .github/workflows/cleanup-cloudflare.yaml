@@ -1,5 +1,7 @@
 name: Cleanup Astro site staging
 
+permissions: {}
+
 on:
   pull_request_target:
     types: [closed]

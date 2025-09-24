@@ -1,5 +1,8 @@
 name: Build Astro site from PR
 
+permissions:
+  contents: read
+
 on:
   pull_request:
     branches:
