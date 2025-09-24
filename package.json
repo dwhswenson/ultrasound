@@ -28,7 +28,7 @@
     "@esbuild/linux-x64": "^0.25.0",
     "@esbuild/linux-arm64": "^0.25.0",
     "@esbuild/darwin-x64": "^0.25.0",
-    "@esbuild/darwin-arm64": "^0.25.0"
+    "@esbuild/darwin-arm64": "^0.25.10"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.6",
