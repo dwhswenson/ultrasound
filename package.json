@@ -26,7 +26,7 @@
     "@rollup/rollup-darwin-x64": "^4.52.2",
     "@rollup/rollup-darwin-arm64": "^4.52.2",
     "@esbuild/linux-x64": "^0.25.10",
-    "@esbuild/linux-arm64": "^0.25.0",
+    "@esbuild/linux-arm64": "^0.25.10",
     "@esbuild/darwin-x64": "^0.25.0",
     "@esbuild/darwin-arm64": "^0.25.10"
   },
