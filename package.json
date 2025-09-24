@@ -22,7 +22,7 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.0.0",
-    "@rollup/rollup-linux-arm64-gnu": "^4.0.0",
+    "@rollup/rollup-linux-arm64-gnu": "^4.52.2",
     "@rollup/rollup-darwin-x64": "^4.0.0",
     "@rollup/rollup-darwin-arm64": "^4.52.2",
     "@esbuild/linux-x64": "^0.25.0",
