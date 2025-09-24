@@ -40,7 +40,7 @@ updates:
     commit-message:
       prefix: "actions"
       include: "scope"
-    group:
+    groups:
       actions:
         patterns:
           - "*"
