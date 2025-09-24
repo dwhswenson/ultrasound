@@ -8,11 +8,10 @@ updates:
       day: "monday"
       time: "09:00"
     groups:
-      vitest-stack:
+      dev-deps:
         dependency-type: development
-        patterns:
-          - "vitest"
-          - "@vitest/*"
+      prod-deps:
+        dependency-type: production
     open-pull-requests-limit: 10
     commit-message:
       prefix: "npm"
@@ -29,3 +28,19 @@ updates:
     commit-message:
       prefix: "terraform"
       include: "scope"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "actions"
+      include: "scope"
+    group:
+      actions:
+        patterns:
+          - "*"
