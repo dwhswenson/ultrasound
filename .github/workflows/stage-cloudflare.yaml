@@ -1,10 +1,5 @@
 name: Upload Astro site to staging
 
-permissions:
-  actions: read
-  statuses: write
-  pull-requests: write
-
 on:
   workflow_run:
     workflows: ["Build Astro site from PR"]
@@ -14,6 +9,9 @@ on:
 jobs:
   get-metadata:
     if: ${{ github.repository == vars.MAIN_REPO }}
+    permissions:
+      actions: read
+      pull-requests: read
     runs-on: ubuntu-latest
     outputs:
       pr_number: ${{ steps.pr-metadata.outputs.pr-number || steps.backup-metadata.outputs.pr-number }}
@@ -39,6 +37,7 @@ jobs:
     needs: get-metadata
     uses: omsf/static-site-tools/.github/workflows/stage-cloudflare.yaml@main
     permissions:
+      actions: read
       statuses: write
       pull-requests: write
     with:

@@ -1,8 +1,5 @@
 name: Deploy Astro site to production
 
-permissions:
-  actions: read
-
 on:
   workflow_run:
     workflows: ["Build Astro site from push"]
@@ -14,6 +11,8 @@ on:
 jobs:
   deploy-to-prod:
     if: ${{ (github.event.workflow_run.conclusion == 'success') && (github.repository == vars.MAIN_REPO) }}
+    permissions:
+      actions: read
     uses: omsf/static-site-tools/.github/workflows/prod-cloudflare.yaml@main
     with:
       run-id: ${{ github.event.workflow_run.id }}

@@ -1,7 +1,5 @@
 name: Cleanup Astro site staging
 
-permissions: {}
-
 on:
   pull_request_target:
     types: [closed]
@@ -13,6 +11,7 @@ on:
 jobs:
   get-branch-name:
     if: ${{ github.repository == vars.MAIN_REPO }}
+    permissions: {}
     runs-on: ubuntu-latest
     outputs:
       pr_number: ${{ steps.get_pr_number.outputs.pr_num }}
@@ -31,6 +30,9 @@ jobs:
   cleanup-staging:
     needs: get-branch-name
     if: ${{ github.repository == vars.MAIN_REPO }}
+    permissions:
+      contents: read
+      actions: read
     uses: omsf/static-site-tools/.github/workflows/cleanup-cloudflare.yaml@main
     with:
       pr_number: ${{ fromJSON(needs.get-branch-name.outputs.pr_number) }}
