@@ -51,14 +51,16 @@ const mockUPlotInstance = {
 };
 
 // Create a proper constructor mock
-const MockUPlot = vi
-  .fn()
-  .mockImplementation((options: any, data: any, element: any) => {
-    // Store options on the instance so setData can access stemPaths
-    mockUPlotInstance._options = options;
-    mockUPlotInstance.data = data;
-    return mockUPlotInstance;
-  });
+const MockUPlot = vi.fn(function MockUPlotConstructor(
+  options: any,
+  data: any,
+  element: any,
+) {
+  // Store options on the instance so setData can access stemPaths
+  mockUPlotInstance._options = options;
+  mockUPlotInstance.data = data;
+  return mockUPlotInstance;
+});
 
 // Mock the dynamic import module
 vi.mock("uplot", () => ({
@@ -1051,7 +1053,9 @@ describe("RadiationSpectrumPlot class", () => {
       lineTo: vi.fn(),
     };
     const originalPath2D = global.Path2D;
-    global.Path2D = vi.fn().mockImplementation(() => mockPath2D);
+    global.Path2D = vi.fn(function Path2DMock() {
+      return mockPath2D;
+    });
 
     // Mount the plot which will create an instance with stemPaths
     await mountRadiationSpectrum("#test-container");
@@ -1136,12 +1140,12 @@ describe("RadiationSpectrumPlot class", () => {
 
     beforeEach(() => {
       // Mock ResizeObserver globally
-      (global as any).ResizeObserver = vi
-        .fn()
-        .mockImplementation((callback) => {
-          mockResizeObserver.callback = callback;
-          return mockResizeObserver;
-        });
+    (global as any).ResizeObserver = vi.fn(function ResizeObserverMock(
+      callback,
+    ) {
+      mockResizeObserver.callback = callback;
+      return mockResizeObserver;
+    });
 
       // Mock uPlot setSize method
       mockUPlotInstance.setSize = vi.fn();
@@ -1390,7 +1394,9 @@ describe("RadiationSpectrumPlot class", () => {
         disconnect: mockDisconnect,
       };
       const originalResizeObserver = global.ResizeObserver;
-      global.ResizeObserver = vi.fn().mockImplementation(() => mockObserver);
+      global.ResizeObserver = vi.fn(function ResizeObserverMock() {
+        return mockObserver;
+      });
 
       // Mock Path2D to capture stemPaths drawing commands
       const mockPath2D = {
@@ -1398,7 +1404,9 @@ describe("RadiationSpectrumPlot class", () => {
         lineTo: vi.fn(),
       };
       const originalPath2D = global.Path2D;
-      global.Path2D = vi.fn().mockImplementation(() => mockPath2D);
+      global.Path2D = vi.fn(function Path2DMock() {
+        return mockPath2D;
+      });
 
       // Create plot instance
       await mountRadiationSpectrum("#test-container");
@@ -1461,7 +1469,9 @@ describe("RadiationSpectrumPlot class", () => {
         disconnect: mockDisconnect,
       };
       const originalResizeObserver = global.ResizeObserver;
-      global.ResizeObserver = vi.fn().mockImplementation(() => mockObserver);
+      global.ResizeObserver = vi.fn(function ResizeObserverMock() {
+        return mockObserver;
+      });
 
       // Import the exported class for testing
       const { RadiationSpectrumPlot } = await import("./RadiationSpectrum");
@@ -1494,7 +1504,9 @@ describe("RadiationSpectrumPlot class", () => {
         lineTo: vi.fn(),
       };
       const originalPath2D = global.Path2D;
-      global.Path2D = vi.fn().mockImplementation(() => mockPath2D);
+      global.Path2D = vi.fn(function Path2DMock() {
+        return mockPath2D;
+      });
 
       // Create plot and trigger updates
       await mountRadiationSpectrum("#test-container");
@@ -1543,7 +1555,9 @@ describe("RadiationSpectrumPlot class", () => {
         lineTo: vi.fn(),
       };
       const originalPath2D = global.Path2D;
-      global.Path2D = vi.fn().mockImplementation(() => mockPath2D);
+      global.Path2D = vi.fn(function Path2DMock() {
+        return mockPath2D;
+      });
 
       // Trigger an update that should call stemPaths
       const frInput = testElement.querySelector("#fr") as HTMLInputElement;
