@@ -21,20 +21,20 @@
     "vite": "^7.2.4"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.53.2",
-    "@rollup/rollup-linux-arm64-gnu": "^4.53.2",
-    "@rollup/rollup-darwin-x64": "^4.53.2",
-    "@rollup/rollup-darwin-arm64": "^4.53.2",
+    "@rollup/rollup-linux-x64-gnu": "^4.53.3",
+    "@rollup/rollup-linux-arm64-gnu": "^4.53.3",
+    "@rollup/rollup-darwin-x64": "^4.53.3",
+    "@rollup/rollup-darwin-arm64": "^4.53.3",
     "@esbuild/linux-x64": "^0.27.0",
     "@esbuild/linux-arm64": "^0.27.0",
     "@esbuild/darwin-x64": "^0.27.0",
     "@esbuild/darwin-arm64": "^0.27.0"
   },
   "dependencies": {
-    "@astrojs/mdx": "^4.3.10",
+    "@astrojs/mdx": "^4.3.12",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
-    "astro": "^5.15.9",
+    "astro": "^5.16.0",
     "tslib": "^2.8.1",
     "uplot": "^1.6.32"
   }
