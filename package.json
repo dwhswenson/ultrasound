@@ -25,16 +25,16 @@
     "@rollup/rollup-linux-arm64-gnu": "^4.53.3",
     "@rollup/rollup-darwin-x64": "^4.53.3",
     "@rollup/rollup-darwin-arm64": "^4.53.3",
-    "@esbuild/linux-x64": "^0.27.0",
-    "@esbuild/linux-arm64": "^0.27.0",
-    "@esbuild/darwin-x64": "^0.27.0",
-    "@esbuild/darwin-arm64": "^0.27.0"
+    "@esbuild/linux-x64": "^0.27.1",
+    "@esbuild/linux-arm64": "^0.27.1",
+    "@esbuild/darwin-x64": "^0.27.1",
+    "@esbuild/darwin-arm64": "^0.27.1"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.12",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
-    "astro": "^5.16.0",
+    "astro": "^5.16.4",
     "tslib": "^2.8.1",
     "uplot": "^1.6.32"
   }
