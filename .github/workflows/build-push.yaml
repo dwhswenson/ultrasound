@@ -40,7 +40,7 @@ jobs:
         run: tar czf site.tar.gz -C ${{ env.ASTRO_SOURCE_DIR }} ${{ env.ASTRO_OUTPUT_DIR }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: site-build
           path: site.tar.gz
