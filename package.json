@@ -13,9 +13,9 @@
   "devDependencies": {
     "canvas": "^3.2.1",
     "gif.js": "^0.2.0",
-    "vitest": "^4.0.17",
-    "@vitest/coverage-v8": "^4.0.17",
-    "happy-dom": "^20.1.0",
+    "vitest": "^4.0.18",
+    "@vitest/coverage-v8": "^4.0.18",
+    "happy-dom": "^20.3.9",
     "@vitest/ui": "^4.0.6",
     "typescript": "~5.9.3",
     "vite": "^7.3.1"
