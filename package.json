@@ -13,10 +13,10 @@
   "devDependencies": {
     "canvas": "^3.2.2",
     "gif.js": "^0.2.0",
-    "vitest": "^4.1.0",
-    "@vitest/coverage-v8": "^4.1.0",
+    "vitest": "^4.1.2",
+    "@vitest/coverage-v8": "^4.1.2",
     "happy-dom": "^20.8.9",
-    "@vitest/ui": "^4.0.6",
+    "@vitest/ui": "^4.1.2",
     "typescript": "~5.9.3",
     "vite": "^8.0.5"
   },
