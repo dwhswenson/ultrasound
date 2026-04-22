@@ -1,4 +1,5 @@
 import type uPlot from "uplot";
+import "uplot/dist/uPlot.min.css";
 
 // Dynamically import uPlot to avoid SSR issues
 let uPlotLib: typeof uPlot | null = null;
@@ -7,14 +8,6 @@ async function loadUPlot() {
   if (!uPlotLib && typeof window !== "undefined") {
     const uPlotModule = await import("uplot");
     uPlotLib = uPlotModule.default;
-
-    // Load CSS dynamically
-    if (!document.querySelector('link[href*="uPlot"]')) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "https://unpkg.com/uplot@1.6.32/dist/uPlot.min.css";
-      document.head.appendChild(link);
-    }
   }
   return uPlotLib;
 }
