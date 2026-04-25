@@ -15,5 +15,13 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/__tests__/**/*",
+    "src/**/*.bak",
+    "src/setupTests.ts",
+    "coverage",
+    "dist"
+  ]
 }
