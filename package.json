@@ -15,7 +15,7 @@
     "@types/node": "^25.6.0",
     "@vitest/coverage-v8": "^4.1.5",
     "@vitest/ui": "^4.1.5",
-    "canvas": "^3.2.2",
+    "canvas": "^3.2.3",
     "gif.js": "^0.2.0",
     "happy-dom": "^20.9.0",
     "typescript": "~6.0.3",
