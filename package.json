@@ -30,13 +30,13 @@
     "@esbuild/darwin-x64": "^0.28.0",
     "@esbuild/linux-arm64": "^0.28.0",
     "@esbuild/linux-x64": "^0.28.0",
-    "@rollup/rollup-darwin-arm64": "^4.60.4",
-    "@rollup/rollup-darwin-x64": "^4.60.4",
-    "@rollup/rollup-linux-arm64-gnu": "^4.60.4",
-    "@rollup/rollup-linux-x64-gnu": "^4.60.4"
+    "@rollup/rollup-darwin-arm64": "^4.61.1",
+    "@rollup/rollup-darwin-x64": "^4.61.1",
+    "@rollup/rollup-linux-arm64-gnu": "^4.61.1",
+    "@rollup/rollup-linux-x64-gnu": "^4.61.1"
   },
   "dependencies": {
-    "@astrojs/mdx": "^5.0.6",
+    "@astrojs/mdx": "^6.0.2",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
     "astro": "^6.3.7",
