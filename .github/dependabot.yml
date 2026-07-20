@@ -4,8 +4,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "monthly"
       time: "09:00"
     groups:
       dev-deps:
@@ -21,8 +20,7 @@ updates:
   - package-ecosystem: "terraform"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "monthly"
       time: "09:00"
     open-pull-requests-limit: 5
     commit-message:
@@ -33,8 +31,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "monthly"
       time: "09:00"
     open-pull-requests-limit: 5
     commit-message:
