@@ -4,9 +4,8 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: "cron"
+      cronjob: "0 9 * * mon%2"
     groups:
       dev-deps:
         dependency-type: development
@@ -21,9 +20,8 @@ updates:
   - package-ecosystem: "terraform"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: "cron"
+      cronjob: "0 9 * * mon%2"
     open-pull-requests-limit: 5
     commit-message:
       prefix: "terraform"
@@ -33,9 +31,8 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: "cron"
+      cronjob: "0 9 * * mon%2"
     open-pull-requests-limit: 5
     commit-message:
       prefix: "actions"
