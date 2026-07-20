@@ -39,7 +39,7 @@
     "@astrojs/mdx": "^7.0.3",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
-    "astro": "^7.0.9",
+    "astro": "^7.1.1",
     "tslib": "^2.8.1",
     "uplot": "^1.6.32"
   }
