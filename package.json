@@ -36,10 +36,10 @@
     "@rollup/rollup-linux-x64-gnu": "^4.62.3"
   },
   "dependencies": {
-    "@astrojs/mdx": "^7.0.4",
+    "@astrojs/mdx": "^7.0.5",
     "@ffmpeg/ffmpeg": "^0.12.15",
     "@ffmpeg/util": "^0.12.2",
-    "astro": "^7.1.4",
+    "astro": "^7.1.5",
     "tslib": "^2.8.1",
     "uplot": "^1.6.32"
   }
